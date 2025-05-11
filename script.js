@@ -1,55 +1,3 @@
-// Sample data for demo purposes
-const sampleOrders = {
-    "TR20250511A": {
-        trackingCode: "TR20250511A",
-        orderDate: "May 11, 2025",
-        status: "Production",
-        completion: "May 20, 2025",
-        progress: 50,
-        stages: [
-            { name: "PO Received", status: "Completed", date: "May 11, 2025" },
-            { name: "Layout Design", status: "Completed", date: "May 12, 2025" },
-            { name: "Film Printing", status: "Completed", date: "May 13, 2025" },
-            { name: "Production", status: "In Progress", date: "May 14, 2025" },
-            { name: "Quality Control", status: "Pending", date: null },
-            { name: "Shipping", status: "Pending", date: null },
-            { name: "Payment", status: "Pending", date: null }
-        ]
-    },
-    "TR20250510B": {
-        trackingCode: "TR20250510B",
-        orderDate: "May 10, 2025",
-        status: "Layout",
-        completion: "May 25, 2025",
-        progress: 25,
-        stages: [
-            { name: "PO Received", status: "Completed", date: "May 10, 2025" },
-            { name: "Layout Design", status: "In Progress", date: "May 12, 2025" },
-            { name: "Film Printing", status: "Pending", date: null },
-            { name: "Production", status: "Pending", date: null },
-            { name: "Quality Control", status: "Pending", date: null },
-            { name: "Shipping", status: "Pending", date: null },
-            { name: "Payment", status: "Pending", date: null }
-        ]
-    },
-    "TR20250505C": {
-        trackingCode: "TR20250505C",
-        orderDate: "May 5, 2025",
-        status: "Completed",
-        completion: "May 15, 2025",
-        progress: 100,
-        stages: [
-            { name: "PO Received", status: "Completed", date: "May 5, 2025" },
-            { name: "Layout Design", status: "Completed", date: "May 7, 2025" },
-            { name: "Film Printing", status: "Completed", date: "May 8, 2025" },
-            { name: "Production", status: "Completed", date: "May 10, 2025" },
-            { name: "Quality Control", status: "Completed", date: "May 12, 2025" },
-            { name: "Shipping", status: "Completed", date: "May 14, 2025" },
-            { name: "Payment", status: "Completed", date: "May 15, 2025" }
-        ]
-    }
-};
-
 // Function to display order details
 function displayOrderDetails(trackingCode) {
     const resultDiv = document.getElementById('result');
@@ -67,39 +15,72 @@ function displayOrderDetails(trackingCode) {
     document.getElementById('order-completion').textContent = order.completion;
     
     // Update progress bar
-    const progressBar = document.querySelector('.progress-bar');
+    const progressBar = document.getElementById('progress-bar');
     progressBar.style.width = `${order.progress}%`;
     progressBar.textContent = `${order.progress}%`;
     
+    // Set progress bar color based on progress
+    if (order.progress < 30) {
+        progressBar.classList.remove('bg-success', 'bg-warning');
+        progressBar.classList.add('bg-primary');
+    } else if (order.progress < 70) {
+        progressBar.classList.remove('bg-success', 'bg-primary');
+        progressBar.classList.add('bg-warning');
+    } else {
+        progressBar.classList.remove('bg-warning', 'bg-primary');
+        progressBar.classList.add('bg-success');
+    }
+    
     // Update timeline
-    const timeline = document.querySelector('.list-group');
+    const timeline = document.getElementById('status-timeline');
     if (timeline) {
         timeline.innerHTML = '';
         
         order.stages.forEach(stage => {
             const item = document.createElement('li');
-            item.className = 'list-group-item d-flex justify-content-between align-items-center';
+            item.className = 'timeline-item';
             
-            const nameSpan = document.createElement('span');
-            nameSpan.textContent = stage.name;
-            if (stage.date) {
-                nameSpan.textContent += ` (${stage.date})`;
-            }
-            
-            const statusBadge = document.createElement('span');
-            
+            // Add class based on stage status
             if (stage.status === 'Completed') {
-                statusBadge.className = 'badge bg-success rounded-pill';
+                item.classList.add('completed-stage');
             } else if (stage.status === 'In Progress') {
-                statusBadge.className = 'badge bg-warning rounded-pill';
+                item.classList.add('in-progress-stage');
             } else {
-                statusBadge.className = 'badge bg-secondary rounded-pill';
+                item.classList.add('pending-stage');
             }
             
-            statusBadge.textContent = stage.status;
+            const icon = document.createElement('div');
+            icon.className = 'timeline-icon';
             
-            item.appendChild(nameSpan);
-            item.appendChild(statusBadge);
+            // Icon based on stage status
+            if (stage.status === 'Completed') {
+                icon.innerHTML = '<i class="fas fa-check"></i>';
+            } else if (stage.status === 'In Progress') {
+                icon.innerHTML = '<i class="fas fa-spinner"></i>';
+            } else {
+                icon.innerHTML = '<i class="fas fa-clock"></i>';
+            }
+            
+            const content = document.createElement('div');
+            content.className = 'timeline-content';
+            
+            let badgeClass = 'bg-secondary';
+            if (stage.status === 'Completed') {
+                badgeClass = 'bg-success';
+            } else if (stage.status === 'In Progress') {
+                badgeClass = 'bg-warning text-dark';
+            }
+            
+            content.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-1">${stage.name}</h5>
+                    <span class="badge ${badgeClass}">${stage.status}</span>
+                </div>
+                ${stage.date ? `<p class="mb-0 text-muted"><i class="far fa-calendar-alt me-1"></i> ${stage.date}</p>` : ''}
+            `;
+            
+            item.appendChild(icon);
+            item.appendChild(content);
             timeline.appendChild(item);
         });
     }
@@ -116,18 +97,6 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const trackingCode = document.getElementById('tracking-code').value.trim().toUpperCase();
             displayOrderDetails(trackingCode);
-        });
-    }
-    
-    const loginForm = document.getElementById('login-form');
-    
-    if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const role = document.getElementById('role').value;
-            
-            alert(`In a real application, you would now be logged in as ${role} with email ${email}`);
         });
     }
 });
