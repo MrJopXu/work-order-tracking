@@ -4,14 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Order Tracking System</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="#">Work Order Tracker</a>
+            <a class="navbar-brand" href="#"><i class="fas fa-clipboard-list me-2"></i>Work Order Tracker</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -31,89 +33,121 @@
         </div>
     </nav>
 
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <h1>Work Order Tracking System</h1>
-                <p class="lead">Track your production workflow from PO to delivery</p>
+    <!-- Hero Section -->
+    <div class="container-fluid hero-section py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="display-4 text-white fw-bold">Work Order Tracking System</h1>
+                    <p class="lead text-white">Effortlessly track your production workflow from PO to delivery</p>
+                    <div class="mt-4">
+                        <a href="tracking.html" class="btn btn-light btn-lg me-2">Track Your Order</a>
+                        <a href="login.html" class="btn btn-outline-light btn-lg">Staff Login</a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-center d-none d-md-block">
+                    <img src="https://placehold.co/600x400/007bff/white?text=Work+Order+Tracking" alt="Work Order Illustration" class="img-fluid rounded shadow">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="container my-5">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2 class="section-title">How It Works</h2>
+                <p class="section-subtitle">Our streamlined process from start to finish</p>
             </div>
         </div>
         
-        <div class="row mt-5">
-            <div class="col-md-4">
-                <div class="card">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 feature-card">
                     <div class="card-body text-center">
-                        <h3>Track Orders</h3>
-                        <p>Check the status of your current orders</p>
-                        <a href="tracking.html" class="btn btn-primary">Track Now</a>
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-file-invoice fa-3x text-primary"></i>
+                        </div>
+                        <h3 class="card-title">Order Placement</h3>
+                        <p class="card-text">Submit your Purchase Order and receive a unique tracking code to monitor your order's progress.</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 feature-card">
                     <div class="card-body text-center">
-                        <h3>Staff Login</h3>
-                        <p>Login for employees to manage orders</p>
-                        <a href="login.html" class="btn btn-primary">Login</a>
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-cogs fa-3x text-primary"></i>
+                        </div>
+                        <h3 class="card-title">Production Process</h3>
+                        <p class="card-text">Track your order through each stage: layout, film printing, production, and quality control.</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 feature-card">
                     <div class="card-body text-center">
-                        <h3>Contact Us</h3>
-                        <p>Questions about your orders?</p>
-                        <a href="#contact" class="btn btn-primary">Contact</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mt-5" id="contact">
-            <div class="col-md-6 mx-auto">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="mb-0">Contact Us</h3>
-                    </div>
-                    <div class="card-body">
-                        <form id="contact-form">
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Your Name</label>
-                                <input type="text" class="form-control" id="name" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" id="email" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="message" class="form-label">Message</label>
-                                <textarea class="form-control" id="message" rows="4" required></textarea>
-                            </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">Send Message</button>
-                            </div>
-                        </form>
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-truck fa-3x text-primary"></i>
+                        </div>
+                        <h3 class="card-title">Delivery & Payment</h3>
+                        <p class="card-text">Receive notifications when your order is shipped and complete the payment process.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <footer class="bg-dark text-white mt-5 py-3">
-        <div class="container text-center">
-            <p>&copy; 2025 Work Order Tracking System</p>
+    <!-- Call to Action -->
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="card bg-primary text-white">
+                    <div class="card-body p-5 text-center">
+                        <h3 class="mb-3">Ready to track your order?</h3>
+                        <p class="lead mb-4">Enter your tracking code to see real-time updates on your order status.</p>
+                        <a href="tracking.html" class="btn btn-light btn-lg">Track Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5>Work Order Tracking System</h5>
+                    <p>Streamlining your production workflow from start to finish.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="index.html" class="text-white">Home</a></li>
+                        <li><a href="tracking.html" class="text-white">Track Order</a></li>
+                        <li><a href="login.html" class="text-white">Staff Login</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Contact Us</h5>
+                    <address class="mb-0">
+                        <p class="mb-1"><i class="fas fa-map-marker-alt me-2"></i> 123 Production Street, Jakarta</p>
+                        <p class="mb-1"><i class="fas fa-phone me-2"></i> (021) 1234-5678</p>
+                        <p class="mb-1"><i class="fas fa-envelope me-2"></i> info@workordertracker.com</p>
+                    </address>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="mb-0">&copy; 2025 Work Order Tracking System. All rights reserved.</p>
+                </div>
+            </div>
         </div>
     </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script.js"></script>
-    <script>
-        document.getElementById('contact-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Thank you for your message! We will get back to you soon.');
-            this.reset();
-        });
-    </script>
 </body>
 </html>
