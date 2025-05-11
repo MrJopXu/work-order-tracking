@@ -1,468 +1,186 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Work Order Tracking System</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#"><i class="fas fa-clipboard-list me-2"></i>Work Order Tracker</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="dashboard.html">
-                            <i class="fas fa-tachometer-alt me-1"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="orders-link">
-                            <i class="fas fa-clipboard-list me-1"></i> Work Orders
-                        </a>
-                    </li>
-                    <li class="nav-item" id="nav-customers">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-users me-1"></i> Customers
-                        </a>
-                    </li>
-                    <li class="nav-item" id="nav-reports">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-chart-bar me-1"></i> Reports
-                        </a>
-                    </li>
-                    <li class="nav-item" id="nav-settings">
-                        <a class="nav-link" href="#">
-                            <i class="fas fa-cog me-1"></i> Settings
-                        </a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="user-dropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle me-1"></i> <span id="user-name">User</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profile</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-bell me-2"></i> Notifications</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#" id="logout-btn"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container-fluid mt-4">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-lg-2 d-none d-lg-block sidebar">
-                <div class="user-profile text-center mb-4">
-                    <div class="avatar-circle mx-auto mb-2">
-                        <i class="fas fa-user-tie fa-2x"></i>
-                    </div>
-                    <h6 id="sidebar-user-name">User Name</h6>
-                    <span class="badge bg-primary" id="user-role">Role</span>
-                </div>
-                <div class="list-group">
-                    <a href="dashboard.html" class="list-group-item list-group-item-action active">
-                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action" id="sidebar-orders">
-                        <i class="fas fa-clipboard-list me-2"></i> Work Orders
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action" id="sidebar-customers">
-                        <i class="fas fa-users me-2"></i> Customers
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action" id="sidebar-reports">
-                        <i class="fas fa-chart-bar me-2"></i> Reports
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action" id="sidebar-settings">
-                        <i class="fas fa-cog me-2"></i> Settings
-                    </a>
-                </div>
-            </div>
-            
-            <!-- Main Content -->
-            <main class="col-lg-10 ml-auto px-4">
-                <div class="row mb-4">
-                    <div class="col-md-12">
-                        <h2><i class="fas fa-tachometer-alt me-2"></i> Dashboard</h2>
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                                <li class="breadcrumb-item active">Dashboard</li>
-                            </ol>
-                        </nav>
-                    </div>
-                </div>
-                
-                <div class="alert alert-info" id="role-message">
-                    <i class="fas fa-info-circle me-2"></i> Loading user information...
-                </div>
-                
-                <!-- Stats Cards -->
-                <div class="row mb-4">
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-primary shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                            Total Orders</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">58</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
-                            </div>
+<!-- Data and scripts -->
+<script src="Data.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if user is logged in
+        const userString = localStorage.getItem('currentUser');
+        if (!userString) {
+            alert('Anda belum login. Silakan login terlebih dahulu.');
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        const user = JSON.parse(userString);
+        
+        // Update UI with user info
+        document.getElementById('user-name').textContent = user.name;
+        document.getElementById('sidebar-user-name').textContent = user.name;
+        document.getElementById('user-role').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+        
+        // Show role-specific message
+        let roleMessage = '';
+        let actionButtons = '';
+        
+        switch(user.role) {
+            case 'manager':
+                roleMessage = 'Welcome to your dashboard! As a Manager, you have full access to all features of the system.';
+                actionButtons = `
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <button class="btn btn-primary btn-block w-100">
+                                <i class="fas fa-plus-circle me-2"></i> New Order
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <button class="btn btn-success btn-block w-100">
+                                <i class="fas fa-file-export me-2"></i> Export Reports
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <button class="btn btn-info text-white btn-block w-100">
+                                <i class="fas fa-users me-2"></i> Manage Users
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <button class="btn btn-warning text-dark btn-block w-100">
+                                <i class="fas fa-cog me-2"></i> System Settings
+                            </button>
                         </div>
                     </div>
-                    
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-success shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                            Completed</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">32</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-warning shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                            In Progress</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">24</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-cogs fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card border-left-danger shadow h-100 py-2">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                            Pending</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">2</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-clock fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Charts Row -->
-                <div class="row mb-4">
-                    <div class="col-xl-8 col-lg-7">
-                        <div class="card shadow mb-4">
-                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 class="m-0 font-weight-bold text-primary">Orders Overview</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-area">
-                                    <canvas id="ordersChart" height="300"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-xl-4 col-lg-5">
-                        <div class="card shadow mb-4">
-                            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 class="m-0 font-weight-bold text-primary">Order Status</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-pie">
-                                    <canvas id="statusPieChart" height="300"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Content Row -->
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="card shadow mb-4">
-                            <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Recent Orders</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-hover" id="recent-orders-table">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Tracking Code</th>
-                                                <th>Customer</th>
-                                                <th>Status</th>
-                                                <th>Date</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="recent-orders">
-                                            <!-- Orders will be loaded here -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-lg-6">
-                        <div class="card shadow mb-4">
-                            <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
-                            </div>
-                            <div class="card-body">
-                                <div id="actions-container">
-                                    <!-- Actions will be loaded based on role -->
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="card shadow">
-                            <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Tasks Assigned to You</h6>
-                            </div>
-                            <div class="card-body">
-                                <div id="tasks-container">
-                                    <div class="mb-2 pb-2 border-bottom">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <h6 class="mb-0">TR20250511A - Layout Design</h6>
-                                                <small class="text-muted">Due: May 15, 2025</small>
-                                            </div>
-                                            <span class="badge bg-warning">In Progress</span>
-                                        </div>
-                                    </div>
-                                    <div class="mb-2 pb-2 border-bottom">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <h6 class="mb-0">TR20250510B - QC Review</h6>
-                                                <small class="text-muted">Due: May 12, 2025</small>
-                                            </div>
-                                            <span class="badge bg-danger">Urgent</span>
-                                        </div>
-                                    </div>
-                                    <div class="mb-2 pb-2 border-bottom">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <h6 class="mb-0">TR20250505C - Final Approval</h6>
-                                                <small class="text-muted">Due: May 11, 2025</small>
-                                            </div>
-                                            <span class="badge bg-success">Completed</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
-    </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Data and scripts -->
-    <script src="data.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is logged in
-            const userString = localStorage.getItem('currentUser');
-            if (!userString) {
-                window.location.href = 'login.html';
-                return;
-            }
-            
-            const user = JSON.parse(userString);
-            
-            // Update UI with user info
-            document.getElementById('user-name').textContent = user.name;
-            document.getElementById('sidebar-user-name').textContent = user.name;
-            document.getElementById('user-role').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
-            
-            // Show role-specific message
-            let roleMessage = '';
-            let actionButtons = '';
-            
-            switch(user.role) {
-                case 'manager':
-                    roleMessage = 'Welcome to your dashboard! As a Manager, you have full access to all features of the system.';
-                    actionButtons = `
-                        <div class="row">
-                            <div class="col-md-6 mb-2">
-                                <button class="btn btn-primary btn-block w-100">
-                                    <i class="fas fa-plus-circle me-2"></i> New Order
-                                </button>
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <button class="btn btn-success btn-block w-100">
-                                    <i class="fas fa-file-export me-2"></i> Export Reports
-                                </button>
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <button class="btn btn-info text-white btn-block w-100">
-                                    <i class="fas fa-users me-2"></i> Manage Users
-                                </button>
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <button class="btn btn-warning text-dark btn-block w-100">
-                                    <i class="fas fa-cog me-2"></i> System Settings
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    // Show all nav items for manager
-                    break;
-                    
-                case 'admin':
-                    roleMessage = 'Welcome to your dashboard! As an Admin, you can manage PO entries and shipping information.';
-                    actionButtons = `
-                        <div class="row">
-                            <div class="col-md-6 mb-2">
-                                <button class="btn btn-primary btn-block w-100">
-                                    <i class="fas fa-plus-circle me-2"></i> New Order
-                                </button>
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <button class="btn btn-success btn-block w-100">
-                                    <i class="fas fa-truck me-2"></i> Update Shipping
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    // Hide some nav items for admin
-                    document.getElementById('nav-reports').style.display = 'none';
-                    document.getElementById('sidebar-reports').style.display = 'none';
-                    document.getElementById('nav-settings').style.display = 'none';
-                    document.getElementById('sidebar-settings').style.display = 'none';
-                    break;
-                    
-                case 'designer':
-                    roleMessage = 'Welcome to your dashboard! As a Designer, you can manage layout and film printing stages.';
-                    actionButtons = `
-                        <div class="row">
-                            <div class="col-md-6 mb-2">
-                                <button class="btn btn-primary btn-block w-100">
-                                    <i class="fas fa-paint-brush me-2"></i> Layout Tasks
-                                </button>
-                            </div>
-                            <div class="col-md-6 mb-2">
-                                <button class="btn btn-success btn-block w-100">
-                                    <i class="fas fa-film me-2"></i> Film Tasks
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    // Hide some nav items for designer
-                    document.getElementById('nav-customers').style.display = 'none';
-                    document.getElementById('sidebar-customers').style.display = 'none';
-                    document.getElementById('nav-reports').style.display = 'none';
-                    document.getElementById('sidebar-reports').style.display = 'none';
-                    document.getElementById('nav-settings').style.display = 'none';
-                    document.getElementById('sidebar-settings').style.display = 'none';
-                    break;
-                    
-                case 'production':
-                    roleMessage = 'Welcome to your dashboard! As a Production staff, you can manage production stages.';
-                    actionButtons = `
-                        <div class="row">
-                            <div class="col-12 mb-2">
-                                <button class="btn btn-primary btn-block w-100">
-                                    <i class="fas fa-industry me-2"></i> View Production Tasks
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    // Hide some nav items for production
-                    document.getElementById('nav-customers').style.display = 'none';
-                    document.getElementById('sidebar-customers').style.display = 'none';
-                    document.getElementById('nav-reports').style.display = 'none';
-                    document.getElementById('sidebar-reports').style.display = 'none';
-                    document.getElementById('nav-settings').style.display = 'none';
-                    document.getElementById('sidebar-settings').style.display = 'none';
-                    break;
-                    
-                default:
-                    roleMessage = `Welcome to your ${user.role} dashboard.`;
-            }
-            
-            document.getElementById('role-message').innerHTML = `<i class="fas fa-info-circle me-2"></i> ${roleMessage}`;
-            document.getElementById('actions-container').innerHTML = actionButtons;
-            
-            // Load sample orders
-            const orderKeys = Object.keys(sampleOrders);
-            const recentOrdersEl = document.getElementById('recent-orders');
-            
-            orderKeys.forEach(key => {
-                const order = sampleOrders[key];
-                const tr = document.createElement('tr');
-                
-                let statusClass = 'bg-secondary';
-                if (order.status === 'Completed') {
-                    statusClass = 'bg-success';
-                } else if (order.status === 'Production' || order.status === 'Layout') {
-                    statusClass = 'bg-warning';
-                }
-                
-                tr.innerHTML = `
-                    <td>${order.trackingCode}</td>
-                    <td>Customer ${order.trackingCode.slice(-1)}</td>
-                    <td><span class="badge ${statusClass}">${order.status}</span></td>
-                    <td>${order.orderDate}</td>
-                    <td>
-                        <button class="btn btn-sm btn-primary">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </td>
                 `;
+                // Show all nav items for manager
+                break;
                 
-                recentOrdersEl.appendChild(tr);
-            });
+            case 'admin':
+                roleMessage = 'Welcome to your dashboard! As an Admin, you can manage PO entries and shipping information.';
+                actionButtons = `
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <button class="btn btn-primary btn-block w-100">
+                                <i class="fas fa-plus-circle me-2"></i> New Order
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <button class="btn btn-success btn-block w-100">
+                                <i class="fas fa-truck me-2"></i> Update Shipping
+                            </button>
+                        </div>
+                    </div>
+                `;
+                // Hide some nav items for admin
+                document.getElementById('nav-reports').style.display = 'none';
+                document.getElementById('sidebar-reports').style.display = 'none';
+                document.getElementById('nav-settings').style.display = 'none';
+                document.getElementById('sidebar-settings').style.display = 'none';
+                break;
+                
+            case 'designer':
+                roleMessage = 'Welcome to your dashboard! As a Designer, you can manage layout and film printing stages.';
+                actionButtons = `
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <button class="btn btn-primary btn-block w-100">
+                                <i class="fas fa-paint-brush me-2"></i> Layout Tasks
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <button class="btn btn-success btn-block w-100">
+                                <i class="fas fa-film me-2"></i> Film Tasks
+                            </button>
+                        </div>
+                    </div>
+                `;
+                // Hide some nav items for designer
+                document.getElementById('nav-customers').style.display = 'none';
+                document.getElementById('sidebar-customers').style.display = 'none';
+                document.getElementById('nav-reports').style.display = 'none';
+                document.getElementById('sidebar-reports').style.display = 'none';
+                document.getElementById('nav-settings').style.display = 'none';
+                document.getElementById('sidebar-settings').style.display = 'none';
+                break;
+                
+            case 'production':
+                roleMessage = 'Welcome to your dashboard! As a Production staff, you can manage production stages.';
+                actionButtons = `
+                    <div class="row">
+                        <div class="col-12 mb-2">
+                            <button class="btn btn-primary btn-block w-100">
+                                <i class="fas fa-industry me-2"></i> View Production Tasks
+                            </button>
+                        </div>
+                    </div>
+                `;
+                // Hide some nav items for production
+                document.getElementById('nav-customers').style.display = 'none';
+                document.getElementById('sidebar-customers').style.display = 'none';
+                document.getElementById('nav-reports').style.display = 'none';
+                document.getElementById('sidebar-reports').style.display = 'none';
+                document.getElementById('nav-settings').style.display = 'none';
+                document.getElementById('sidebar-settings').style.display = 'none';
+                break;
+                
+            default:
+                roleMessage = `Welcome to your ${user.role} dashboard.`;
+        }
+        
+        document.getElementById('role-message').innerHTML = `<i class="fas fa-info-circle me-2"></i> ${roleMessage}`;
+        document.getElementById('actions-container').innerHTML = actionButtons;
+        
+        // Load sample orders
+        loadSampleOrders();
+        
+        // Handle logout
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        });
+        
+        // Initialize charts
+        initializeCharts();
+    });
+
+    function loadSampleOrders() {
+        const recentOrdersEl = document.getElementById('recent-orders');
+        if (!recentOrdersEl || !sampleOrders) return;
+        
+        const orderKeys = Object.keys(sampleOrders);
+        
+        orderKeys.forEach(key => {
+            const order = sampleOrders[key];
+            const tr = document.createElement('tr');
             
-            // Handle logout
-            document.getElementById('logout-btn').addEventListener('click', function() {
-                localStorage.removeItem('currentUser');
-                window.location.href = 'index.html';
-            });
+            let statusClass = 'bg-secondary';
+            if (order.status === 'Completed') {
+                statusClass = 'bg-success';
+            } else if (order.status === 'Production' || order.status === 'Layout') {
+                statusClass = 'bg-warning';
+            }
             
-            // Charts
-            const ordersCtx = document.getElementById('ordersChart').getContext('2d');
-            const ordersChart = new Chart(ordersCtx, {
+            tr.innerHTML = `
+                <td>${order.trackingCode}</td>
+                <td>Customer ${order.trackingCode.slice(-1)}</td>
+                <td><span class="badge ${statusClass}">${order.status}</span></td>
+                <td>${order.orderDate}</td>
+                <td>
+                    <button class="btn btn-sm btn-primary">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            `;
+            
+            recentOrdersEl.appendChild(tr);
+        });
+    }
+
+    function initializeCharts() {
+        // Only initialize if Chart.js is loaded and canvas elements exist
+        if (typeof Chart === 'undefined') return;
+        
+        const ordersCtx = document.getElementById('ordersChart');
+        const statusCtx = document.getElementById('statusPieChart');
+        
+        if (ordersCtx) {
+            new Chart(ordersCtx.getContext('2d'), {
                 type: 'line',
                 data: {
                     labels: ['January', 'February', 'March', 'April', 'May'],
@@ -490,9 +208,10 @@
                     }
                 }
             });
-            
-            const statusCtx = document.getElementById('statusPieChart').getContext('2d');
-            const statusChart = new Chart(statusCtx, {
+        }
+        
+        if (statusCtx) {
+            new Chart(statusCtx.getContext('2d'), {
                 type: 'doughnut',
                 data: {
                     labels: ['Completed', 'In Progress', 'Pending'],
@@ -520,7 +239,6 @@
                     }
                 }
             });
-        });
-    </script>
-</body>
-</html>
+        }
+    }
+</script>
