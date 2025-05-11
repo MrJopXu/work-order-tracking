@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Simple Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">Work Order Tracker</a>
+            <div class="d-flex text-white">
+                <span class="me-3" id="user-display">-</span>
+                <button class="btn btn-outline-light btn-sm" id="logout-btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col">
+                <div class="alert alert-info" id="debug-info">
+                    Loading user information...
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">User Information</div>
+                    <div class="card-body">
+                        <p><strong>Username:</strong> <span id="username-display">-</span></p>
+                        <p><strong>Name:</strong> <span id="name-display">-</span></p>
+                        <p><strong>Role:</strong> <span id="role-display">-</span></p>
+                        <p><strong>Email:</strong> <span id="email-display">-</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">Local Storage Contents</div>
+                    <div class="card-body">
+                        <pre id="storage-display" class="border p-3 bg-light" style="overflow-x: auto;">-</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">Test Dashboard Actions</div>
+                    <div class="card-body">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary" id="test-btn">Show Test Alert</button>
+                            <button class="btn btn-warning" id="clear-storage">Clear Local Storage</button>
+                            <a href="login.html" class="btn btn-secondary">Back to Login</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple debugging dashboard 
+        document.addEventListener('DOMContentLoaded', function() {
+            const debugInfo = document.getElementById('debug-info');
+            
+            debugInfo.textContent = "DOM loaded. Checking login status...";
+            
+            try {
+                // Get all localStorage contents for debugging
+                let storageContents = {};
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    storageContents[key] = localStorage.getItem(key);
+                }
+                
+                document.getElementById('storage-display').textContent = 
+                    JSON.stringify(storageContents, null, 2);
+                
+                // Check login
+                const userString = localStorage.getItem('currentUser');
+                if (!userString) {
+                    debugInfo.innerHTML = "ERROR: No user data found in localStorage.<br>" +
+                                         "Please <a href='login.html'>login again</a>.";
+                    debugInfo.className = "alert alert-danger";
+                    return;
+                }
+                
+                // Try to parse the user object
+                let user;
+                try {
+                    user = JSON.parse(userString);
+                    debugInfo.textContent = "Login detected. User data parsed successfully.";
+                    debugInfo.className = "alert alert-success";
+                } catch (e) {
+                    debugInfo.innerHTML = "ERROR: Failed to parse user data.<br>Error: " + e.message;
+                    debugInfo.className = "alert alert-danger";
+                    return;
+                }
+                
+                // Display user data if available
+                if (user) {
+                    document.getElementById('user-display').textContent = `Welcome, ${user.name || 'User'}!`;
+                    document.getElementById('username-display').textContent = user.username || 'Not found';
+                    document.getElementById('name-display').textContent = user.name || 'Not found';
+                    document.getElementById('role-display').textContent = user.role || 'Not found';
+                    document.getElementById('email-display').textContent = user.email || 'Not found';
+                }
+                
+                // Set up button actions
+                document.getElementById('test-btn').addEventListener('click', function() {
+                    alert("Button works! Current user: " + (user ? user.name : "Unknown"));
+                });
+                
+                document.getElementById('clear-storage').addEventListener('click', function() {
+                    if (confirm("Are you sure you want to clear all local storage data?")) {
+                        localStorage.clear();
+                        alert("Local storage cleared. You will need to login again.");
+                        window.location.href = 'login.html';
+                    }
+                });
+                
+                document.getElementById('logout-btn').addEventListener('click', function() {
+                    localStorage.removeItem('currentUser');
+                    alert("Logged out successfully.");
+                    window.location.href = 'login.html';
+                });
+                
+            } catch (error) {
+                debugInfo.innerHTML = "CRITICAL ERROR: " + error.message;
+                debugInfo.className = "alert alert-danger";
+            }
+        });
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
