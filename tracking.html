@@ -3,94 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Track Order - Work Order Tracking System</title>
+    <title>Track Order - Work Order System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="#">Work Order Tracker - Simple Version</a>
+            <a class="navbar-brand" href="#">Work Order Tracker</a>
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="login-simple.html">Login</a>
+                    <a class="nav-link" href="login.html">Login</a>
                 </li>
             </ul>
         </div>
     </nav>
 
     <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="text-center mb-0">Track Your Order (Simple)</h3>
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4>Track Your Order</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    Try: TR20250511A
+                </div>
+                <form id="trackForm">
+                    <div class="mb-3">
+                        <label>Tracking Code</label>
+                        <input type="text" class="form-control" id="code" required>
                     </div>
-                    <div class="card-body">
-                        <form id="tracking-form">
-                            <div class="mb-3">
-                                <label for="tracking-code" class="form-label">Enter Your Tracking Code</label>
-                                <input type="text" class="form-control" id="tracking-code" placeholder="e.g., TR20250511A">
-                                <small class="text-muted">* Try: TR20250511A, TR20250510B, or TR20250505C</small>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Track Order</button>
-                        </form>
-
-                        <div id="result" class="mt-4" style="display: none;">
-                            <div class="alert alert-success">
-                                <h4>Order Found!</h4>
-                                <p><strong>Tracking Code:</strong> <span id="show-code"></span></p>
-                                <p><strong>Status:</strong> <span id="show-status"></span></p>
-                                <p><strong>Date:</strong> <span id="show-date"></span></p>
-                                <p><strong>Progress:</strong> <span id="show-progress"></span>%</p>
-                            </div>
-                        </div>
+                    <button type="submit" class="btn btn-primary">Track</button>
+                </form>
+                
+                <div id="result" style="display:none" class="mt-4">
+                    <div class="alert alert-success">
+                        <h5>Order Found!</h5>
+                        <p>Code: <span id="showCode"></span></p>
+                        <p>Status: <span id="showStatus"></span></p>
+                        <p>Progress: <span id="showProgress"></span>%</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <script>
-        // Sample orders data
-        const orders = {
-            "TR20250511A": {
-                code: "TR20250511A",
-                status: "Production",
-                date: "May 11, 2025",
-                progress: 50
-            },
-            "TR20250510B": {
-                code: "TR20250510B",
-                status: "Layout",
-                date: "May 10, 2025",
-                progress: 25
-            },
-            "TR20250505C": {
-                code: "TR20250505C",
-                status: "Completed",
-                date: "May 5, 2025",
-                progress: 100
-            }
-        };
-
-        // Setup form
-        document.getElementById('tracking-form').addEventListener('submit', function(e) {
+        document.getElementById('trackForm').onsubmit = function(e) {
             e.preventDefault();
+            const code = document.getElementById('code').value.toUpperCase();
             
-            const code = document.getElementById('tracking-code').value.toUpperCase();
-            console.log("Searching for:", code);
-            
-            if (orders[code]) {
-                document.getElementById('show-code').textContent = orders[code].code;
-                document.getElementById('show-status').textContent = orders[code].status;
-                document.getElementById('show-date').textContent = orders[code].date;
-                document.getElementById('show-progress').textContent = orders[code].progress;
+            if (code === 'TR20250511A') {
+                document.getElementById('showCode').textContent = code;
+                document.getElementById('showStatus').textContent = 'Production';
+                document.getElementById('showProgress').textContent = '50';
                 document.getElementById('result').style.display = 'block';
             } else {
                 alert('Order not found!');
                 document.getElementById('result').style.display = 'none';
             }
-        });
+        };
     </script>
 </body>
 </html>
