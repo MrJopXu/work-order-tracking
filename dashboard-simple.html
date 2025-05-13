@@ -140,7 +140,7 @@
                     { name: "Settings", id: "settings" }
                 ],
                 actions: [
-                    '<button class="btn btn-primary btn-sm">Create New Order</button>',
+                    '<button class="btn btn-primary btn-sm" id="create-new-order-btn">Create New Order</button>',
                     '<button class="btn btn-secondary btn-sm">Export Report</button>'
                 ],
                 content: `
@@ -255,7 +255,7 @@
                     { name: "Customer List", id: "customers" }
                 ],
                 actions: [
-                    '<button class="btn btn-primary btn-sm">Create PO</button>',
+                    '<button class="btn btn-primary btn-sm" id="create-po-btn">Create PO</button>',
                     '<button class="btn btn-secondary btn-sm">Update Shipping</button>'
                 ],
                 content: `
@@ -536,8 +536,13 @@
             
             // Action button handlers
             document.addEventListener('click', function(e) {
-                // Create New Order button
-                if (e.target.matches('.btn-primary') && e.target.textContent.includes('Create')) {
+                // Create New Order button (Manager)
+                if (e.target.matches('#create-new-order-btn')) {
+                    handleCreateOrder();
+                }
+                
+                // Create PO button (Admin)
+                if (e.target.matches('#create-po-btn')) {
                     handleCreateOrder();
                 }
                 
@@ -589,7 +594,7 @@
                     showOrdersPage();
                     break;
                 case 'new-order':
-                    showCreateOrderForm();
+                    handleCreateOrder(); // Changed from showCreateOrderForm()
                     break;
                 case 'reports':
                     showReportsPage();
@@ -606,6 +611,7 @@
         }
         
         function handleCreateOrder() {
+            console.log('Creating order, redirecting to create-order.html');
             window.location.href = 'create-order.html';
         }
         
