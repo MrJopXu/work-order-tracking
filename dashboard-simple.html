@@ -3,1126 +3,864 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Work Order System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Work Order System - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --light-bg: #f8fafc;
+            --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --hover-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--light-bg);
+            color: #1f2937;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        /* Mobile First Navbar */
+        .navbar {
+            background: white;
+            box-shadow: var(--card-shadow);
+            padding: 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 1.25rem;
+        }
+        
+        .navbar-brand i {
+            margin-right: 0.5rem;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-info {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--secondary-color);
+            font-size: 0.875rem;
+        }
+        
+        @media (min-width: 768px) {
+            .user-info {
+                display: flex;
+            }
+        }
+        
+        .mobile-menu-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .mobile-menu-btn {
+                display: none;
+            }
+        }
+        
+        /* Sidebar for mobile */
         .sidebar {
-            background-color: #f8f9fa;
-            min-height: calc(100vh - 56px);
-            padding: 20px 0;
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 1001;
+            overflow-y: auto;
         }
         
-        .sidebar .nav-link {
-            color: #333;
-            padding: 10px 20px;
+        .sidebar.active {
+            left: 0;
         }
         
-        .sidebar .nav-link:hover {
-            background-color: #e9ecef;
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
-        .sidebar .nav-link.active {
-            background-color: #007bff;
-            color: white;
+        .sidebar-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            cursor: pointer;
+        }
+        
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        .sidebar-item {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: #374151;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+        
+        .sidebar-item:hover,
+        .sidebar-item.active {
+            background: var(--light-bg);
+            color: var(--primary-color);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .sidebar-item i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Overlay for mobile menu */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .overlay.active {
+            display: block;
+        }
+        
+        /* Main content */
+        .main-content {
+            margin-top: 60px;
+            padding: 1rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        @media (min-width: 768md) {
+            .main-content {
+                padding: 2rem;
+            }
+        }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border: none;
+            border-radius: 0.75rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+            transition: box-shadow 0.2s;
+        }
+        
+        .card:hover {
+            box-shadow: var(--hover-shadow);
+        }
+        
+        .card-header {
+            background: none;
+            border: none;
+            padding: 1.5rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: #111827;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        /* Stats cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (min-width: 640px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
         
         .stat-card {
-            border-left: 4px solid #007bff;
-            padding: 20px;
-            margin-bottom: 20px;
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .stat-card.primary {
+            border-left-color: var(--primary-color);
         }
         
         .stat-card.success {
-            border-left-color: #28a745;
+            border-left-color: var(--success-color);
         }
         
         .stat-card.warning {
-            border-left-color: #ffc107;
+            border-left-color: var(--warning-color);
         }
         
         .stat-card.danger {
-            border-left-color: #dc3545;
+            border-left-color: var(--danger-color);
         }
         
-        .task-item {
-            border-bottom: 1px solid #dee2e6;
-            padding: 15px 0;
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
         }
         
-        .task-item:last-child {
-            border-bottom: none;
+        .stat-label {
+            color: var(--secondary-color);
+            font-size: 0.875rem;
         }
         
-        .badge-status {
-            font-size: 12px;
-            padding: 4px 8px;
+        /* Tables */
+        .table-responsive {
+            border-radius: 0.5rem;
+            overflow: hidden;
         }
         
-        .material-row {
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            margin-bottom: 10px;
+        .table {
+            margin-bottom: 0;
         }
         
-        .card-header.bg-light {
-            background-color: #f8f9fa !important;
+        .table th {
+            background: var(--light-bg);
+            font-weight: 600;
+            color: #374151;
+            border: none;
+            padding: 1rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+        
+        .table td {
+            padding: 1rem;
+            border-color: #f3f4f6;
+            vertical-align: middle;
+        }
+        
+        .table tbody tr:hover {
+            background: #f9fafb;
+        }
+        
+        /* Buttons */
+        .btn {
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .btn-info {
+            background: #0891b2;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+        
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+        
+        /* Status badges */
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge-primary {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        /* Quick actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .action-btn {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            background: white;
+            border-radius: 0.75rem;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: #374151;
+        }
+        
+        .action-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .action-btn i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        /* Responsive utilities */
+        @media (max-width: 640px) {
+            .hide-mobile {
+                display: none;
+            }
+            
+            .table {
+                font-size: 0.875rem;
+            }
+            
+            .table th,
+            .table td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+        
+        /* Loading state */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            color: var(--secondary-color);
+        }
+        
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-dark bg-primary">
-        <div class="container-fluid">
-            <span class="navbar-brand">Work Order Dashboard</span>
-            <div class="d-flex align-items-center">
-                <span class="text-white me-3">Welcome, <span id="user-name">User</span></span>
-                <button class="btn btn-light btn-sm" id="logout">Logout</button>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="navbar-brand">
+                <i class="fas fa-clipboard-list"></i>
+                Work Order
+            </a>
+            
+            <div class="navbar-menu">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="user-name">User</span>
+                </div>
+                <button class="btn btn-sm btn-secondary hide-mobile" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="hide-mobile">Logout</span>
+                </button>
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
         </div>
     </nav>
     
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column" id="sidebar-menu">
-                        <!-- Menu items will be dynamically added based on role -->
-                    </ul>
-                </div>
-            </nav>
-            
-            <!-- Main Content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2" id="page-title">Dashboard</h1>
-                    <div class="btn-toolbar mb-2 mb-md-0" id="action-buttons">
-                        <!-- Action buttons will be added based on role -->
-                    </div>
-                </div>
-                
-                <!-- Role-specific content will be inserted here -->
-                <div id="dashboard-content">
-                    Loading dashboard...
-                </div>
-            </main>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span class="h5 mb-0">Menu</span>
+            <button class="sidebar-close" onclick="toggleSidebar()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="sidebar-menu" id="sidebar-menu">
+            <!-- Menu items will be loaded dynamically -->
+        </nav>
+        <div class="p-3 border-top">
+            <button class="btn btn-secondary w-100" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
         </div>
     </div>
     
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <div id="content-area">
+            <!-- Content will be loaded dynamically -->
+        </div>
+    </main>
+    
     <script>
-        // Sample data - in real app this would come from backend
-        const orderData = {
-            total: 58,
-            completed: 32,
-            inProgress: 24,
-            pending: 2,
-            todayNew: 5,
-            weeklyNew: 18,
-            monthlyRevenue: "Rp 45,000,000",
-            recentOrders: [
-                { code: "TR20250511A", customer: "PT ABC Indonesia", status: "Production", deadline: "May 20, 2025", assignedTo: "Produksi Team" },
-                { code: "TR20250510B", customer: "CV XYZ Mandiri", status: "Layout Design", deadline: "May 25, 2025", assignedTo: "Designer Kreatif" },
-                { code: "TR20250509C", customer: "Toko Jaya", status: "QC", deadline: "May 15, 2025", assignedTo: "QC Team" },
-                { code: "TR20250508D", customer: "PT Maju Jaya", status: "Shipping", deadline: "May 14, 2025", assignedTo: "Admin Satu" },
-                { code: "TR20250507E", customer: "CV Berkah", status: "Payment", deadline: "May 13, 2025", assignedTo: "Finance Team" }
-            ]
-        };
+        // Check authentication and load dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadDashboard();
+        });
         
-        // Dashboard templates for each role
-        const dashboardTemplates = {
-            manager: {
-                menu: [
-                    { name: "Dashboard", id: "dashboard", active: true },
-                    { name: "All Orders", id: "orders" },
-                    { name: "Reports", id: "reports" },
-                    { name: "Users", id: "users" },
-                    { name: "Settings", id: "settings" }
-                ],
-                actions: [
-                    '<button class="btn btn-primary btn-sm" id="create-new-order-btn">Create New Order</button>',
-                    '<button class="btn btn-success btn-sm" id="add-user-btn">Add User</button>',
-                    '<button class="btn btn-secondary btn-sm">Export Report</button>'
-                ],
-                content: `
-                    <div class="row">
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card stat-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Total Orders</h5>
-                                    <h2 class="text-primary">${orderData.total}</h2>
-                                    <p class="mb-0">All time orders</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card stat-card success">
-                                <div class="card-body">
-                                    <h5 class="card-title">Completed</h5>
-                                    <h2 class="text-success">${orderData.completed}</h2>
-                                    <p class="mb-0">Successfully delivered</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card stat-card warning">
-                                <div class="card-body">
-                                    <h5 class="card-title">In Progress</h5>
-                                    <h2 class="text-warning">${orderData.inProgress}</h2>
-                                    <p class="mb-0">Currently processing</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card stat-card danger">
-                                <div class="card-body">
-                                    <h5 class="card-title">Pending</h5>
-                                    <h2 class="text-danger">${orderData.pending}</h2>
-                                    <p class="mb-0">Waiting to start</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-lg-8">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Recent Orders</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Order Code</th>
-                                                    <th>Customer</th>
-                                                    <th>Status</th>
-                                                    <th>Deadline</th>
-                                                    <th>Assigned To</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                ${orderData.recentOrders.map(order => `
-                                                    <tr>
-                                                        <td>${order.code}</td>
-                                                        <td>${order.customer}</td>
-                                                        <td><span class="badge bg-primary">${order.status}</span></td>
-                                                        <td>${order.deadline}</td>
-                                                        <td>${order.assignedTo}</td>
-                                                        <td>
-                                                            <button class="btn btn-sm btn-info">View</button>
-                                                            <button class="btn btn-sm btn-warning">Edit</button>
-                                                        </td>
-                                                    </tr>
-                                                `).join('')}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Quick Actions</h5>
-                                </div>
-                                <div class="card-body">
-                                    <button class="btn btn-primary w-100 mb-2" onclick="showCreateOrder()">
-                                        <i class="fas fa-plus me-2"></i>New Order
-                                    </button>
-                                    <button class="btn btn-info w-100 mb-2" onclick="showTracking()">
-                                        <i class="fas fa-search me-2"></i>Track Order
-                                    </button>
-                                    <button class="btn btn-success w-100">
-                                        <i class="fas fa-file-export me-2"></i>Export Report
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `
-            },
+        // Check if user is logged in
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!user.username) {
+                window.location.href = 'login.html';
+                return;
+            }
+            document.getElementById('user-name').textContent = user.name || user.username;
+        }
+        
+        // Toggle sidebar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+        
+        // Load dashboard based on user role
+        function loadDashboard() {
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const role = user.role || 'admin';
             
-            admin: {
-                menu: [
-                    { name: "Dashboard", id: "dashboard", active: true },
-                    { name: "New Order", id: "new-order" },
-                    { name: "Shipping", id: "shipping" },
-                    { name: "Customer List", id: "customers" }
-                ],
-                actions: [
-                    '<button class="btn btn-primary btn-sm" id="create-po-btn">Create PO</button>',
-                    '<button class="btn btn-secondary btn-sm">Update Shipping</button>'
-                ],
-                content: `
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <div class="card stat-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">New Orders Today</h5>
-                                    <h2 class="text-primary">${orderData.todayNew}</h2>
-                                    <p class="mb-0">Ready for processing</p>
-                                </div>
-                            </div>
+            // Load menu items based on role
+            loadMenu(role);
+            
+            // Load dashboard content
+            const content = document.getElementById('content-area');
+            
+            if (role === 'manager') {
+                content.innerHTML = `
+                    <h2 class="mb-4">Manager Dashboard</h2>
+                    
+                    <!-- Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card primary">
+                            <div class="stat-label">Total Orders</div>
+                            <div class="stat-value">156</div>
+                            <small class="text-muted">All time</small>
                         </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="card stat-card warning">
-                                <div class="card-body">
-                                    <h5 class="card-title">Pending Shipments</h5>
-                                    <h2 class="text-warning">7</h2>
-                                    <p class="mb-0">Ready to ship</p>
-                                </div>
-                            </div>
+                        <div class="stat-card success">
+                            <div class="stat-label">Completed</div>
+                            <div class="stat-value">89</div>
+                            <small class="text-muted">This month</small>
+                        </div>
+                        <div class="stat-card warning">
+                            <div class="stat-label">In Progress</div>
+                            <div class="stat-value">45</div>
+                            <small class="text-muted">Active now</small>
+                        </div>
+                        <div class="stat-card danger">
+                            <div class="stat-label">Overdue</div>
+                            <div class="stat-value">3</div>
+                            <small class="text-muted">Need attention</small>
                         </div>
                     </div>
                     
+                    <!-- Recent Orders -->
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="mb-0">Tasks for Admin</h5>
+                            <h5 class="mb-0">Recent Orders</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Order Code</th>
+                                            <th>Customer</th>
+                                            <th>Status</th>
+                                            <th class="hide-mobile">Deadline</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>TR20250514A</strong></td>
+                                            <td>PT ABC Indonesia</td>
+                                            <td><span class="badge badge-warning">Production</span></td>
+                                            <td class="hide-mobile">May 20, 2025</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-info">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>TR20250513B</strong></td>
+                                            <td>CV XYZ Mandiri</td>
+                                            <td><span class="badge badge-primary">Design</span></td>
+                                            <td class="hide-mobile">May 25, 2025</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-info">View</button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>TR20250512C</strong></td>
+                                            <td>Toko Jaya</td>
+                                            <td><span class="badge badge-success">Completed</span></td>
+                                            <td class="hide-mobile">May 15, 2025</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-info">View</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <a href="#" class="action-btn" onclick="showCreateOrder()">
+                            <i class="fas fa-plus-circle text-primary"></i>
+                            <h6>Create New Order</h6>
+                        </a>
+                        <a href="#" class="action-btn" onclick="showReports()">
+                            <i class="fas fa-chart-bar text-success"></i>
+                            <h6>View Reports</h6>
+                        </a>
+                        <a href="#" class="action-btn" onclick="showUsers()">
+                            <i class="fas fa-users text-warning"></i>
+                            <h6>Manage Users</h6>
+                        </a>
+                        <a href="#" class="action-btn" onclick="showAllOrders()">
+                            <i class="fas fa-list text-info"></i>
+                            <h6>All Orders</h6>
+                        </a>
+                    </div>
+                `;
+            } else if (role === 'admin') {
+                content.innerHTML = `
+                    <h2 class="mb-4">Admin Dashboard</h2>
+                    
+                    <!-- Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card primary">
+                            <div class="stat-label">New Orders</div>
+                            <div class="stat-value">12</div>
+                            <small class="text-muted">Today</small>
+                        </div>
+                        <div class="stat-card warning">
+                            <div class="stat-label">Pending Shipping</div>
+                            <div class="stat-value">8</div>
+                            <small class="text-muted">Ready to ship</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Tasks -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Today's Tasks</h5>
                         </div>
                         <div class="card-body">
-                            <div class="task-item">
+                            <div class="task-item mb-3 p-3 border rounded">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6>Process New PO from PT ABC</h6>
-                                        <p class="mb-0 text-muted">Customer: PT ABC Indonesia</p>
+                                        <h6 class="mb-1">Process PO from PT ABC</h6>
+                                        <small class="text-muted">Customer: PT ABC Indonesia</small>
                                     </div>
                                     <button class="btn btn-sm btn-primary">Process</button>
                                 </div>
                             </div>
-                            <div class="task-item">
+                            <div class="task-item mb-3 p-3 border rounded">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6>Update Shipping for TR20250508D</h6>
-                                        <p class="mb-0 text-muted">Ready for delivery</p>
+                                        <h6 class="mb-1">Update Shipping TR20250508D</h6>
+                                        <small class="text-muted">Ready for delivery</small>
                                     </div>
                                     <button class="btn btn-sm btn-success">Update</button>
                                 </div>
                             </div>
-                            <div class="task-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6>Contact Customer - CV XYZ</h6>
-                                        <p class="mb-0 text-muted">Regarding order specifications</p>
-                                    </div>
-                                    <button class="btn btn-sm btn-info">Contact</button>
-                                </div>
-                            </div>
                         </div>
                     </div>
-                `
-            },
-            
-            designer: {
-                menu: [
-                    { name: "Dashboard", id: "dashboard", active: true },
-                    { name: "Layout Tasks", id: "layout" },
-                    { name: "Film Tasks", id: "film" },
-                    { name: "My Assignments", id: "assignments" }
-                ],
-                actions: [
-                    '<button class="btn btn-primary btn-sm">Upload Design</button>'
-                ],
-                content: `
-                    <div class="row">
-                        <div class="col-md-4 mb-4">
-                            <div class="card stat-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Layout Tasks</h5>
-                                    <h2 class="text-primary">4</h2>
-                                    <p class="mb-0">Pending design</p>
-                                </div>
-                            </div>
+                `;
+            } else if (role === 'designer') {
+                content.innerHTML = `
+                    <h2 class="mb-4">Designer Dashboard</h2>
+                    
+                    <!-- Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card primary">
+                            <div class="stat-label">Layout Tasks</div>
+                            <div class="stat-value">4</div>
+                            <small class="text-muted">Pending</small>
                         </div>
-                        <div class="col-md-4 mb-4">
-                            <div class="card stat-card warning">
-                                <div class="card-body">
-                                    <h5 class="card-title">Film Printing</h5>
-                                    <h2 class="text-warning">2</h2>
-                                    <p class="mb-0">Ready to print</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-4">
-                            <div class="card stat-card success">
-                                <div class="card-body">
-                                    <h5 class="card-title">Completed Today</h5>
-                                    <h2 class="text-success">3</h2>
-                                    <p class="mb-0">Tasks finished</p>
-                                </div>
-                            </div>
+                        <div class="stat-card warning">
+                            <div class="stat-label">Film Printing</div>
+                            <div class="stat-value">2</div>
+                            <small class="text-muted">Ready</small>
                         </div>
                     </div>
                     
+                    <!-- Design Tasks -->
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="mb-0">Designer Tasks</h5>
+                            <h5 class="mb-0">Design Tasks</h5>
                         </div>
                         <div class="card-body">
-                            <div class="task-item">
+                            <div class="task-item mb-3 p-3 border rounded">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6>Design Layout - TR20250510B</h6>
-                                        <p class="mb-0 text-muted">Customer: CV XYZ Mandiri</p>
-                                        <span class="badge-status badge bg-warning">In Progress</span>
+                                        <h6 class="mb-1">Layout - TR20250510B</h6>
+                                        <small class="text-muted">Customer: CV XYZ Mandiri</small>
+                                        <div class="mt-1">
+                                            <span class="badge badge-warning">In Progress</span>
+                                        </div>
                                     </div>
                                     <div>
                                         <button class="btn btn-sm btn-primary">Upload</button>
-                                        <button class="btn btn-sm btn-secondary">Preview</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="task-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6>Prepare Film - TR20250512C</h6>
-                                        <p class="mb-0 text-muted">Banner 3x4m design</p>
-                                        <span class="badge-status badge bg-danger">Urgent</span>
-                                    </div>
-                                    <div>
-                                        <button class="btn btn-sm btn-success">Start</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="task-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6>Review Design - TR20250513D</h6>
-                                        <p class="mb-0 text-muted">Customer feedback received</p>
-                                        <span class="badge-status badge bg-info">Review</span>
-                                    </div>
-                                    <div>
-                                        <button class="btn btn-sm btn-info">Check Feedback</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                `
-            },
-            
-            production: {
-                menu: [
-                    { name: "Dashboard", id: "dashboard", active: true },
-                    { name: "Production Queue", id: "queue" },
-                    { name: "My Tasks", id: "tasks" }
-                ],
-                actions: [
-                    '<button class="btn btn-success btn-sm">Mark Complete</button>'
-                ],
-                content: `
-                    <div class="row">
-                        <div class="col-md-6 mb-4">
-                            <div class="card stat-card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Production Queue</h5>
-                                    <h2 class="text-primary">6</h2>
-                                    <p class="mb-0">Items in production</p>
-                                </div>
-                            </div>
+                `;
+            } else if (role === 'production') {
+                content.innerHTML = `
+                    <h2 class="mb-4">Production Dashboard</h2>
+                    
+                    <!-- Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card primary">
+                            <div class="stat-label">In Production</div>
+                            <div class="stat-value">6</div>
+                            <small class="text-muted">Active</small>
                         </div>
-                        <div class="col-md-6 mb-4">
-                            <div class="card stat-card success">
-                                <div class="card-body">
-                                    <h5 class="card-title">Completed Today</h5>
-                                    <h2 class="text-success">4</h2>
-                                    <p class="mb-0">Items finished</p>
-                                </div>
-                            </div>
+                        <div class="stat-card success">
+                            <div class="stat-label">Completed Today</div>
+                            <div class="stat-value">4</div>
+                            <small class="text-muted">Finished</small>
                         </div>
                     </div>
                     
+                    <!-- Production Queue -->
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="mb-0">Production Tasks</h5>
+                            <h5 class="mb-0">Production Queue</h5>
                         </div>
                         <div class="card-body">
-                            <div class="task-item">
+                            <div class="task-item mb-3 p-3 border rounded">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6>Produce Banner - TR20250511A</h6>
-                                        <p class="mb-0 text-muted">3x4m Custom Banner</p>
-                                        <span class="badge-status badge bg-warning">In Progress</span>
-                                    </div>
-                                    <div>
-                                        <div class="progress" style="width: 150px; height: 20px;">
-                                            <div class="progress-bar" style="width: 60%">60%</div>
+                                        <h6 class="mb-1">Banner - TR20250511A</h6>
+                                        <small class="text-muted">3x4m Custom Banner</small>
+                                        <div class="mt-2">
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar bg-warning" style="width: 60%">60%</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="task-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6>Start Production - TR20250514E</h6>
-                                        <p class="mb-0 text-muted">Sticker vinyl 100pcs</p>
-                                        <span class="badge-status badge bg-info">Ready</span>
-                                    </div>
-                                    <button class="btn btn-sm btn-success">Start</button>
-                                </div>
-                            </div>
                         </div>
                     </div>
-                `
-            }
-        };
-        
-        // Load dashboard based on user role
-        function loadDashboard() {
-            const userStr = localStorage.getItem('currentUser');
-            if (!userStr) {
-                alert('Please login first');
-                window.location.href = 'login.html';
-                return;
-            }
-            
-            const user = JSON.parse(userStr);
-            const role = user.role || 'admin';
-            
-            // Update user info
-            document.getElementById('user-name').textContent = user.name || 'Unknown';
-            
-            // Get dashboard config for user role
-            const dashboard = dashboardTemplates[role] || dashboardTemplates.admin;
-            
-            // Set up sidebar menu
-            const sidebarMenu = document.getElementById('sidebar-menu');
-            sidebarMenu.innerHTML = dashboard.menu.map(item => `
-                <li class="nav-item">
-                    <a class="nav-link ${item.active ? 'active' : ''}" href="#${item.id}">
-                        ${item.name}
-                    </a>
-                </li>
-            `).join('');
-            
-            // Set up action buttons
-            const actionButtons = document.getElementById('action-buttons');
-            actionButtons.innerHTML = dashboard.actions.join('');
-            
-            // Load main content
-            document.getElementById('dashboard-content').innerHTML = dashboard.content;
-            
-            // Update page title
-            document.getElementById('page-title').textContent = `${role.charAt(0).toUpperCase() + role.slice(1)} Dashboard`;
-        }
-        
-        // Add event listeners for buttons and menu items
-        function setupEventListeners() {
-            // Sidebar menu navigation
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Remove active class from all links
-                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                    
-                    // Add active class to clicked link
-                    this.classList.add('active');
-                    
-                    // Get page id from href
-                    const pageId = this.getAttribute('href').substring(1);
-                    
-                    // Update page title
-                    document.getElementById('page-title').textContent = this.textContent;
-                    
-                    // Load appropriate content
-                    handlePageNavigation(pageId);
-                });
-            });
-            
-            // Action button handlers
-            document.addEventListener('click', function(e) {
-                // Create New Order button (Manager)
-                if (e.target.matches('#create-new-order-btn')) {
-                    handleCreateOrder();
-                }
-                
-                // Create PO button (Admin)
-                if (e.target.matches('#create-po-btn')) {
-                    handleCreateOrder();
-                }
-                
-                // Add User button (Manager)
-                if (e.target.matches('#add-user-btn') || e.target.matches('.btn-primary') && e.target.textContent.includes('Add New User')) {
-                    handleAddUser();
-                }
-                
-                // Export Report button
-                if (e.target.matches('.btn-secondary') && e.target.textContent.includes('Export')) {
-                    handleExportReport();
-                }
-                
-                // View button in table
-                if (e.target.matches('.btn-info') && e.target.textContent === 'View') {
-                    const row = e.target.closest('tr');
-                    const orderCode = row.cells[0].textContent;
-                    handleViewOrder(orderCode);
-                }
-                
-                // Edit button in table
-                if (e.target.matches('.btn-warning') && e.target.textContent === 'Edit') {
-                    const row = e.target.closest('tr');
-                    const orderCode = row.cells[0].textContent;
-                    handleEditOrder(orderCode);
-                }
-                
-                // Process button (Admin)
-                if (e.target.matches('.btn-primary') && e.target.textContent === 'Process') {
-                    handleProcessOrder();
-                }
-                
-                // Update button (Admin)
-                if (e.target.matches('.btn-success') && e.target.textContent === 'Update') {
-                    handleUpdateShipping();
-                }
-                
-                // Upload button (Designer)
-                if (e.target.matches('.btn-primary') && e.target.textContent === 'Upload') {
-                    handleUploadDesign();
-                }
-                
-                // Start button (Production)
-                if (e.target.matches('.btn-success') && e.target.textContent === 'Start') {
-                    handleStartProduction();
-                }
-            });
-        }
-        
-        // Handler functions
-        function handlePageNavigation(pageId) {
-            switch(pageId) {
-                case 'orders':
-                    showOrdersPage();
-                    break;
-                case 'new-order':
-                    handleCreateOrder();
-                    break;
-                case 'reports':
-                    showReportsPage();
-                    break;
-                case 'users':
-                    showUsersPage();
-                    break;
-                case 'settings':
-                    showSettingsPage();
-                    break;
-                default:
-                    loadDashboard(); // Reload main dashboard
+                `;
             }
         }
         
-        function handleAddUser() {
-            showAddUserForm();
-        }
-        
-        function showAddUserForm() {
-            const content = document.getElementById('dashboard-content');
-            content.innerHTML = `
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Add New User</h5>
-                    </div>
-                    <div class="card-body">
-                        <form id="add-user-form">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Username <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="new-username" required 
-                                               pattern="[a-zA-Z0-9]+" 
-                                               title="Username should only contain letters and numbers">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="new-fullname" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Email <span class="text-danger">*</span></label>
-                                        <input type="email" class="form-control" id="new-email" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Role <span class="text-danger">*</span></label>
-                                        <select class="form-control" id="new-role" required>
-                                            <option value="">Select Role</option>
-                                            <option value="manager">Manager</option>
-                                            <option value="admin">Admin</option>
-                                            <option value="designer">Designer</option>
-                                            <option value="production">Production</option>
-                                            <option value="qc">Quality Control</option>
-                                            <option value="finance">Finance</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Password <span class="text-danger">*</span></label>
-                                        <input type="password" class="form-control" id="new-password" required 
-                                               minlength="6">
-                                        <small class="text-muted">Minimum 6 characters</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
-                                        <input type="password" class="form-control" id="confirm-password" required>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <hr>
-                            
-                            <!-- Permissions/Access Section -->
-                            <h6 class="mb-3">Permissions</h6>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="can-create-orders">
-                                        <label class="form-check-label" for="can-create-orders">
-                                            Can create new orders
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="can-edit-orders">
-                                        <label class="form-check-label" for="can-edit-orders">
-                                            Can edit orders
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="can-delete-orders">
-                                        <label class="form-check-label" for="can-delete-orders">
-                                            Can delete orders
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="can-view-reports">
-                                        <label class="form-check-label" for="can-view-reports">
-                                            Can view reports
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="can-manage-users">
-                                        <label class="form-check-label" for="can-manage-users">
-                                            Can manage users
-                                        </label>
-                                    </div>
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" id="can-export-data">
-                                        <label class="form-check-label" for="can-export-data">
-                                            Can export data
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-4">
-                                <button type="submit" class="btn btn-primary">Create User</button>
-                                <button type="button" class="btn btn-secondary" onclick="loadDashboard()">Cancel</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                
-                <!-- Current Users List -->
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Current Users</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Username</th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Role</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="users-list">
-                                    <!-- Users will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            `;
+        // Load menu based on role
+        function loadMenu(role) {
+            const menu = document.getElementById('sidebar-menu');
             
-            // Load existing users
-            loadUsersList();
+            const menuItems = {
+                manager: [
+                    { icon: 'fa-tachometer-alt', text: 'Dashboard', action: 'loadDashboard()' },
+                    { icon: 'fa-plus', text: 'Create Order', action: 'showCreateOrder()' },
+                    { icon: 'fa-list', text: 'All Orders', action: 'showAllOrders()' },
+                    { icon: 'fa-chart-bar', text: 'Reports', action: 'showReports()' },
+                    { icon: 'fa-users', text: 'Users', action: 'showUsers()' },
+                    { icon: 'fa-cog', text: 'Settings', action: 'showSettings()' }
+                ],
+                admin: [
+                    { icon: 'fa-tachometer-alt', text: 'Dashboard', action: 'loadDashboard()' },
+                    { icon: 'fa-plus', text: 'New Order', action: 'showCreateOrder()' },
+                    { icon: 'fa-truck', text: 'Shipping', action: 'showShipping()' },
+                    { icon: 'fa-users', text: 'Customers', action: 'showCustomers()' }
+                ],
+                designer: [
+                    { icon: 'fa-tachometer-alt', text: 'Dashboard', action: 'loadDashboard()' },
+                    { icon: 'fa-palette', text: 'Layout Tasks', action: 'showLayoutTasks()' },
+                    { icon: 'fa-print', text: 'Film Tasks', action: 'showFilmTasks()' },
+                    { icon: 'fa-tasks', text: 'My Tasks', action: 'showMyTasks()' }
+                ],
+                production: [
+                    { icon: 'fa-tachometer-alt', text: 'Dashboard', action: 'loadDashboard()' },
+                    { icon: 'fa-industry', text: 'Production Queue', action: 'showProductionQueue()' },
+                    { icon: 'fa-tasks', text: 'My Tasks', action: 'showMyTasks()' }
+                ]
+            };
             
-            // Add form submit handler
-            document.getElementById('add-user-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Get form values
-                const username = document.getElementById('new-username').value;
-                const fullname = document.getElementById('new-fullname').value;
-                const email = document.getElementById('new-email').value;
-                const role = document.getElementById('new-role').value;
-                const password = document.getElementById('new-password').value;
-                const confirmPassword = document.getElementById('confirm-password').value;
-                
-                // Validate passwords match
-                if (password !== confirmPassword) {
-                    alert('Passwords do not match!');
-                    return;
-                }
-                
-                // Get permissions based on role
-                const permissions = {
-                    canCreateOrders: document.getElementById('can-create-orders').checked,
-                    canEditOrders: document.getElementById('can-edit-orders').checked,
-                    canDeleteOrders: document.getElementById('can-delete-orders').checked,
-                    canViewReports: document.getElementById('can-view-reports').checked,
-                    canManageUsers: document.getElementById('can-manage-users').checked,
-                    canExportData: document.getElementById('can-export-data').checked
-                };
-                
-                // Create user object
-                const newUser = {
-                    username: username,
-                    name: fullname,
-                    email: email,
-                    role: role,
-                    password: password, // In real app, this would be hashed
-                    permissions: permissions,
-                    status: 'active',
-                    createdAt: new Date().toISOString(),
-                    createdBy: JSON.parse(localStorage.getItem('currentUser')).username
-                };
-                
-                // Check if username already exists
-                let users = JSON.parse(localStorage.getItem('users') || '[]');
-                if (users.find(u => u.username === username)) {
-                    alert('Username already exists!');
-                    return;
-                }
-                
-                // Add user to storage
-                users.push(newUser);
-                localStorage.setItem('users', JSON.stringify(users));
-                
-                alert('User created successfully!');
-                showAddUserForm(); // Reload the form to show updated user list
-            });
+            const items = menuItems[role] || menuItems.admin;
             
-            // Auto-select permissions based on role
-            document.getElementById('new-role').addEventListener('change', function() {
-                const role = this.value;
-                
-                // Reset all checkboxes
-                document.querySelectorAll('.form-check-input').forEach(cb => cb.checked = false);
-                
-                // Set permissions based on role
-                switch(role) {
-                    case 'manager':
-                        document.getElementById('can-create-orders').checked = true;
-                        document.getElementById('can-edit-orders').checked = true;
-                        document.getElementById('can-delete-orders').checked = true;
-                        document.getElementById('can-view-reports').checked = true;
-                        document.getElementById('can-manage-users').checked = true;
-                        document.getElementById('can-export-data').checked = true;
-                        break;
-                    case 'admin':
-                        document.getElementById('can-create-orders').checked = true;
-                        document.getElementById('can-edit-orders').checked = true;
-                        document.getElementById('can-view-reports').checked = true;
-                        document.getElementById('can-export-data').checked = true;
-                        break;
-                    case 'designer':
-                        document.getElementById('can-edit-orders').checked = true;
-                        break;
-                    case 'production':
-                        document.getElementById('can-edit-orders').checked = true;
-                        break;
-                    case 'qc':
-                        document.getElementById('can-edit-orders').checked = true;
-                        break;
-                    case 'finance':
-                        document.getElementById('can-view-reports').checked = true;
-                        document.getElementById('can-export-data').checked = true;
-                        break;
-                }
-            });
-        }
-        
-        function loadUsersList() {
-            const tbody = document.getElementById('users-list');
-            if (!tbody) return; // Exit if element not found
-            
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
-            
-            // Add default users if list is empty
-            if (users.length === 0) {
-                const defaultUsers = [
-                    { username: 'manager1', name: 'Manager Utama', email: 'manager@company.com', role: 'manager', status: 'active' },
-                    { username: 'admin1', name: 'Admin Satu', email: 'admin@company.com', role: 'admin', status: 'active' },
-                    { username: 'designer1', name: 'Designer Kreatif', email: 'designer@company.com', role: 'designer', status: 'active' },
-                    { username: 'prod1', name: 'Produksi Team', email: 'production@company.com', role: 'production', status: 'active' }
-                ];
-                users.push(...defaultUsers);
-                localStorage.setItem('users', JSON.stringify(users));
-            }
-            
-            tbody.innerHTML = users.map(user => `
-                <tr>
-                    <td>${user.name}</td>
-                    <td>${user.email}</td>
-                    <td><span class="badge bg-primary">${user.role}</span></td>
-                    <td>
-                        <span class="badge ${user.status === 'active' ? 'bg-success' : 'bg-danger'}">
-                            ${user.status}
-                        </span>
-                    </td>
-                    <td>
-                        <button class="btn btn-sm btn-info" onclick="editUser('${user.username}')">Edit</button>
-                        <button class="btn btn-sm btn-${user.status === 'active' ? 'danger' : 'success'}" 
-                                onclick="toggleUserStatus('${user.username}')">
-                            ${user.status === 'active' ? 'Disable' : 'Enable'}
-                        </button>
-                    </td>
-                </tr>
+            menu.innerHTML = items.map((item, index) => `
+                <button class="sidebar-item ${index === 0 ? 'active' : ''}" onclick="${item.action}">
+                    <i class="fas ${item.icon}"></i>
+                    ${item.text}
+                </button>
             `).join('');
         }
         
-        function toggleUserStatus(username) {
-            let users = JSON.parse(localStorage.getItem('users') || '[]');
-            const user = users.find(u => u.username === username);
-            
-            if (user) {
-                user.status = user.status === 'active' ? 'inactive' : 'active';
-                localStorage.setItem('users', JSON.stringify(users));
-                loadUsersList();
-            }
-        }
-        
-        function deleteUser(username) {
-            if (!confirm(`Are you sure you want to delete user: ${username}?`)) {
-                return;
-            }
-            
-            let users = JSON.parse(localStorage.getItem('users') || '[]');
-            users = users.filter(u => u.username !== username);
-            localStorage.setItem('users', JSON.stringify(users));
-            loadUsersList();
-        }
-        
-        function editUser(username) {
-            alert(`Edit functionality for ${username} would be implemented here`);
-        }
-        
-        function handleCreateOrder() {
-            console.log('Creating order, redirecting to create-order.html');
+        // Show functions (stubs for now)
+        function showCreateOrder() {
             window.location.href = 'create-order.html';
         }
         
-        function showCreateOrder() {
-            handleCreateOrder();
-        }
-        
-        function showTracking() {
-            window.location.href = 'tracking.html';
-        }
-        
-        function handleExportReport() {
-            if (confirm('Export report to CSV?')) {
-                alert('Report exported successfully! (This is a demo - in real app, file would download)');
-            }
-        }
-        
-        function handleViewOrder(orderCode) {
-            window.location.href = `order-detail.html?code=${orderCode}`;
-        }
-        
-        function handleEditOrder(orderCode) {
-            alert(`Editing order: ${orderCode}\n\nIn real app, this would open edit form.`);
-        }
-        
-        function handleProcessOrder() {
-            alert('Processing new PO...\n\nIn real app, this would open PO processing form.');
-        }
-        
-        function handleUpdateShipping() {
-            alert('Updating shipping information...\n\nIn real app, this would open shipping update form.');
-        }
-        
-        function handleUploadDesign() {
-            alert('Upload design file...\n\nIn real app, this would open file upload dialog.');
-        }
-        
-        function handleStartProduction() {
-            if (confirm('Start production for this order?')) {
-                alert('Production started!');
-            }
-        }
-        
-        // Page content functions
-        function showOrdersPage() {
+        function showAllOrders() {
             window.location.href = 'work-orders.html';
         }
         
-        function showReportsPage() {
-            const content = document.getElementById('dashboard-content');
-            content.innerHTML = `
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Reports</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="card-body text-center">
-                                        <h5>Monthly Report</h5>
-                                        <p>Sales and production summary</p>
-                                        <button class="btn btn-primary">Generate</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="card-body text-center">
-                                        <h5>Customer Report</h5>
-                                        <p>Customer order history</p>
-                                        <button class="btn btn-primary">Generate</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="card-body text-center">
-                                        <h5>Production Report</h5>
-                                        <p>Production efficiency metrics</p>
-                                        <button class="btn btn-primary">Generate</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+        function showReports() {
+            alert('Reports page - to be implemented');
         }
         
-        function showUsersPage() {
-            const content = document.getElementById('dashboard-content');
-            content.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2>User Management</h2>
-                    <button class="btn btn-primary" onclick="showAddUserForm()">
-                        <i class="fas fa-plus me-2"></i>Add New User
-                    </button>
-                </div>
-                
-                <div class="card">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Role</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="users-list">
-                                    <!-- Users will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Load users
-            loadUsersList();
+        function showUsers() {
+            const content = document.getElementById('content-area');
+            content.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            // Load users page
         }
         
-        function showSettingsPage() {
-            const content = document.getElementById('dashboard-content');
-            content.innerHTML = `
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Settings</h5>
-                    </div>
-                    <div class="card-body">
-                        <h6>Company Settings</h6>
-                        <form>
-                            <div class="mb-3">
-                                <label class="form-label">Company Name</label>
-                                <input type="text" class="form-control" value="PT Production Indonesia">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Address</label>
-                                <textarea class="form-control">123 Production Street, Jakarta</textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" value="info@production.com">
-                            </div>
-                            <button type="submit" class="btn btn-primary">Save Settings</button>
-                        </form>
-                    </div>
-                </div>
-            `;
+        function showSettings() {
+            alert('Settings page - to be implemented');
         }
         
-        // Helper function to generate order rows
-        function generateOrderRows(count) {
-            let rows = '';
-            for (let i = 1; i <= count; i++) {
-                rows += `
-                    <tr>
-                        <td>TR2025051${i < 10 ? '0' + i : i}</td>
-                        <td>Customer ${i}</td>
-                        <td>May ${i}, 2025</td>
-                        <td><span class="badge bg-primary">Processing</span></td>
-                        <td>Rp ${(Math.random() * 10000000).toFixed(0)}</td>
-                        <td>
-                            <button class="btn btn-sm btn-info">View</button>
-                            <button class="btn btn-sm btn-warning">Edit</button>
-                        </td>
-                    </tr>
-                `;
-            }
-            return rows;
-        }
-        
-        // Initialize dashboard on load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadDashboard();
-            setupEventListeners();
-            
-            // Global click handler for dynamic buttons
-            document.addEventListener('click', function(e) {
-                if (e.target.matches('#add-new-user-btn') || e.target.closest('#add-new-user-btn')) {
-                    showAddUserForm();
-                }
-            });
-        });
-        
-        // Logout handler
-        document.getElementById('logout').onclick = function() {
+        function logout() {
             localStorage.removeItem('currentUser');
             window.location.href = 'login.html';
-        };
+        }
     </script>
 </body>
 </html>
