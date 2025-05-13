@@ -498,8 +498,380 @@
             document.getElementById('page-title').textContent = `${role.charAt(0).toUpperCase() + role.slice(1)} Dashboard`;
         }
         
+        // Add event listeners for buttons and menu items
+        function setupEventListeners() {
+            // Sidebar menu navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Get page id from href
+                    const pageId = this.getAttribute('href').substring(1);
+                    
+                    // Update page title
+                    document.getElementById('page-title').textContent = this.textContent;
+                    
+                    // Load appropriate content
+                    handlePageNavigation(pageId);
+                });
+            });
+            
+            // Action button handlers
+            document.addEventListener('click', function(e) {
+                // Create New Order button
+                if (e.target.matches('.btn-primary') && e.target.textContent.includes('Create')) {
+                    handleCreateOrder();
+                }
+                
+                // Export Report button
+                if (e.target.matches('.btn-secondary') && e.target.textContent.includes('Export')) {
+                    handleExportReport();
+                }
+                
+                // View button in table
+                if (e.target.matches('.btn-info') && e.target.textContent === 'View') {
+                    const row = e.target.closest('tr');
+                    const orderCode = row.cells[0].textContent;
+                    handleViewOrder(orderCode);
+                }
+                
+                // Edit button in table
+                if (e.target.matches('.btn-warning') && e.target.textContent === 'Edit') {
+                    const row = e.target.closest('tr');
+                    const orderCode = row.cells[0].textContent;
+                    handleEditOrder(orderCode);
+                }
+                
+                // Process button (Admin)
+                if (e.target.matches('.btn-primary') && e.target.textContent === 'Process') {
+                    handleProcessOrder();
+                }
+                
+                // Update button (Admin)
+                if (e.target.matches('.btn-success') && e.target.textContent === 'Update') {
+                    handleUpdateShipping();
+                }
+                
+                // Upload button (Designer)
+                if (e.target.matches('.btn-primary') && e.target.textContent === 'Upload') {
+                    handleUploadDesign();
+                }
+                
+                // Start button (Production)
+                if (e.target.matches('.btn-success') && e.target.textContent === 'Start') {
+                    handleStartProduction();
+                }
+            });
+        }
+        
+        // Handler functions
+        function handlePageNavigation(pageId) {
+            switch(pageId) {
+                case 'orders':
+                    showOrdersPage();
+                    break;
+                case 'new-order':
+                    showCreateOrderForm();
+                    break;
+                case 'reports':
+                    showReportsPage();
+                    break;
+                case 'users':
+                    showUsersPage();
+                    break;
+                case 'settings':
+                    showSettingsPage();
+                    break;
+                default:
+                    loadDashboard(); // Reload main dashboard
+            }
+        }
+        
+        function handleCreateOrder() {
+            showCreateOrderForm();
+        }
+        
+        function handleExportReport() {
+            if (confirm('Export report to CSV?')) {
+                alert('Report exported successfully! (This is a demo - in real app, file would download)');
+            }
+        }
+        
+        function handleViewOrder(orderCode) {
+            alert(`Viewing order: ${orderCode}\n\nIn real app, this would show detailed order information.`);
+        }
+        
+        function handleEditOrder(orderCode) {
+            alert(`Editing order: ${orderCode}\n\nIn real app, this would open edit form.`);
+        }
+        
+        function handleProcessOrder() {
+            alert('Processing new PO...\n\nIn real app, this would open PO processing form.');
+        }
+        
+        function handleUpdateShipping() {
+            alert('Updating shipping information...\n\nIn real app, this would open shipping update form.');
+        }
+        
+        function handleUploadDesign() {
+            alert('Upload design file...\n\nIn real app, this would open file upload dialog.');
+        }
+        
+        function handleStartProduction() {
+            if (confirm('Start production for this order?')) {
+                alert('Production started!');
+            }
+        }
+        
+        // Page content functions
+        function showOrdersPage() {
+            const content = document.getElementById('dashboard-content');
+            content.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">All Orders</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" placeholder="Search orders...">
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Order Code</th>
+                                        <th>Customer</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Amount</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${generateOrderRows(20)}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function showCreateOrderForm() {
+            const content = document.getElementById('dashboard-content');
+            content.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Create New Order</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="create-order-form">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Customer Name</label>
+                                        <input type="text" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">PO Number</label>
+                                        <input type="text" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Product Type</label>
+                                        <select class="form-control">
+                                            <option>Banner</option>
+                                            <option>Sticker</option>
+                                            <option>Poster</option>
+                                            <option>Vinyl</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Deadline</label>
+                                        <input type="date" class="form-control" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Quantity</label>
+                                <input type="number" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Create Order</button>
+                            <button type="button" class="btn btn-secondary" onclick="loadDashboard()">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            `;
+            
+            // Add form submit handler
+            document.getElementById('create-order-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Order created successfully!\n\nIn real app, this would save to database.');
+                loadDashboard();
+            });
+        }
+        
+        function showReportsPage() {
+            const content = document.getElementById('dashboard-content');
+            content.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Reports</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5>Monthly Report</h5>
+                                        <p>Sales and production summary</p>
+                                        <button class="btn btn-primary">Generate</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5>Customer Report</h5>
+                                        <p>Customer order history</p>
+                                        <button class="btn btn-primary">Generate</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5>Production Report</h5>
+                                        <p>Production efficiency metrics</p>
+                                        <button class="btn btn-primary">Generate</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function showUsersPage() {
+            const content = document.getElementById('dashboard-content');
+            content.innerHTML = `
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">User Management</h5>
+                        <button class="btn btn-primary btn-sm">Add New User</button>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Manager Utama</td>
+                                    <td>manager@company.com</td>
+                                    <td><span class="badge bg-primary">Manager</span></td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info">Edit</button>
+                                        <button class="btn btn-sm btn-danger">Disable</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Admin Satu</td>
+                                    <td>admin@company.com</td>
+                                    <td><span class="badge bg-info">Admin</span></td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info">Edit</button>
+                                        <button class="btn btn-sm btn-danger">Disable</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function showSettingsPage() {
+            const content = document.getElementById('dashboard-content');
+            content.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Settings</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>Company Settings</h6>
+                        <form>
+                            <div class="mb-3">
+                                <label class="form-label">Company Name</label>
+                                <input type="text" class="form-control" value="PT Production Indonesia">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control">123 Production Street, Jakarta</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" value="info@production.com">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Save Settings</button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Helper function to generate order rows
+        function generateOrderRows(count) {
+            let rows = '';
+            for (let i = 1; i <= count; i++) {
+                rows += `
+                    <tr>
+                        <td>TR2025051${i < 10 ? '0' + i : i}</td>
+                        <td>Customer ${i}</td>
+                        <td>May ${i}, 2025</td>
+                        <td><span class="badge bg-primary">Processing</span></td>
+                        <td>Rp ${(Math.random() * 10000000).toFixed(0)}</td>
+                        <td>
+                            <button class="btn btn-sm btn-info">View</button>
+                            <button class="btn btn-sm btn-warning">Edit</button>
+                        </td>
+                    </tr>
+                `;
+            }
+            return rows;
+        }
+        
         // Initialize dashboard on load
-        document.addEventListener('DOMContentLoaded', loadDashboard);
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboard();
+            setupEventListeners();
+        });
         
         // Logout handler
         document.getElementById('logout').onclick = function() {
