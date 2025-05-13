@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Track Order - Work Order System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .timeline {
             position: relative;
             padding: 20px 0;
-            margin: 20px 0;
         }
         
         .timeline-item {
@@ -27,6 +27,7 @@
         
         .timeline-item.in-progress {
             border-left-color: #ffc107;
+            background: #fff9e6;
         }
         
         .timeline-header {
@@ -54,6 +55,7 @@
         
         .status-badge.in-progress {
             background-color: #ffc107;
+            color: #212529;
         }
         
         .status-badge.pending {
@@ -88,7 +90,7 @@
                 <form id="trackForm">
                     <div class="row">
                         <div class="col-md-8 mb-3">
-                            <input type="text" class="form-control form-control-lg" id="code" placeholder="Enter tracking code (e.g., TR20250511A)" required>
+                            <input type="text" class="form-control form-control-lg" id="trackingCode" placeholder="Enter tracking code (e.g., TR20250511A)" required>
                         </div>
                         <div class="col-md-4 mb-3">
                             <button type="submit" class="btn btn-primary btn-lg w-100">Track Order</button>
@@ -146,7 +148,10 @@
     </div>
     
     <script>
-        // Sample order data
+        // Debug mode
+        const DEBUG = true;
+        
+        // Simplified sample data
         const orders = {
             "TR20250511A": {
                 code: "TR20250511A",
@@ -204,81 +209,106 @@
             }
         };
         
-        document.getElementById('trackForm').onsubmit = function(e) {
+        function log(message, data = null) {
+            if (DEBUG) {
+                console.log(`[TRACKING] ${message}`, data || '');
+            }
+        }
+        
+        document.getElementById('trackForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const code = document.getElementById('code').value.toUpperCase();
+            log('Form submitted');
             
-            if (orders[code]) {
-                const order = orders[code];
+            const code = document.getElementById('trackingCode').value.trim().toUpperCase();
+            log('Looking for order code:', code);
+            
+            if (!code) {
+                alert('Please enter a tracking code');
+                return;
+            }
+            
+            const order = orders[code];
+            log('Order found:', order);
+            
+            if (!order) {
+                alert('Order not found! Please check your tracking code.\nTry: TR20250511A, TR20250510B, or TR20250505C');
+                document.getElementById('result').style.display = 'none';
+                return;
+            }
+            
+            // Update order details
+            document.getElementById('showCode').textContent = order.code;
+            document.getElementById('showDate').textContent = order.date;
+            document.getElementById('showCustomer').textContent = order.customer;
+            document.getElementById('showStatus').textContent = order.status;
+            document.getElementById('showDeadline').textContent = order.deadline;
+            document.getElementById('showDescription').textContent = order.description;
+            
+            // Update progress bar
+            document.getElementById('progressBar').style.width = order.progress + '%';
+            document.getElementById('progressText').textContent = order.progress + '%';
+            
+            // Set progress bar color
+            const progressBar = document.getElementById('progressBar');
+            progressBar.className = 'progress-bar progress-bar-striped progress-bar-animated';
+            if (order.progress < 30) {
+                progressBar.classList.add('bg-danger');
+            } else if (order.progress < 70) {
+                progressBar.classList.add('bg-warning');
+            } else {
+                progressBar.classList.add('bg-success');
+            }
+            
+            // Create timeline
+            const timelineEl = document.getElementById('timeline');
+            timelineEl.innerHTML = '';
+            
+            order.timeline.forEach((item) => {
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'timeline-item';
                 
-                // Update order details
-                document.getElementById('showCode').textContent = order.code;
-                document.getElementById('showDate').textContent = order.date;
-                document.getElementById('showCustomer').textContent = order.customer;
-                document.getElementById('showStatus').textContent = order.status;
-                document.getElementById('showDeadline').textContent = order.deadline;
-                document.getElementById('showDescription').textContent = order.description;
-                
-                // Update progress bar
-                document.getElementById('progressBar').style.width = order.progress + '%';
-                document.getElementById('progressText').textContent = order.progress + '%';
-                
-                // Set progress bar color
-                const progressBar = document.getElementById('progressBar');
-                progressBar.className = 'progress-bar progress-bar-striped progress-bar-animated';
-                if (order.progress < 30) {
-                    progressBar.classList.add('bg-danger');
-                } else if (order.progress < 70) {
-                    progressBar.classList.add('bg-warning');
-                } else {
-                    progressBar.classList.add('bg-success');
+                if (item.status === 'completed') {
+                    timelineItem.classList.add('completed');
+                } else if (item.status === 'in-progress') {
+                    timelineItem.classList.add('in-progress');
                 }
                 
-                // Create timeline
-                const timelineEl = document.getElementById('timeline');
-                timelineEl.innerHTML = '';
+                let statusBadge = '';
+                if (item.status === 'completed') {
+                    statusBadge = '<span class="status-badge completed">Completed</span>';
+                } else if (item.status === 'in-progress') {
+                    statusBadge = '<span class="status-badge in-progress">In Progress</span>';
+                } else {
+                    statusBadge = '<span class="status-badge pending">Pending</span>';
+                }
                 
-                order.timeline.forEach((item) => {
-                    const timelineItem = document.createElement('div');
-                    timelineItem.className = 'timeline-item';
-                    
-                    if (item.status === 'completed') {
-                        timelineItem.classList.add('completed');
-                    } else if (item.status === 'in-progress') {
-                        timelineItem.classList.add('in-progress');
-                    }
-                    
-                    let statusBadge = '';
-                    if (item.status === 'completed') {
-                        statusBadge = '<span class="status-badge completed">Completed</span>';
-                    } else if (item.status === 'in-progress') {
-                        statusBadge = '<span class="status-badge in-progress">In Progress</span>';
-                    } else {
-                        statusBadge = '<span class="status-badge pending">Pending</span>';
-                    }
-                    
-                    timelineItem.innerHTML = `
-                        <div class="timeline-header">
-                            ${item.stage} ${statusBadge}
-                        </div>
-                        ${item.date ? `<div class="timeline-date">Date: ${item.date}</div>` : ''}
-                        ${item.user ? `<div>By: ${item.user}</div>` : ''}
-                        ${item.notes ? `<div class="text-muted">${item.notes}</div>` : ''}
-                        ${!item.date ? '<div class="text-muted">Waiting to start...</div>' : ''}
-                    `;
-                    
-                    timelineEl.appendChild(timelineItem);
-                });
+                timelineItem.innerHTML = `
+                    <div class="timeline-header">
+                        ${item.stage} ${statusBadge}
+                    </div>
+                    ${item.date ? `<div class="timeline-date">Date: ${item.date}</div>` : ''}
+                    ${item.user ? `<div>By: ${item.user}</div>` : ''}
+                    ${item.notes ? `<div class="text-muted">${item.notes}</div>` : ''}
+                    ${!item.date ? '<div class="text-muted">Waiting to start...</div>' : ''}
+                `;
                 
-                document.getElementById('result').style.display = 'block';
-                
-                // Scroll to result
+                timelineEl.appendChild(timelineItem);
+            });
+            
+            document.getElementById('result').style.display = 'block';
+            log('Results displayed');
+            
+            // Scroll to result
+            setTimeout(() => {
                 document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
-            } else {
-                alert('Order not found! Please check your tracking code.');
-                document.getElementById('result').style.display = 'none';
-            }
-        };
+            }, 100);
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Page loaded and ready');
+            log('Available orders:', Object.keys(orders));
+        });
     </script>
 </body>
 </html>
