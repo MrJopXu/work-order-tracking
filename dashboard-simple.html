@@ -225,21 +225,18 @@
                         <div class="col-lg-4">
                             <div class="card">
                                 <div class="card-header">
-                                    <h5 class="mb-0">Quick Stats</h5>
+                                    <h5 class="mb-0">Quick Actions</h5>
                                 </div>
                                 <div class="card-body">
-                                    <div class="mb-3">
-                                        <strong>Today's New Orders:</strong> ${orderData.todayNew}
-                                    </div>
-                                    <div class="mb-3">
-                                        <strong>This Week:</strong> ${orderData.weeklyNew} orders
-                                    </div>
-                                    <div class="mb-3">
-                                        <strong>Monthly Revenue:</strong> ${orderData.monthlyRevenue}
-                                    </div>
-                                    <div class="progress mb-3">
-                                        <div class="progress-bar bg-success" style="width: 55%">55% Completed this month</div>
-                                    </div>
+                                    <button class="btn btn-primary w-100 mb-2" onclick="showCreateOrder()">
+                                        <i class="fas fa-plus me-2"></i>New Order
+                                    </button>
+                                    <button class="btn btn-info w-100 mb-2" onclick="showTracking()">
+                                        <i class="fas fa-search me-2"></i>Track Order
+                                    </button>
+                                    <button class="btn btn-success w-100">
+                                        <i class="fas fa-file-export me-2"></i>Export Report
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -594,7 +591,7 @@
                     showOrdersPage();
                     break;
                 case 'new-order':
-                    handleCreateOrder(); // Changed from showCreateOrderForm()
+                    handleCreateOrder();
                     break;
                 case 'reports':
                     showReportsPage();
@@ -613,6 +610,14 @@
         function handleCreateOrder() {
             console.log('Creating order, redirecting to create-order.html');
             window.location.href = 'create-order.html';
+        }
+        
+        function showCreateOrder() {
+            handleCreateOrder();
+        }
+        
+        function showTracking() {
+            window.location.href = 'tracking.html';
         }
         
         function handleExportReport() {
@@ -650,196 +655,6 @@
         // Page content functions
         function showOrdersPage() {
             window.location.href = 'work-orders.html';
-        }
-        
-        function showCreateOrderForm() {
-            const content = document.getElementById('dashboard-content');
-            content.innerHTML = `
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Create New Order</h5>
-                    </div>
-                    <div class="card-body">
-                        <form id="create-order-form">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Customer Name</label>
-                                        <input type="text" class="form-control" id="customer-name" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">PO Number</label>
-                                        <input type="text" class="form-control" id="po-number" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Product Type</label>
-                                        <select class="form-control" id="product-type" onchange="toggleCustomProductType()">
-                                            <option>Banner</option>
-                                            <option>Sticker</option>
-                                            <option>Poster</option>
-                                            <option>Vinyl</option>
-                                            <option value="custom">Custom (Manual Input)</option>
-                                        </select>
-                                        <input type="text" class="form-control mt-2" id="custom-product-type" placeholder="Enter custom product type" style="display:none;" />
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Deadline</label>
-                                        <input type="date" class="form-control" id="deadline" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Description</label>
-                                <textarea class="form-control" id="description" rows="3"></textarea>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Quantity</label>
-                                        <input type="number" class="form-control" id="quantity" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Size</label>
-                                        <input type="text" class="form-control" id="size" placeholder="e.g., 3x4 meter">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Raw Materials Section -->
-                            <div class="card mt-4 mb-3">
-                                <div class="card-header bg-light">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6 class="mb-0">Raw Materials</h6>
-                                        <button type="button" class="btn btn-sm btn-success" onclick="addMaterialRow()">
-                                            <i class="fas fa-plus"></i> Add Material
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div id="materials-container">
-                                        <div class="material-row mb-3">
-                                            <div class="row">
-                                                <div class="col-md-4">
-                                                    <input type="text" class="form-control" placeholder="Material name" name="material-name[]">
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <input type="number" class="form-control" placeholder="Quantity" name="material-quantity[]">
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <input type="text" class="form-control" placeholder="Unit (pcs, meter, kg)" name="material-unit[]">
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeMaterialRow(this)">Remove</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary">Create Order</button>
-                            <button type="button" class="btn btn-secondary" onclick="loadDashboard()">Cancel</button>
-                        </form>
-                    </div>
-                </div>
-            `;
-            
-            // Add form submit handler
-            document.getElementById('create-order-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Collect form data
-                const productType = document.getElementById('product-type').value;
-                const finalProductType = productType === 'custom' ? 
-                    document.getElementById('custom-product-type').value : productType;
-                
-                // Collect materials
-                const materials = [];
-                const materialRows = document.querySelectorAll('.material-row');
-                materialRows.forEach(row => {
-                    const name = row.querySelector('input[name="material-name[]"]').value;
-                    const quantity = row.querySelector('input[name="material-quantity[]"]').value;
-                    const unit = row.querySelector('input[name="material-unit[]"]').value;
-                    
-                    if (name && quantity) {
-                        materials.push({ name, quantity, unit });
-                    }
-                });
-                
-                // Create order object
-                const orderData = {
-                    customerName: document.getElementById('customer-name').value,
-                    poNumber: document.getElementById('po-number').value,
-                    productType: finalProductType,
-                    deadline: document.getElementById('deadline').value,
-                    description: document.getElementById('description').value,
-                    quantity: document.getElementById('quantity').value,
-                    size: document.getElementById('size').value,
-                    materials: materials,
-                    createdAt: new Date().toISOString(),
-                    status: 'New'
-                };
-                
-                console.log('Order Data:', orderData);
-                alert('Order created successfully!\n\nProduct Type: ' + finalProductType + 
-                      '\nMaterials: ' + materials.length + ' items');
-                loadDashboard();
-            });
-        }
-        
-        // Toggle custom product type input
-        function toggleCustomProductType() {
-            const select = document.getElementById('product-type');
-            const customInput = document.getElementById('custom-product-type');
-            
-            if (select.value === 'custom') {
-                customInput.style.display = 'block';
-                customInput.required = true;
-            } else {
-                customInput.style.display = 'none';
-                customInput.required = false;
-                customInput.value = '';
-            }
-        }
-        
-        // Add new material row
-        function addMaterialRow() {
-            const container = document.getElementById('materials-container');
-            const newRow = document.createElement('div');
-            newRow.className = 'material-row mb-3';
-            newRow.innerHTML = `
-                <div class="row">
-                    <div class="col-md-4">
-                        <input type="text" class="form-control" placeholder="Material name" name="material-name[]">
-                    </div>
-                    <div class="col-md-3">
-                        <input type="number" class="form-control" placeholder="Quantity" name="material-quantity[]">
-                    </div>
-                    <div class="col-md-3">
-                        <input type="text" class="form-control" placeholder="Unit (pcs, meter, kg)" name="material-unit[]">
-                    </div>
-                    <div class="col-md-2">
-                        <button type="button" class="btn btn-danger btn-sm" onclick="removeMaterialRow(this)">Remove</button>
-                    </div>
-                </div>
-            `;
-            container.appendChild(newRow);
-        }
-        
-        // Remove material row
-        function removeMaterialRow(button) {
-            const row = button.closest('.material-row');
-            row.remove();
         }
         
         function showReportsPage() {
