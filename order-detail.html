@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Detail - Work Order System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .workflow-stage {
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #dee2e6;
+            position: relative;
+        }
+        
+        .workflow-stage.completed {
+            border-left-color: #28a745;
+            background: #f0fff4;
+        }
+        
+        .workflow-stage.in-progress {
+            border-left-color: #ffc107;
+            background: #fff9e6;
+        }
+        
+        .stage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .stage-checkbox {
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+        }
+        
+        .stage-checkbox:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        
+        .stage-info {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .stage-notes {
+            margin-top: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+        
+        .progress-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+        
+        .progress-step {
+            text-align: center;
+            position: relative;
+            flex: 1;
+        }
+        
+        .progress-step::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: -50%;
+            width: 100%;
+            height: 3px;
+            background: #dee2e6;
+            z-index: 0;
+        }
+        
+        .progress-step:last-child::after {
+            display: none;
+        }
+        
+        .progress-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #dee2e6;
+            margin: 0 auto 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .progress-step.completed .progress-circle {
+            background: #28a745;
+            color: white;
+        }
+        
+        .progress-step.in-progress .progress-circle {
+            background: #ffc107;
+            color: white;
+        }
+        
+        .disabled-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-clipboard-list me-2"></i>Work Order Tracker</a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">
+                    <i class="fas fa-user me-1"></i> <span id="user-name">User</span> (<span id="user-role">Role</span>)
+                </span>
+                <a class="btn btn-outline-light btn-sm" href="dashboard-simple.html">Dashboard</a>
+                <button class="btn btn-light btn-sm ms-2" id="logout-btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Order Summary Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Order Details: <span id="order-code">TR20250511A</span></h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Customer:</strong> <span id="customer-name">PT ABC Indonesia</span></p>
+                        <p><strong>Order Date:</strong> <span id="order-date">May 11, 2025</span></p>
+                        <p><strong>Deadline:</strong> <span id="deadline">May 20, 2025</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Product:</strong> <span id="product-type">Banner 3x4m</span></p>
+                        <p><strong>Description:</strong> <span id="description">Custom design banner</span></p>
+                        <p><strong>Quantity:</strong> <span id="quantity">1</span></p>
+                    </div>
+                </div>
+                
+                <!-- Overall Progress -->
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <strong>Overall Progress</strong>
+                        <span id="overall-progress">0%</span>
+                    </div>
+                    <div class="progress" style="height: 25px;">
+                        <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="progress-indicator mb-4" id="progress-indicator">
+            <!-- Progress steps will be dynamically added -->
+        </div>
+
+        <!-- Workflow Stages -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Workflow Progress</h5>
+            </div>
+            <div class="card-body">
+                <div id="workflow-stages">
+                    <!-- Stages will be dynamically added based on workflow -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-4 text-center">
+            <button class="btn btn-primary" id="save-progress">Save Progress</button>
+            <a href="dashboard-simple.html" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Workflow stages configuration
+        const workflowStages = [
+            { id: 'po', name: 'P.O Received', role: ['admin', 'manager'], icon: 'fa-file-invoice' },
+            { id: 'layout', name: 'Layout Design', role: ['designer', 'manager'], icon: 'fa-palette' },
+            { id: 'film', name: 'Film Printing', role: ['designer', 'manager'], icon: 'fa-print' },
+            { id: 'production', name: 'Production', role: ['production', 'manager'], icon: 'fa-industry' },
+            { id: 'qc', name: 'Quality Control', role: ['qc', 'manager'], icon: 'fa-check-circle' },
+            { id: 'shipping', name: 'Shipping', role: ['admin', 'manager'], icon: 'fa-truck' },
+            { id: 'payment', name: 'Payment', role: ['finance', 'manager'], icon: 'fa-money-bill' }
+        ];
+
+        // Current user (from localStorage)
+        let currentUser = null;
+        let orderData = null;
+
+        // Initialize page
+        function initializePage() {
+            // Get current user
+            const userStr = localStorage.getItem('currentUser');
+            if (!userStr) {
+                alert('Please login first');
+                window.location.href = 'login.html';
+                return;
+            }
+            currentUser = JSON.parse(userStr);
+            
+            // Update user info in navbar
+            document.getElementById('user-name').textContent = currentUser.name;
+            document.getElementById('user-role').textContent = currentUser.role;
+            
+            // Get order data (from URL parameter or localStorage)
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderCode = urlParams.get('code') || 'TR20250511A';
+            
+            // Load order data (in real app, this would come from database)
+            loadOrderData(orderCode);
+            
+            // Render progress indicator
+            renderProgressIndicator();
+            
+            // Render workflow stages
+            renderWorkflowStages();
+        }
+
+        // Load order data
+        function loadOrderData(orderCode) {
+            // In real app, this would be fetched from database
+            orderData = {
+                code: orderCode,
+                customer: 'PT ABC Indonesia',
+                orderDate: 'May 11, 2025',
+                deadline: 'May 20, 2025',
+                product: 'Banner 3x4m',
+                description: 'Custom design banner',
+                quantity: 1,
+                stages: {
+                    po: { completed: true, date: 'May 11, 2025', user: 'Admin Satu', notes: 'PO received and confirmed' },
+                    layout: { completed: true, date: 'May 12, 2025', user: 'Designer Kreatif', notes: 'Design approved by customer' },
+                    film: { completed: true, date: 'May 13, 2025', user: 'Designer Kreatif', notes: 'Film ready for production' },
+                    production: { completed: false, inProgress: true, user: 'Produksi Team', notes: 'Production in progress' },
+                    qc: { completed: false },
+                    shipping: { completed: false },
+                    payment: { completed: false }
+                }
+            };
+            
+            // Update UI with order data
+            document.getElementById('order-code').textContent = orderData.code;
+            document.getElementById('customer-name').textContent = orderData.customer;
+            document.getElementById('order-date').textContent = orderData.orderDate;
+            document.getElementById('deadline').textContent = orderData.deadline;
+            document.getElementById('product-type').textContent = orderData.product;
+            document.getElementById('description').textContent = orderData.description;
+            document.getElementById('quantity').textContent = orderData.quantity;
+            
+            // Calculate and update progress
+            updateProgress();
+        }
+
+        // Render progress indicator
+        function renderProgressIndicator() {
+            const indicator = document.getElementById('progress-indicator');
+            indicator.innerHTML = workflowStages.map((stage, index) => {
+                const stageData = orderData.stages[stage.id];
+                let statusClass = '';
+                let icon = '';
+                
+                if (stageData.completed) {
+                    statusClass = 'completed';
+                    icon = '<i class="fas fa-check"></i>';
+                } else if (stageData.inProgress) {
+                    statusClass = 'in-progress';
+                    icon = '<i class="fas fa-spinner fa-spin"></i>';
+                } else {
+                    icon = `<span>${index + 1}</span>`;
+                }
+                
+                return `
+                    <div class="progress-step ${statusClass}">
+                        <div class="progress-circle">${icon}</div>
+                        <div class="small">${stage.name}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render workflow stages
+        function renderWorkflowStages() {
+            const container = document.getElementById('workflow-stages');
+            container.innerHTML = workflowStages.map(stage => {
+                const stageData = orderData.stages[stage.id];
+                const canEdit = stage.role.includes(currentUser.role);
+                let stageClass = '';
+                
+                if (stageData.completed) {
+                    stageClass = 'completed';
+                } else if (stageData.inProgress) {
+                    stageClass = 'in-progress';
+                }
+                
+                // Check if previous stages are completed
+                const stageIndex = workflowStages.findIndex(s => s.id === stage.id);
+                const previousStagesCompleted = workflowStages.slice(0, stageIndex).every(s => orderData.stages[s.id].completed);
+                const isEnabled = canEdit && previousStagesCompleted;
+                
+                return `
+                    <div class="workflow-stage ${stageClass}">
+                        <div class="stage-header">
+                            <div>
+                                <h5><i class="fas ${stage.icon} me-2"></i>${stage.name}</h5>
+                                <div class="stage-info">
+                                    ${stageData.date ? `Completed: ${stageData.date}` : 'Not started'}
+                                    ${stageData.user ? ` by ${stageData.user}` : ''}
+                                </div>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input stage-checkbox" 
+                                       type="checkbox" 
+                                       id="check-${stage.id}"
+                                       data-stage="${stage.id}"
+                                       ${stageData.completed ? 'checked' : ''}
+                                       ${isEnabled ? '' : 'disabled'}>
+                                <label class="form-check-label" for="check-${stage.id}">
+                                    ${stageData.completed ? 'Completed' : 'Mark as complete'}
+                                </label>
+                            </div>
+                        </div>
+                        ${stageData.notes ? `
+                            <div class="stage-notes">
+                                <strong>Notes:</strong> ${stageData.notes}
+                            </div>
+                        ` : ''}
+                        ${!isEnabled && !stageData.completed ? `
+                            <div class="disabled-overlay">
+                                <span class="text-muted">
+                                    ${!canEdit ? 'You don\'t have permission for this stage' : 'Complete previous stages first'}
+                                </span>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            // Add checkbox event listeners
+            document.querySelectorAll('.stage-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', handleCheckboxChange);
+            });
+        }
+
+        // Handle checkbox change
+        function handleCheckboxChange(e) {
+            const stageId = e.target.dataset.stage;
+            const isChecked = e.target.checked;
+            
+            if (isChecked) {
+                // Mark stage as completed
+                orderData.stages[stageId].completed = true;
+                orderData.stages[stageId].date = new Date().toLocaleDateString();
+                orderData.stages[stageId].user = currentUser.name;
+                orderData.stages[stageId].inProgress = false;
+                
+                // Mark next stage as in progress
+                const currentIndex = workflowStages.findIndex(s => s.id === stageId);
+                if (currentIndex < workflowStages.length - 1) {
+                    const nextStage = workflowStages[currentIndex + 1];
+                    orderData.stages[nextStage.id].inProgress = true;
+                }
+            } else {
+                // Unmark stage (only allow if no subsequent stages are completed)
+                const currentIndex = workflowStages.findIndex(s => s.id === stageId);
+                const hasCompletedSubsequent = workflowStages.slice(currentIndex + 1).some(s => orderData.stages[s.id].completed);
+                
+                if (hasCompletedSubsequent) {
+                    alert('Cannot uncheck this stage because subsequent stages are already completed');
+                    e.target.checked = true;
+                    return;
+                }
+                
+                orderData.stages[stageId].completed = false;
+                orderData.stages[stageId].date = null;
+                orderData.stages[stageId].user = null;
+                
+                // Update in progress status
+                if (currentIndex > 0) {
+                    orderData.stages[stageId].inProgress = false;
+                    const prevStage = workflowStages[currentIndex - 1];
+                    if (orderData.stages[prevStage.id].completed) {
+                        orderData.stages[stageId].inProgress = true;
+                    }
+                }
+            }
+            
+            // Re-render everything
+            renderProgressIndicator();
+            renderWorkflowStages();
+            updateProgress();
+        }
+
+        // Update overall progress
+        function updateProgress() {
+            const completedStages = workflowStages.filter(stage => orderData.stages[stage.id].completed).length;
+            const totalStages = workflowStages.length;
+            const progress = Math.round((completedStages / totalStages) * 100);
+            
+            document.getElementById('overall-progress').textContent = `${progress}%`;
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = `${progress}%`;
+            
+            // Update progress bar color
+            progressBar.className = 'progress-bar progress-bar-striped progress-bar-animated';
+            if (progress < 30) {
+                progressBar.classList.add('bg-danger');
+            } else if (progress < 70) {
+                progressBar.classList.add('bg-warning');
+            } else {
+                progressBar.classList.add('bg-success');
+            }
+        }
+
+        // Save progress
+        document.getElementById('save-progress').addEventListener('click', function() {
+            // In real app, this would save to database
+            localStorage.setItem(`order_${orderData.code}`, JSON.stringify(orderData));
+            alert('Progress saved successfully!');
+        });
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        });
+
+        // Initialize page on load
+        document.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>
