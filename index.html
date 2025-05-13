@@ -4,16 +4,280 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Order Tracking System</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,165.3C384,171,480,149,576,138.7C672,128,768,128,864,149.3C960,171,1056,213,1152,213.3C1248,213,1344,171,1392,149.3L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+            background-size: cover;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Feature Cards */
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            height: 100%;
+            transition: all 0.3s ease;
+            border: 1px solid #f0f0f0;
+            text-align: center;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-color: #007bff;
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: #f0f7ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #007bff;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover .feature-icon {
+            background: #007bff;
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        /* Process Section */
+        .process-section {
+            background: #f8f9fa;
+            padding: 80px 0;
+        }
+        
+        .process-step {
+            text-align: center;
+            position: relative;
+            padding: 0 20px;
+        }
+        
+        .process-step::after {
+            content: '';
+            position: absolute;
+            top: 40px;
+            right: -30%;
+            width: 60%;
+            height: 2px;
+            background: #dee2e6;
+            z-index: 0;
+        }
+        
+        .process-step:last-child::after {
+            display: none;
+        }
+        
+        .process-number {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: white;
+            border: 3px solid #007bff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .process-step:hover .process-number {
+            background: #007bff;
+            color: white;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 80px 0;
+            position: relative;
+        }
+        
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,165.3C384,171,480,149,576,138.7C672,128,768,128,864,149.3C960,171,1056,213,1152,213.3C1248,213,1344,171,1392,149.3L1440,128L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path></svg>') no-repeat top;
+            background-size: cover;
+        }
+        
+        /* Stats Section */
+        .stats-section {
+            padding: 60px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+        
+        /* Testimonial Section */
+        .testimonial-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        
+        .testimonial-stars {
+            color: #ffc107;
+            margin-bottom: 15px;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .author-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #dee2e6;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #6c757d;
+        }
+        
+        /* Quick Track Section */
+        .quick-track {
+            background: #f8f9fa;
+            padding: 30px 0;
+        }
+        
+        .track-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Footer */
+        footer {
+            background: #212529;
+            color: white;
+            padding: 50px 0 30px;
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: #adb5bd;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .social-icons {
+            font-size: 1.5rem;
+        }
+        
+        .social-icons a {
+            color: #adb5bd;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+        
+        .social-icons a:hover {
+            color: white;
+        }
+        
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .process-step::after {
+                display: none;
+            }
+            
+            .hero-section {
+                padding: 60px 0;
+            }
+            
+            .stat-number {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#"><i class="fas fa-clipboard-list me-2"></i>Work Order Tracker</a>
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-clipboard-list me-2"></i>
+                <strong>Work Order Tracker</strong>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -23,10 +287,19 @@
                         <a class="nav-link active" href="index.html">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="tracking.html">Track Order</a>
+                        <a class="nav-link" href="#features">Features</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="login.html">Login</a>
+                        <a class="nav-link" href="#process">Process</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-primary" href="tracking.html">Track Order</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-outline-primary" href="login.html">Staff Login</a>
                     </li>
                 </ul>
             </div>
@@ -34,64 +307,255 @@
     </nav>
 
     <!-- Hero Section -->
-    <div class="container-fluid hero-section py-5">
+    <div class="hero-section">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h1 class="display-4 text-white fw-bold">Work Order Tracking System</h1>
-                    <p class="lead text-white">Effortlessly track your production workflow from PO to delivery</p>
-                    <div class="mt-4">
-                        <a href="tracking.html" class="btn btn-light btn-lg me-2">Track Your Order</a>
-                        <a href="login.html" class="btn btn-outline-light btn-lg">Staff Login</a>
+            <div class="row align-items-center hero-content">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">Track Your Orders in Real-Time</h1>
+                    <p class="lead mb-4">Experience seamless order tracking from production to delivery. Stay informed at every step of your order journey.</p>
+                    <div class="d-flex gap-3">
+                        <a href="tracking.html" class="btn btn-light btn-lg">
+                            <i class="fas fa-search me-2"></i>Track Your Order
+                        </a>
+                        <a href="#features" class="btn btn-outline-light btn-lg">Learn More</a>
                     </div>
                 </div>
-                <div class="col-md-6 text-center d-none d-md-block">
-                    <img src="https://placehold.co/600x400/007bff/white?text=Work+Order+Tracking" alt="Work Order Illustration" class="img-fluid rounded shadow">
+                <div class="col-lg-6">
+                    <img src="https://placehold.co/600x400/ffffff/007bff?text=Order+Tracking+System" 
+                         alt="Order Tracking System" 
+                         class="img-fluid rounded shadow float-animation">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Track Section -->
+    <div class="quick-track">
+        <div class="container">
+            <div class="track-form">
+                <form id="quickTrackForm" class="d-flex gap-2">
+                    <input type="text" 
+                           class="form-control form-control-lg" 
+                           placeholder="Enter your tracking code"
+                           id="quickTrackCode">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-search"></i> Track
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number" data-count="5000">0</div>
+                        <div class="stat-label">Orders Processed</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number" data-count="98">0%</div>
+                        <div class="stat-label">On-Time Delivery</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number" data-count="24">0/7</div>
+                        <div class="stat-label">Support Available</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-item">
+                        <div class="stat-number" data-count="500">0+</div>
+                        <div class="stat-label">Happy Customers</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Features Section -->
-    <div class="container my-5">
-        <div class="row text-center mb-5">
-            <div class="col">
-                <h2 class="section-title">How It Works</h2>
-                <p class="section-subtitle">Our streamlined process from start to finish</p>
+    <div id="features" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">Why Choose Our System?</h2>
+                <p class="lead text-muted">Powerful features designed for seamless order management</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h4>Real-Time Updates</h4>
+                        <p>Get instant notifications as your order progresses through each stage of production.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h4>Secure & Reliable</h4>
+                        <p>Your order information is protected with industry-standard security measures.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h4>Mobile Friendly</h4>
+                        <p>Track your orders anytime, anywhere with our responsive mobile design.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h4>Detailed Analytics</h4>
+                        <p>View comprehensive reports and analytics for all your orders.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4>Multi-User Support</h4>
+                        <p>Different access levels for managers, staff, and customers.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <h4>Customizable Workflow</h4>
+                        <p>Adapt the system to match your unique business processes.</p>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 feature-card">
-                    <div class="card-body text-center">
-                        <div class="feature-icon mb-3">
-                            <i class="fas fa-file-invoice fa-3x text-primary"></i>
-                        </div>
-                        <h3 class="card-title">Order Placement</h3>
-                        <p class="card-text">Submit your Purchase Order and receive a unique tracking code to monitor your order's progress.</p>
+    </div>
+
+    <!-- Process Section -->
+    <div id="process" class="process-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">How It Works</h2>
+                <p class="lead text-muted">Simple steps to track your order from start to finish</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="process-step">
+                        <div class="process-number">1</div>
+                        <h5>Place Order</h5>
+                        <p>Submit your order and receive a unique tracking code instantly.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="process-step">
+                        <div class="process-number">2</div>
+                        <h5>Production</h5>
+                        <p>Your order goes through design, printing, and quality control.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="process-step">
+                        <div class="process-number">3</div>
+                        <h5>Track Progress</h5>
+                        <p>Monitor real-time updates as your order moves through each stage.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="process-step">
+                        <div class="process-number">4</div>
+                        <h5>Delivery</h5>
+                        <p>Receive your order on time with complete tracking information.</p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 feature-card">
-                    <div class="card-body text-center">
-                        <div class="feature-icon mb-3">
-                            <i class="fas fa-cogs fa-3x text-primary"></i>
+        </div>
+    </div>
+
+    <!-- Testimonials Section -->
+    <div class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">What Our Customers Say</h2>
+                <p class="lead text-muted">Don't just take our word for it</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="testimonial-card">
+                        <div class="testimonial-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
                         </div>
-                        <h3 class="card-title">Production Process</h3>
-                        <p class="card-text">Track your order through each stage: layout, film printing, production, and quality control.</p>
+                        <p>"The tracking system is incredibly intuitive and has streamlined our order management process completely."</p>
+                        <div class="testimonial-author">
+                            <div class="author-image">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <strong>Sarah Johnson</strong>
+                                <div class="text-muted">PT ABC Indonesia</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 feature-card">
-                    <div class="card-body text-center">
-                        <div class="feature-icon mb-3">
-                            <i class="fas fa-truck fa-3x text-primary"></i>
+                <div class="col-md-4">
+                    <div class="testimonial-card">
+                        <div class="testimonial-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
                         </div>
-                        <h3 class="card-title">Delivery & Payment</h3>
-                        <p class="card-text">Receive notifications when your order is shipped and complete the payment process.</p>
+                        <p>"Real-time updates keep us informed at every step. Our customers love the transparency!"</p>
+                        <div class="testimonial-author">
+                            <div class="author-image">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <strong>Michael Chen</strong>
+                                <div class="text-muted">CV XYZ Mandiri</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="testimonial-card">
+                        <div class="testimonial-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p>"Excellent system that has improved our delivery times and customer satisfaction rates."</p>
+                        <div class="testimonial-author">
+                            <div class="author-image">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <strong>Lisa Anderson</strong>
+                                <div class="text-muted">Toko Jaya Abadi</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -99,55 +563,169 @@
     </div>
 
     <!-- Call to Action -->
-    <div class="container my-5">
-        <div class="row">
-            <div class="col-12">
-                <div class="card bg-primary text-white">
-                    <div class="card-body p-5 text-center">
-                        <h3 class="mb-3">Ready to track your order?</h3>
-                        <p class="lead mb-4">Enter your tracking code to see real-time updates on your order status.</p>
-                        <a href="tracking.html" class="btn btn-light btn-lg">Track Now</a>
-                    </div>
-                </div>
+    <div class="cta-section">
+        <div class="container text-center position-relative">
+            <h2 class="display-5 fw-bold mb-4">Ready to Track Your Orders?</h2>
+            <p class="lead mb-4">Join thousands of satisfied customers who trust our system for their order tracking needs.</p>
+            <div class="d-flex gap-3 justify-content-center">
+                <a href="tracking.html" class="btn btn-light btn-lg">
+                    <i class="fas fa-search me-2"></i>Track Order Now
+                </a>
+                <a href="#contact" class="btn btn-outline-light btn-lg">Contact Us</a>
             </div>
         </div>
     </div>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white py-4">
+    <footer id="contact">
         <div class="container">
             <div class="row">
-                <div class="col-md-4 mb-3">
-                    <h5>Work Order Tracking System</h5>
-                    <p>Streamlining your production workflow from start to finish.</p>
+                <div class="col-md-4 mb-4">
+                    <h5 class="mb-3">Work Order Tracking System</h5>
+                    <p class="text-muted">Streamlining your production workflow from order placement to delivery.</p>
+                    <div class="social-icons mt-3">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <h5>Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="index.html" class="text-white">Home</a></li>
-                        <li><a href="tracking.html" class="text-white">Track Order</a></li>
-                        <li><a href="login.html" class="text-white">Staff Login</a></li>
+                <div class="col-md-2 mb-4">
+                    <h6 class="mb-3">Quick Links</h6>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="tracking.html">Track Order</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#process">How It Works</a></li>
                     </ul>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <h5>Contact Us</h5>
-                    <address class="mb-0">
-                        <p class="mb-1"><i class="fas fa-map-marker-alt me-2"></i> 123 Production Street, Jakarta</p>
-                        <p class="mb-1"><i class="fas fa-phone me-2"></i> (021) 1234-5678</p>
-                        <p class="mb-1"><i class="fas fa-envelope me-2"></i> info@workordertracker.com</p>
-                    </address>
+                <div class="col-md-2 mb-4">
+                    <h6 class="mb-3">Support</h6>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Contact Support</a></li>
+                        <li><a href="#">System Status</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h6 class="mb-3">Contact Us</h6>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            123 Production Street, Jakarta, Indonesia
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-phone me-2"></i>
+                            +62 21 1234 5678
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-envelope me-2"></i>
+                            info@workordertracker.com
+                        </li>
+                        <li>
+                            <i class="fas fa-clock me-2"></i>
+                            Mon-Fri: 9:00 AM - 6:00 PM
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <hr>
+            <hr class="my-4">
             <div class="row">
                 <div class="col-12 text-center">
-                    <p class="mb-0">&copy; 2025 Work Order Tracking System. All rights reserved.</p>
+                    <p class="text-muted mb-0">&copy; 2025 Work Order Tracking System. All rights reserved.</p>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Quick Track Form
+        document.getElementById('quickTrackForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const code = document.getElementById('quickTrackCode').value.trim();
+            if (code) {
+                window.location.href = `tracking.html?code=${code}`;
+            }
+        });
+        
+        // Animate stats on scroll
+        let animated = false;
+        function animateStats() {
+            if (animated) return;
+            
+            const statsSection = document.querySelector('.stats-section');
+            const rect = statsSection.getBoundingClientRect();
+            
+            if (rect.top <= window.innerHeight && rect.bottom >= 0) {
+                animated = true;
+                const counters = document.querySelectorAll('.stat-number');
+                
+                counters.forEach(counter => {
+                    const target = counter.dataset.count;
+                    let count = 0;
+                    
+                    const updateCount = () => {
+                        const increment = target / 200;
+                        
+                        if (count < target) {
+                            count += increment;
+                            
+                            if (target.includes('%')) {
+                                counter.textContent = Math.floor(count) + '%';
+                            } else if (target.includes('/')) {
+                                counter.textContent = Math.floor(count) + '/7';
+                            } else if (target.includes('+')) {
+                                counter.textContent = Math.floor(count) + '+';
+                            } else {
+                                counter.textContent = Math.floor(count);
+                            }
+                            
+                            setTimeout(updateCount, 10);
+                        } else {
+                            if (target.includes('%')) {
+                                counter.textContent = target + '%';
+                            } else if (target.includes('/')) {
+                                counter.textContent = target + '/7';
+                            } else if (target.includes('+')) {
+                                counter.textContent = target + '+';
+                            } else {
+                                counter.textContent = target;
+                            }
+                        }
+                    };
+                    
+                    updateCount();
+                });
+            }
+        }
+        
+        window.addEventListener('scroll', animateStats);
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Add navbar background on scroll
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow');
+            } else {
+                navbar.classList.add('shadow-sm');
+            }
+        });
+    </script>
 </body>
 </html>
