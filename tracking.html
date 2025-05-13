@@ -5,70 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Track Order - Work Order System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .timeline {
             position: relative;
             padding: 20px 0;
-        }
-        
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 4px;
-            height: 100%;
-            background: #dee2e6;
-            top: 0;
+            margin: 20px 0;
         }
         
         .timeline-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 30px 0;
-            position: relative;
-        }
-        
-        .timeline-left,
-        .timeline-right {
-            width: 45%;
-        }
-        
-        .timeline-badge {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: #fff;
-            border: 4px solid #dee2e6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            z-index: 1;
-        }
-        
-        .timeline-badge.completed {
-            background: #28a745;
-            border-color: #28a745;
-            color: white;
-        }
-        
-        .timeline-badge.in-progress {
-            background: #ffc107;
-            border-color: #ffc107;
-            color: white;
-        }
-        
-        .timeline-card {
-            background: #f8f9fa;
+            margin: 20px 0;
             padding: 20px;
+            background: #f8f9fa;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+            border-left: 4px solid #dee2e6;
+        }
+        
+        .timeline-item.completed {
+            border-left-color: #28a745;
+        }
+        
+        .timeline-item.in-progress {
+            border-left-color: #ffc107;
+        }
+        
+        .timeline-header {
+            font-weight: bold;
+            margin-bottom: 10px;
         }
         
         .timeline-date {
@@ -76,25 +39,25 @@
             font-size: 14px;
         }
         
-        @media (max-width: 768px) {
-            .timeline::before {
-                left: 30px;
-            }
-            
-            .timeline-item {
-                flex-direction: column;
-                align-items: flex-start;
-                margin-left: 60px;
-            }
-            
-            .timeline-badge {
-                left: 30px;
-            }
-            
-            .timeline-left,
-            .timeline-right {
-                width: 100%;
-            }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .status-badge.completed {
+            background-color: #28a745;
+        }
+        
+        .status-badge.in-progress {
+            background-color: #ffc107;
+        }
+        
+        .status-badge.pending {
+            background-color: #6c757d;
         }
     </style>
 </head>
@@ -116,11 +79,11 @@
     <div class="container mt-5">
         <div class="card mb-4">
             <div class="card-header bg-primary text-white">
-                <h4><i class="fas fa-search me-2"></i>Track Your Order</h4>
+                <h4>Track Your Order</h4>
             </div>
             <div class="card-body">
                 <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>Demo tracking codes: TR20250511A, TR20250510B, TR20250505C
+                    Demo codes: TR20250511A, TR20250510B, TR20250505C
                 </div>
                 <form id="trackForm">
                     <div class="row">
@@ -128,9 +91,7 @@
                             <input type="text" class="form-control form-control-lg" id="code" placeholder="Enter tracking code (e.g., TR20250511A)" required>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <button type="submit" class="btn btn-primary btn-lg w-100">
-                                <i class="fas fa-search me-2"></i>Track Order
-                            </button>
+                            <button type="submit" class="btn btn-primary btn-lg w-100">Track Order</button>
                         </div>
                     </div>
                 </form>
@@ -141,17 +102,17 @@
             <!-- Order Summary Card -->
             <div class="card mb-4">
                 <div class="card-header bg-success text-white">
-                    <h5><i class="fas fa-box me-2"></i>Order Found</h5>
+                    <h5>Order Details</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <p><strong>Tracking Code:</strong> <span id="showCode" class="badge bg-primary"></span></p>
+                            <p><strong>Tracking Code:</strong> <span id="showCode" class="badge bg-primary fs-6"></span></p>
                             <p><strong>Order Date:</strong> <span id="showDate"></span></p>
                             <p><strong>Customer:</strong> <span id="showCustomer"></span></p>
                         </div>
                         <div class="col-md-6">
-                            <p><strong>Current Status:</strong> <span id="showStatus" class="badge bg-info"></span></p>
+                            <p><strong>Current Status:</strong> <span id="showStatus" class="badge bg-info fs-6"></span></p>
                             <p><strong>Expected Completion:</strong> <span id="showDeadline"></span></p>
                             <p><strong>Description:</strong> <span id="showDescription"></span></p>
                         </div>
@@ -160,7 +121,7 @@
                     <!-- Progress Bar -->
                     <div class="mt-4">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span>Progress</span>
+                            <span><strong>Progress</strong></span>
                             <span id="progressText">0%</span>
                         </div>
                         <div class="progress" style="height: 30px;">
@@ -173,7 +134,7 @@
             <!-- Timeline -->
             <div class="card">
                 <div class="card-header">
-                    <h5><i class="fas fa-history me-2"></i>Order Timeline</h5>
+                    <h5>Order Timeline</h5>
                 </div>
                 <div class="card-body">
                     <div class="timeline" id="timeline">
@@ -185,7 +146,7 @@
     </div>
     
     <script>
-        // Sample order data with more details
+        // Sample order data
         const orders = {
             "TR20250511A": {
                 code: "TR20250511A",
@@ -243,17 +204,6 @@
             }
         };
         
-        // Icons for each stage
-        const stageIcons = {
-            "PO Received": "fa-file-invoice",
-            "Layout Design": "fa-paint-brush",
-            "Film Printing": "fa-film",
-            "Production": "fa-industry",
-            "Quality Control": "fa-check-circle",
-            "Shipping": "fa-truck",
-            "Payment": "fa-money-bill-wave"
-        };
-        
         document.getElementById('trackForm').onsubmit = function(e) {
             e.preventDefault();
             const code = document.getElementById('code').value.toUpperCase();
@@ -273,7 +223,7 @@
                 document.getElementById('progressBar').style.width = order.progress + '%';
                 document.getElementById('progressText').textContent = order.progress + '%';
                 
-                // Set progress bar color based on percentage
+                // Set progress bar color
                 const progressBar = document.getElementById('progressBar');
                 progressBar.className = 'progress-bar progress-bar-striped progress-bar-animated';
                 if (order.progress < 30) {
@@ -288,56 +238,42 @@
                 const timelineEl = document.getElementById('timeline');
                 timelineEl.innerHTML = '';
                 
-                order.timeline.forEach((item, index) => {
-                    const isLeft = index % 2 === 0;
+                order.timeline.forEach((item) => {
                     const timelineItem = document.createElement('div');
                     timelineItem.className = 'timeline-item';
                     
-                    let badgeClass = '';
-                    let badgeIcon = '';
-                    
                     if (item.status === 'completed') {
-                        badgeClass = 'completed';
-                        badgeIcon = '<i class="fas fa-check"></i>';
+                        timelineItem.classList.add('completed');
                     } else if (item.status === 'in-progress') {
-                        badgeClass = 'in-progress';
-                        badgeIcon = '<i class="fas fa-spinner fa-spin"></i>';
+                        timelineItem.classList.add('in-progress');
+                    }
+                    
+                    let statusBadge = '';
+                    if (item.status === 'completed') {
+                        statusBadge = '<span class="status-badge completed">Completed</span>';
+                    } else if (item.status === 'in-progress') {
+                        statusBadge = '<span class="status-badge in-progress">In Progress</span>';
                     } else {
-                        badgeIcon = '<i class="fas fa-clock"></i>';
+                        statusBadge = '<span class="status-badge pending">Pending</span>';
                     }
                     
                     timelineItem.innerHTML = `
-                        <div class="timeline-left ${!isLeft ? 'order-2' : ''}">
-                            ${isLeft ? `
-                                <div class="timeline-card">
-                                    <h6><i class="fas ${stageIcons[item.stage]} me-2"></i>${item.stage}</h6>
-                                    ${item.date ? `<p class="timeline-date mb-1"><i class="far fa-calendar me-1"></i>${item.date}</p>` : ''}
-                                    ${item.user ? `<p class="mb-1"><i class="fas fa-user me-1"></i>${item.user}</p>` : ''}
-                                    ${item.notes ? `<p class="mb-0 text-muted"><i class="fas fa-comment me-1"></i>${item.notes}</p>` : ''}
-                                    ${!item.date ? '<p class="mb-0 text-muted">Waiting...</p>' : ''}
-                                </div>
-                            ` : ''}
+                        <div class="timeline-header">
+                            ${item.stage} ${statusBadge}
                         </div>
-                        <div class="timeline-badge ${badgeClass}">
-                            ${badgeIcon}
-                        </div>
-                        <div class="timeline-right ${!isLeft ? 'order-1' : ''}">
-                            ${!isLeft ? `
-                                <div class="timeline-card">
-                                    <h6><i class="fas ${stageIcons[item.stage]} me-2"></i>${item.stage}</h6>
-                                    ${item.date ? `<p class="timeline-date mb-1"><i class="far fa-calendar me-1"></i>${item.date}</p>` : ''}
-                                    ${item.user ? `<p class="mb-1"><i class="fas fa-user me-1"></i>${item.user}</p>` : ''}
-                                    ${item.notes ? `<p class="mb-0 text-muted"><i class="fas fa-comment me-1"></i>${item.notes}</p>` : ''}
-                                    ${!item.date ? '<p class="mb-0 text-muted">Waiting...</p>' : ''}
-                                </div>
-                            ` : ''}
-                        </div>
+                        ${item.date ? `<div class="timeline-date">Date: ${item.date}</div>` : ''}
+                        ${item.user ? `<div>By: ${item.user}</div>` : ''}
+                        ${item.notes ? `<div class="text-muted">${item.notes}</div>` : ''}
+                        ${!item.date ? '<div class="text-muted">Waiting to start...</div>' : ''}
                     `;
                     
                     timelineEl.appendChild(timelineItem);
                 });
                 
                 document.getElementById('result').style.display = 'block';
+                
+                // Scroll to result
+                document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
             } else {
                 alert('Order not found! Please check your tracking code.');
                 document.getElementById('result').style.display = 'none';
