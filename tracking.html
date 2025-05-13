@@ -5,14 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Track Order - Work Order System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .hero-section {
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-            color: white;
-            padding: 50px 0;
-        }
-        
         .timeline {
             position: relative;
             padding: 20px 0;
@@ -21,71 +14,24 @@
         
         .timeline-item {
             margin: 20px 0;
-            padding: 20px 20px 20px 60px;
+            padding: 20px;
             background: #f8f9fa;
             border-radius: 8px;
             position: relative;
             border-left: 4px solid #dee2e6;
-            transition: all 0.3s;
-        }
-        
-        .timeline-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
         .timeline-item.completed {
             border-left-color: #28a745;
-            background: #f0fff4;
         }
         
         .timeline-item.in-progress {
             border-left-color: #ffc107;
-            background: #fff9e6;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.8; }
-            100% { opacity: 1; }
-        }
-        
-        .timeline-icon {
-            position: absolute;
-            left: -12px;
-            top: 20px;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: #dee2e6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            color: white;
-        }
-        
-        .timeline-item.completed .timeline-icon {
-            background: #28a745;
-        }
-        
-        .timeline-item.in-progress .timeline-icon {
-            background: #ffc107;
-            animation: spin 2s linear infinite;
-        }
-        
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
         }
         
         .timeline-header {
             font-weight: bold;
             margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         
         .timeline-date {
@@ -95,10 +41,10 @@
         
         .status-badge {
             display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
+            padding: 4px 8px;
+            border-radius: 4px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: bold;
             color: white;
         }
         
@@ -108,240 +54,87 @@
         
         .status-badge.in-progress {
             background-color: #ffc107;
-            color: #212529;
         }
         
         .status-badge.pending {
             background-color: #6c757d;
         }
-        
-        .progress-visual {
-            height: 10px;
-            background: #e9ecef;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 20px 0;
-        }
-        
-        .progress-visual .progress-fill {
-            height: 100%;
-            background: linear-gradient(to right, #28a745, #20c997);
-            border-radius: 10px;
-            transition: width 0.5s ease;
-        }
-        
-        .order-info-card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-        
-        .info-item {
-            padding: 15px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .info-item:last-child {
-            border-bottom: none;
-        }
-        
-        .info-label {
-            font-weight: 600;
-            color: #6c757d;
-            font-size: 14px;
-        }
-        
-        .info-value {
-            font-size: 16px;
-            color: #212529;
-            font-weight: 500;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 50px;
-            color: #6c757d;
-        }
-        
-        .empty-state i {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            color: #dee2e6;
-        }
-        
-        .search-suggestions {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #dee2e6;
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            max-height: 200px;
-            overflow-y: auto;
-            display: none;
-            z-index: 10;
-        }
-        
-        .search-suggestions.show {
-            display: block;
-        }
-        
-        .suggestion-item {
-            padding: 10px 15px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        
-        .suggestion-item:hover {
-            background: #f8f9fa;
-        }
-        
-        .tracking-form {
-            max-width: 600px;
-            margin: 0 auto;
-            position: relative;
-        }
-        
-        .recent-orders {
-            margin-top: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="index.html">
-                <i class="fas fa-clipboard-list me-2"></i>Work Order Tracker
-            </a>
+            <a class="navbar-brand" href="#">Work Order Tracker</a>
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="index.html">Home</a>
+                    <a class="nav-link" href="dashboard-simple.html">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="tracking.html">Track Order</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="login.html">Staff Login</a>
+                    <a class="nav-link" href="login.html">Login</a>
                 </li>
             </ul>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <div class="hero-section">
-        <div class="container text-center">
-            <h1 class="display-4 mb-3">Track Your Order</h1>
-            <p class="lead">Enter your tracking code to see real-time updates on your order status</p>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="container py-5">
-        <!-- Search Form -->
-        <div class="tracking-form mb-5">
-            <form id="trackForm">
-                <div class="input-group input-group-lg shadow">
-                    <span class="input-group-text bg-primary text-white">
-                        <i class="fas fa-search"></i>
-                    </span>
-                    <input type="text" 
-                           class="form-control" 
-                           id="trackingCode" 
-                           placeholder="Enter tracking code (e.g., TR20250511A)" 
-                           required
-                           autocomplete="off">
-                    <button type="submit" class="btn btn-primary">
-                        Track Order
-                    </button>
+    <div class="container mt-5">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4>Track Your Order</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    Demo codes: TR20250511A, TR20250510B, TR20250505C
                 </div>
-                <div class="search-suggestions" id="searchSuggestions"></div>
-            </form>
-            
-            <!-- Recent Orders (stored in browser) -->
-            <div class="recent-orders" id="recentOrders" style="display: none;">
-                <h6 class="mb-3">Recently Tracked Orders</h6>
-                <div id="recentOrdersList"></div>
+                <form id="trackForm">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <input type="text" class="form-control form-control-lg" id="code" placeholder="Enter tracking code (e.g., TR20250511A)" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">Track Order</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
         
-        <!-- Results Container -->
         <div id="result" style="display:none">
             <!-- Order Summary Card -->
-            <div class="order-info-card">
-                <div class="row">
-                    <div class="col-md-8">
-                        <h3 class="mb-4">Order Information</h3>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="info-item">
-                                    <div class="info-label">Tracking Code</div>
-                                    <div class="info-value" id="showCode"></div>
-                                </div>
-                                <div class="info-item">
-                                    <div class="info-label">Customer</div>
-                                    <div class="info-value" id="showCustomer"></div>
-                                </div>
-                                <div class="info-item">
-                                    <div class="info-label">Order Date</div>
-                                    <div class="info-value" id="showDate"></div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="info-item">
-                                    <div class="info-label">Product</div>
-                                    <div class="info-value" id="showProduct"></div>
-                                </div>
-                                <div class="info-item">
-                                    <div class="info-label">Quantity</div>
-                                    <div class="info-value" id="showQuantity"></div>
-                                </div>
-                                <div class="info-item">
-                                    <div class="info-label">Expected Delivery</div>
-                                    <div class="info-value" id="showDeadline"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 text-center">
-                        <h3 class="mb-4">Overall Progress</h3>
-                        <div class="progress-circle mb-3" style="position: relative; display: inline-block;">
-                            <svg width="150" height="150">
-                                <circle cx="75" cy="75" r="70" stroke="#e9ecef" stroke-width="10" fill="none"/>
-                                <circle cx="75" cy="75" r="70" 
-                                        stroke="#28a745" 
-                                        stroke-width="10" 
-                                        fill="none"
-                                        stroke-dasharray="440"
-                                        stroke-dashoffset="440"
-                                        id="progressCircle"
-                                        style="transition: stroke-dashoffset 0.5s ease; transform: rotate(-90deg); transform-origin: center;"/>
-                            </svg>
-                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem; font-weight: bold;" id="progressText">0%</div>
-                        </div>
-                        <div class="text-center">
-                            <span class="status-badge" id="currentStatus">Pending</span>
-                        </div>
-                    </div>
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5>Order Details</h5>
                 </div>
-                
-                <!-- Progress Bar -->
-                <div class="progress-visual mt-4">
-                    <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Tracking Code:</strong> <span id="showCode" class="badge bg-primary fs-6"></span></p>
+                            <p><strong>Order Date:</strong> <span id="showDate"></span></p>
+                            <p><strong>Customer:</strong> <span id="showCustomer"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Current Status:</strong> <span id="showStatus" class="badge bg-info fs-6"></span></p>
+                            <p><strong>Expected Completion:</strong> <span id="showDeadline"></span></p>
+                            <p><strong>Description:</strong> <span id="showDescription"></span></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span><strong>Progress</strong></span>
+                            <span id="progressText">0%</span>
+                        </div>
+                        <div class="progress" style="height: 30px;">
+                            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
             <!-- Timeline -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <h4 class="mb-0">Order Timeline</h4>
+            <div class="card">
+                <div class="card-header">
+                    <h5>Order Timeline</h5>
                 </div>
                 <div class="card-body">
                     <div class="timeline" id="timeline">
@@ -350,431 +143,142 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Empty State -->
-        <div id="emptyState" class="empty-state" style="display: none;">
-            <i class="fas fa-search"></i>
-            <h3>Order Not Found</h3>
-            <p>Please check your tracking code and try again</p>
-            <button class="btn btn-primary" onclick="resetForm()">Try Again</button>
-        </div>
     </div>
     
     <script>
-        // Initialize data
-        let allOrders = {};
-        let recentlyTracked = [];
+        // Sample order data
+        const orders = {
+            "TR20250511A": {
+                code: "TR20250511A",
+                status: "Production",
+                date: "May 11, 2025",
+                deadline: "May 20, 2025",
+                customer: "PT ABC Indonesia",
+                description: "Banner 3x4m dengan desain custom",
+                progress: 57,
+                timeline: [
+                    { stage: "PO Received", status: "completed", date: "May 11, 2025 09:00", user: "Admin Satu", notes: "Purchase order received and confirmed" },
+                    { stage: "Layout Design", status: "completed", date: "May 12, 2025 14:30", user: "Designer Kreatif", notes: "Design approved by customer" },
+                    { stage: "Film Printing", status: "completed", date: "May 13, 2025 10:00", user: "Designer Kreatif", notes: "Film ready for production" },
+                    { stage: "Production", status: "in-progress", date: "May 14, 2025 08:00", user: "Produksi Team", notes: "Production started" },
+                    { stage: "Quality Control", status: "pending", date: null, user: null, notes: null },
+                    { stage: "Shipping", status: "pending", date: null, user: null, notes: null },
+                    { stage: "Payment", status: "pending", date: null, user: null, notes: null }
+                ]
+            },
+            "TR20250510B": {
+                code: "TR20250510B",
+                status: "Layout Design",
+                date: "May 10, 2025",
+                deadline: "May 25, 2025",
+                customer: "CV XYZ Mandiri",
+                description: "Sticker vinyl ukuran custom 100pcs",
+                progress: 28,
+                timeline: [
+                    { stage: "PO Received", status: "completed", date: "May 10, 2025 11:00", user: "Admin Satu", notes: "Purchase order received" },
+                    { stage: "Layout Design", status: "in-progress", date: "May 11, 2025 09:00", user: "Designer Kreatif", notes: "Working on design" },
+                    { stage: "Film Printing", status: "pending", date: null, user: null, notes: null },
+                    { stage: "Production", status: "pending", date: null, user: null, notes: null },
+                    { stage: "Quality Control", status: "pending", date: null, user: null, notes: null },
+                    { stage: "Shipping", status: "pending", date: null, user: null, notes: null },
+                    { stage: "Payment", status: "pending", date: null, user: null, notes: null }
+                ]
+            },
+            "TR20250505C": {
+                code: "TR20250505C",
+                status: "Completed",
+                date: "May 5, 2025",
+                deadline: "May 15, 2025",
+                customer: "Toko Jaya Abadi",
+                description: "Poster A3 glossy 50 lembar",
+                progress: 100,
+                timeline: [
+                    { stage: "PO Received", status: "completed", date: "May 5, 2025 10:00", user: "Admin Satu", notes: "Purchase order received" },
+                    { stage: "Layout Design", status: "completed", date: "May 6, 2025 15:00", user: "Designer Kreatif", notes: "Design completed" },
+                    { stage: "Film Printing", status: "completed", date: "May 7, 2025 09:00", user: "Designer Kreatif", notes: "Film printed" },
+                    { stage: "Production", status: "completed", date: "May 9, 2025 12:00", user: "Produksi Team", notes: "Production finished" },
+                    { stage: "Quality Control", status: "completed", date: "May 10, 2025 14:00", user: "QC Team", notes: "All items passed QC" },
+                    { stage: "Shipping", status: "completed", date: "May 12, 2025 16:00", user: "Admin Satu", notes: "Shipped via JNE" },
+                    { stage: "Payment", status: "completed", date: "May 15, 2025 11:00", user: "Finance Team", notes: "Payment received in full" }
+                ]
+            }
+        };
         
-        // Load all orders from localStorage and sample data
-        function loadAllOrders() {
-            console.log('Loading all orders...');
+        document.getElementById('trackForm').onsubmit = function(e) {
+            e.preventDefault();
+            const code = document.getElementById('code').value.toUpperCase();
             
-            // Sample orders
-            const sampleOrders = {
-                "TR20250511A": {
-                    code: "TR20250511A",
-                    customer: "PT ABC Indonesia",
-                    product: "Banner 3x4m",
-                    quantity: 1,
-                    orderDate: "May 11, 2025",
-                    deadline: "May 20, 2025",
-                    progress: 57,
-                    status: "Production",
-                    timeline: [
-                        { stage: "PO Received", status: "completed", date: "May 11, 2025 09:00", user: "Admin Satu", notes: "Purchase order received and confirmed" },
-                        { stage: "Layout Design", status: "completed", date: "May 12, 2025 14:30", user: "Designer Kreatif", notes: "Design approved by customer" },
-                        { stage: "Film Printing", status: "completed", date: "May 13, 2025 10:00", user: "Designer Kreatif", notes: "Film ready for production" },
-                        { stage: "Production", status: "in-progress", date: "May 14, 2025 08:00", user: "Produksi Team", notes: "Production in progress - 60% completed" },
-                        { stage: "Quality Control", status: "pending", date: null, user: null, notes: null },
-                        { stage: "Shipping", status: "pending", date: null, user: null, notes: null },
-                        { stage: "Payment", status: "pending", date: null, user: null, notes: null }
-                    ]
-                },
-                "TR20250510B": {
-                    code: "TR20250510B",
-                    customer: "CV XYZ Mandiri",
-                    product: "Sticker vinyl custom",
-                    quantity: 100,
-                    orderDate: "May 10, 2025",
-                    deadline: "May 25, 2025",
-                    progress: 28,
-                    status: "Layout Design",
-                    timeline: [
-                        { stage: "PO Received", status: "completed", date: "May 10, 2025 11:00", user: "Admin Satu", notes: "Purchase order received" },
-                        { stage: "Layout Design", status: "in-progress", date: "May 11, 2025 09:00", user: "Designer Kreatif", notes: "Working on design layout" },
-                        { stage: "Film Printing", status: "pending", date: null, user: null, notes: null },
-                        { stage: "Production", status: "pending", date: null, user: null, notes: null },
-                        { stage: "Quality Control", status: "pending", date: null, user: null, notes: null },
-                        { stage: "Shipping", status: "pending", date: null, user: null, notes: null },
-                        { stage: "Payment", status: "pending", date: null, user: null, notes: null }
-                    ]
-                },
-                "TR20250505C": {
-                    code: "TR20250505C",
-                    customer: "Toko Jaya Abadi",
-                    product: "Poster A3 glossy",
-                    quantity: 50,
-                    orderDate: "May 5, 2025",
-                    deadline: "May 15, 2025",
-                    progress: 100,
-                    status: "Completed",
-                    timeline: [
-                        { stage: "PO Received", status: "completed", date: "May 5, 2025 10:00", user: "Admin Satu", notes: "Purchase order received" },
-                        { stage: "Layout Design", status: "completed", date: "May 6, 2025 15:00", user: "Designer Kreatif", notes: "Design completed and approved" },
-                        { stage: "Film Printing", status: "completed", date: "May 7, 2025 09:00", user: "Designer Kreatif", notes: "Film printed successfully" },
-                        { stage: "Production", status: "completed", date: "May 9, 2025 12:00", user: "Produksi Team", notes: "Production completed" },
-                        { stage: "Quality Control", status: "completed", date: "May 10, 2025 14:00", user: "QC Team", notes: "All items passed quality control" },
-                        { stage: "Shipping", status: "completed", date: "May 12, 2025 16:00", user: "Admin Satu", notes: "Shipped via JNE - Tracking: JNE123456789" },
-                        { stage: "Payment", status: "completed", date: "May 15, 2025 11:00", user: "Finance Team", notes: "Payment received in full" }
-                    ]
-                }
-            };
-            
-            // Load orders from localStorage
-            try {
-                const storedOrders = {};
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key && key.startsWith('order_')) {
-                        try {
-                            const orderData = JSON.parse(localStorage.getItem(key));
-                            if (orderData && orderData.code) {
-                                const order = {
-                                    code: orderData.code,
-                                    customer: orderData.customer?.name || 'Unknown',
-                                    product: `${orderData.product?.type || ''} - ${orderData.product?.size || ''}`,
-                                    quantity: orderData.product?.quantity || 0,
-                                    orderDate: formatDate(orderData.order?.orderDate),
-                                    deadline: formatDate(orderData.order?.deadline),
-                                    progress: calculateProgress(orderData.stages || {}),
-                                    status: getCurrentStatus(orderData.stages || {}),
-                                    timeline: convertStagesToTimeline(orderData.stages || {})
-                                };
-                                storedOrders[orderData.code] = order;
-                            }
-                        } catch (parseError) {
-                            console.error('Error parsing order:', key, parseError);
-                        }
-                    }
-                }
+            if (orders[code]) {
+                const order = orders[code];
                 
-                // Combine sample and stored orders
-                allOrders = { ...sampleOrders, ...storedOrders };
-                console.log('Loaded orders:', Object.keys(allOrders));
-            } catch (error) {
-                console.error('Error loading orders:', error);
-                allOrders = sampleOrders;
-            }
-            
-            // Load recently tracked
-            try {
-                recentlyTracked = JSON.parse(localStorage.getItem('recentlyTracked') || '[]');
-            } catch (e) {
-                recentlyTracked = [];
-            }
-            
-            return Object.keys(allOrders);
-        }
-        
-        // Convert stages to timeline format
-        function convertStagesToTimeline(stages) {
-            const stageOrder = [
-                { key: 'po', name: 'PO Received' },
-                { key: 'layout', name: 'Layout Design' },
-                { key: 'film', name: 'Film Printing' },
-                { key: 'production', name: 'Production' },
-                { key: 'qc', name: 'Quality Control' },
-                { key: 'shipping', name: 'Shipping' },
-                { key: 'payment', name: 'Payment' }
-            ];
-            
-            return stageOrder.map(stageInfo => {
-                const stage = stages[stageInfo.key] || {};
-                return {
-                    stage: stageInfo.name,
-                    status: stage.completed ? 'completed' : (stage.inProgress ? 'in-progress' : 'pending'),
-                    date: stage.date ? formatDateTime(stage.date) : null,
-                    user: stage.user || null,
-                    notes: stage.notes || null
-                };
-            });
-        }
-        
-        // Helper functions
-        function getCurrentStatus(stages) {
-            const statusMap = {
-                'po': 'PO Received',
-                'layout': 'Layout Design',
-                'film': 'Film Printing',
-                'production': 'Production',
-                'qc': 'Quality Control',
-                'shipping': 'Shipping',
-                'payment': 'Payment'
-            };
-            
-            if (stages.payment && stages.payment.completed) {
-                return 'Completed';
-            }
-            
-            const statusOrder = Object.keys(statusMap);
-            for (let i = statusOrder.length - 1; i >= 0; i--) {
-                if (stages[statusOrder[i]] && (stages[statusOrder[i]].completed || stages[statusOrder[i]].inProgress)) {
-                    return statusMap[statusOrder[i]];
-                }
-            }
-            
-            return 'New';
-        }
-        
-        function calculateProgress(stages) {
-            const totalStages = 7;
-            let completedStages = 0;
-            
-            Object.values(stages).forEach(stage => {
-                if (stage && stage.completed) {
-                    completedStages++;
-                }
-            });
-            
-            return Math.round((completedStages / totalStages) * 100);
-        }
-        
-        function formatDate(dateStr) {
-            if (!dateStr) return 'Unknown';
-            try {
-                const date = new Date(dateStr);
-                if (isNaN(date.getTime())) return dateStr;
-                return date.toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                });
-            } catch (e) {
-                return dateStr;
-            }
-        }
-        
-        function formatDateTime(dateStr) {
-            if (!dateStr) return null;
-            try {
-                const date = new Date(dateStr);
-                if (isNaN(date.getTime())) return dateStr;
-                return date.toLocaleString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            } catch (e) {
-                return dateStr;
-            }
-        }
-        
-        // Search suggestions
-        function showSuggestions(value) {
-            const suggestions = document.getElementById('searchSuggestions');
-            const codes = Object.keys(allOrders);
-            
-            if (value.length < 2) {
-                suggestions.classList.remove('show');
-                return;
-            }
-            
-            const matches = codes.filter(code => 
-                code.toLowerCase().includes(value.toLowerCase())
-            );
-            
-            if (matches.length > 0) {
-                suggestions.innerHTML = matches.map(code => `
-                    <div class="suggestion-item" onclick="selectSuggestion('${code}')">
-                        <strong>${code}</strong> - ${allOrders[code].customer}
-                    </div>
-                `).join('');
-                suggestions.classList.add('show');
-            } else {
-                suggestions.classList.remove('show');
-            }
-        }
-        
-        function selectSuggestion(code) {
-            document.getElementById('trackingCode').value = code;
-            document.getElementById('searchSuggestions').classList.remove('show');
-            document.getElementById('trackForm').dispatchEvent(new Event('submit'));
-        }
-        
-        // Show recent orders
-        function showRecentOrders() {
-            if (recentlyTracked.length === 0) {
-                document.getElementById('recentOrders').style.display = 'none';
-                return;
-            }
-            
-            const recentList = document.getElementById('recentOrdersList');
-            recentList.innerHTML = recentlyTracked.slice(0, 5).map(code => {
-                const order = allOrders[code];
-                if (!order) return '';
+                // Update order details
+                document.getElementById('showCode').textContent = order.code;
+                document.getElementById('showDate').textContent = order.date;
+                document.getElementById('showCustomer').textContent = order.customer;
+                document.getElementById('showStatus').textContent = order.status;
+                document.getElementById('showDeadline').textContent = order.deadline;
+                document.getElementById('showDescription').textContent = order.description;
                 
-                return `
-                    <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
-                        <div>
-                            <strong>${code}</strong>
-                            <small class="text-muted d-block">${order.customer}</small>
-                        </div>
-                        <button class="btn btn-sm btn-outline-primary" onclick="selectSuggestion('${code}')">
-                            Track
-                        </button>
-                    </div>
-                `;
-            }).join('');
-            
-            document.getElementById('recentOrders').style.display = 'block';
-        }
-        
-        // Track order
-        function trackOrder(code) {
-            console.log('Tracking order:', code);
-            
-            if (!code) {
-                alert('Please enter a tracking code');
-                return;
-            }
-            
-            const order = allOrders[code.toUpperCase()];
-            console.log('Order found:', order);
-            
-            if (!order) {
-                document.getElementById('result').style.display = 'none';
-                document.getElementById('emptyState').style.display = 'block';
-                return;
-            }
-            
-            // Update recent orders
-            if (!recentlyTracked.includes(code)) {
-                recentlyTracked.unshift(code);
-                recentlyTracked = recentlyTracked.slice(0, 10);
-                localStorage.setItem('recentlyTracked', JSON.stringify(recentlyTracked));
-            }
-            
-            // Update order details
-            document.getElementById('showCode').textContent = order.code;
-            document.getElementById('showCustomer').textContent = order.customer;
-            document.getElementById('showProduct').textContent = order.product;
-            document.getElementById('showQuantity').textContent = order.quantity;
-            document.getElementById('showDate').textContent = order.orderDate;
-            document.getElementById('showDeadline').textContent = order.deadline;
-            
-            // Update progress
-            const progress = order.progress || 0;
-            document.getElementById('progressBar').style.width = progress + '%';
-            document.getElementById('progressText').textContent = progress + '%';
-            
-            // Update circular progress
-            const circle = document.getElementById('progressCircle');
-            const circumference = 2 * Math.PI * 70;
-            const offset = circumference - (progress / 100) * circumference;
-            circle.style.strokeDashoffset = offset;
-            
-            // Update status
-            const statusBadge = document.getElementById('currentStatus');
-            statusBadge.textContent = order.status;
-            statusBadge.className = 'status-badge';
-            if (order.status === 'Completed') {
-                statusBadge.classList.add('completed');
-            } else if (order.status.includes('Progress') || order.status.includes('Design') || order.status.includes('Production')) {
-                statusBadge.classList.add('in-progress');
-            } else {
-                statusBadge.classList.add('pending');
-            }
-            
-            // Update timeline
-            const timeline = document.getElementById('timeline');
-            timeline.innerHTML = order.timeline.map((item, index) => {
-                let icon = '';
-                if (item.status === 'completed') {
-                    icon = '<i class="fas fa-check"></i>';
-                } else if (item.status === 'in-progress') {
-                    icon = '<i class="fas fa-spinner"></i>';
+                // Update progress bar
+                document.getElementById('progressBar').style.width = order.progress + '%';
+                document.getElementById('progressText').textContent = order.progress + '%';
+                
+                // Set progress bar color
+                const progressBar = document.getElementById('progressBar');
+                progressBar.className = 'progress-bar progress-bar-striped progress-bar-animated';
+                if (order.progress < 30) {
+                    progressBar.classList.add('bg-danger');
+                } else if (order.progress < 70) {
+                    progressBar.classList.add('bg-warning');
                 } else {
-                    icon = `${index + 1}`;
+                    progressBar.classList.add('bg-success');
                 }
                 
-                return `
-                    <div class="timeline-item ${item.status}">
-                        <div class="timeline-icon">${icon}</div>
+                // Create timeline
+                const timelineEl = document.getElementById('timeline');
+                timelineEl.innerHTML = '';
+                
+                order.timeline.forEach((item) => {
+                    const timelineItem = document.createElement('div');
+                    timelineItem.className = 'timeline-item';
+                    
+                    if (item.status === 'completed') {
+                        timelineItem.classList.add('completed');
+                    } else if (item.status === 'in-progress') {
+                        timelineItem.classList.add('in-progress');
+                    }
+                    
+                    let statusBadge = '';
+                    if (item.status === 'completed') {
+                        statusBadge = '<span class="status-badge completed">Completed</span>';
+                    } else if (item.status === 'in-progress') {
+                        statusBadge = '<span class="status-badge in-progress">In Progress</span>';
+                    } else {
+                        statusBadge = '<span class="status-badge pending">Pending</span>';
+                    }
+                    
+                    timelineItem.innerHTML = `
                         <div class="timeline-header">
-                            <span>${item.stage}</span>
-                            <span class="status-badge ${item.status}">${item.status.replace('-', ' ')}</span>
+                            ${item.stage} ${statusBadge}
                         </div>
-                        ${item.date ? `<div class="timeline-date">${item.date}</div>` : ''}
-                        ${item.user ? `<div class="text-muted">By: ${item.user}</div>` : ''}
-                        ${item.notes ? `<div class="mt-2">${item.notes}</div>` : ''}
+                        ${item.date ? `<div class="timeline-date">Date: ${item.date}</div>` : ''}
+                        ${item.user ? `<div>By: ${item.user}</div>` : ''}
+                        ${item.notes ? `<div class="text-muted">${item.notes}</div>` : ''}
                         ${!item.date ? '<div class="text-muted">Waiting to start...</div>' : ''}
-                    </div>
-                `;
-            }).join('');
-            
-            // Show results
-            document.getElementById('result').style.display = 'block';
-            document.getElementById('emptyState').style.display = 'none';
-            
-            // Scroll to results
-            setTimeout(() => {
+                    `;
+                    
+                    timelineEl.appendChild(timelineItem);
+                });
+                
+                document.getElementById('result').style.display = 'block';
+                
+                // Scroll to result
                 document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
-            }, 100);
-        }
-        
-        // Reset form
-        function resetForm() {
-            document.getElementById('trackForm').reset();
-            document.getElementById('result').style.display = 'none';
-            document.getElementById('emptyState').style.display = 'none';
-            document.getElementById('searchSuggestions').classList.remove('show');
-        }
-        
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Page loaded, initializing...');
-            
-            // Load all orders
-            loadAllOrders();
-            
-            // Show recent orders
-            showRecentOrders();
-            
-            // Setup form
-            const form = document.getElementById('trackForm');
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                console.log('Form submitted');
-                const code = document.getElementById('trackingCode').value.trim().toUpperCase();
-                console.log('Tracking code:', code);
-                trackOrder(code);
-            });
-            
-            // Setup input suggestions
-            const input = document.getElementById('trackingCode');
-            input.addEventListener('input', function() {
-                showSuggestions(this.value);
-            });
-            
-            // Hide suggestions on click outside
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.tracking-form')) {
-                    document.getElementById('searchSuggestions').classList.remove('show');
-                }
-            });
-            
-            // Check if code in URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const codeFromUrl = urlParams.get('code');
-            if (codeFromUrl) {
-                document.getElementById('trackingCode').value = codeFromUrl;
-                trackOrder(codeFromUrl.toUpperCase());
+            } else {
+                alert('Order not found! Please check your tracking code.');
+                document.getElementById('result').style.display = 'none';
             }
-            
-            console.log('Initialization complete. Available orders:', Object.keys(allOrders));
-        });
+        };
     </script>
 </body>
 </html>
