@@ -545,7 +545,7 @@
                 }
                 
                 // Add User button (Manager)
-                if (e.target.matches('#add-user-btn')) {
+                if (e.target.matches('#add-user-btn') || e.target.matches('.btn-primary') && e.target.textContent.includes('Add New User')) {
                     handleAddUser();
                 }
                 
@@ -863,8 +863,10 @@
         }
         
         function loadUsersList() {
-            const users = JSON.parse(localStorage.getItem('users') || '[]');
             const tbody = document.getElementById('users-list');
+            if (!tbody) return; // Exit if element not found
+            
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
             
             // Add default users if list is empty
             if (users.length === 0) {
@@ -880,7 +882,6 @@
             
             tbody.innerHTML = users.map(user => `
                 <tr>
-                    <td>${user.username}</td>
                     <td>${user.name}</td>
                     <td>${user.email}</td>
                     <td><span class="badge bg-primary">${user.role}</span></td>
@@ -891,11 +892,10 @@
                     </td>
                     <td>
                         <button class="btn btn-sm btn-info" onclick="editUser('${user.username}')">Edit</button>
-                        <button class="btn btn-sm btn-${user.status === 'active' ? 'warning' : 'success'}" 
+                        <button class="btn btn-sm btn-${user.status === 'active' ? 'danger' : 'success'}" 
                                 onclick="toggleUserStatus('${user.username}')">
                             ${user.status === 'active' ? 'Disable' : 'Enable'}
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteUser('${user.username}')">Delete</button>
                     </td>
                 </tr>
             `).join('');
@@ -1020,14 +1020,39 @@
         }
         
         function showUsersPage() {
-            // Redirect to add user form for manager
-            const user = JSON.parse(localStorage.getItem('currentUser'));
-            if (user.role === 'manager') {
-                showAddUserForm();
-            } else {
-                alert('You do not have permission to manage users');
-                loadDashboard();
-            }
+            const content = document.getElementById('dashboard-content');
+            content.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>User Management</h2>
+                    <button class="btn btn-primary" onclick="showAddUserForm()">
+                        <i class="fas fa-plus me-2"></i>Add New User
+                    </button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-list">
+                                    <!-- Users will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Load users
+            loadUsersList();
         }
         
         function showSettingsPage() {
@@ -1084,6 +1109,13 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadDashboard();
             setupEventListeners();
+            
+            // Global click handler for dynamic buttons
+            document.addEventListener('click', function(e) {
+                if (e.target.matches('#add-new-user-btn') || e.target.closest('#add-new-user-btn')) {
+                    showAddUserForm();
+                }
+            });
         });
         
         // Logout handler
