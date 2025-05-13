@@ -5,12 +5,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Track Order - Work Order System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: #dee2e6;
+            top: 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            position: relative;
+        }
+        
+        .timeline-left,
+        .timeline-right {
+            width: 45%;
+        }
+        
+        .timeline-badge {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #fff;
+            border: 4px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            z-index: 1;
+        }
+        
+        .timeline-badge.completed {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+        
+        .timeline-badge.in-progress {
+            background: #ffc107;
+            border-color: #ffc107;
+            color: white;
+        }
+        
+        .timeline-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-date {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 30px;
+            }
+            
+            .timeline-item {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-left: 60px;
+            }
+            
+            .timeline-badge {
+                left: 30px;
+            }
+            
+            .timeline-left,
+            .timeline-right {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
             <a class="navbar-brand" href="#">Work Order Tracker</a>
             <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="dashboard-simple.html">Dashboard</a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="login.html">Login</a>
                 </li>
@@ -19,28 +114,70 @@
     </nav>
 
     <div class="container mt-5">
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-header bg-primary text-white">
-                <h4>Track Your Order</h4>
+                <h4><i class="fas fa-search me-2"></i>Track Your Order</h4>
             </div>
             <div class="card-body">
                 <div class="alert alert-info">
-                    Try: TR20250511A
+                    <i class="fas fa-info-circle me-2"></i>Demo tracking codes: TR20250511A, TR20250510B, TR20250505C
                 </div>
                 <form id="trackForm">
-                    <div class="mb-3">
-                        <label>Tracking Code</label>
-                        <input type="text" class="form-control" id="code" required>
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <input type="text" class="form-control form-control-lg" id="code" placeholder="Enter tracking code (e.g., TR20250511A)" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-search me-2"></i>Track Order
+                            </button>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Track</button>
                 </form>
-                
-                <div id="result" style="display:none" class="mt-4">
-                    <div class="alert alert-success">
-                        <h5>Order Found!</h5>
-                        <p>Code: <span id="showCode"></span></p>
-                        <p>Status: <span id="showStatus"></span></p>
-                        <p>Progress: <span id="showProgress"></span>%</p>
+            </div>
+        </div>
+        
+        <div id="result" style="display:none">
+            <!-- Order Summary Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-box me-2"></i>Order Found</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Tracking Code:</strong> <span id="showCode" class="badge bg-primary"></span></p>
+                            <p><strong>Order Date:</strong> <span id="showDate"></span></p>
+                            <p><strong>Customer:</strong> <span id="showCustomer"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Current Status:</strong> <span id="showStatus" class="badge bg-info"></span></p>
+                            <p><strong>Expected Completion:</strong> <span id="showDeadline"></span></p>
+                            <p><strong>Description:</strong> <span id="showDescription"></span></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Progress</span>
+                            <span id="progressText">0%</span>
+                        </div>
+                        <div class="progress" style="height: 30px;">
+                            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Timeline -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-history me-2"></i>Order Timeline</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline" id="timeline">
+                        <!-- Timeline items will be inserted here -->
                     </div>
                 </div>
             </div>
@@ -48,17 +185,161 @@
     </div>
     
     <script>
+        // Sample order data with more details
+        const orders = {
+            "TR20250511A": {
+                code: "TR20250511A",
+                status: "Production",
+                date: "May 11, 2025",
+                deadline: "May 20, 2025",
+                customer: "PT ABC Indonesia",
+                description: "Banner 3x4m dengan desain custom",
+                progress: 57,
+                timeline: [
+                    { stage: "PO Received", status: "completed", date: "May 11, 2025 09:00", user: "Admin Satu", notes: "Purchase order received and confirmed" },
+                    { stage: "Layout Design", status: "completed", date: "May 12, 2025 14:30", user: "Designer Kreatif", notes: "Design approved by customer" },
+                    { stage: "Film Printing", status: "completed", date: "May 13, 2025 10:00", user: "Designer Kreatif", notes: "Film ready for production" },
+                    { stage: "Production", status: "in-progress", date: "May 14, 2025 08:00", user: "Produksi Team", notes: "Production started" },
+                    { stage: "Quality Control", status: "pending", date: null, user: null, notes: null },
+                    { stage: "Shipping", status: "pending", date: null, user: null, notes: null },
+                    { stage: "Payment", status: "pending", date: null, user: null, notes: null }
+                ]
+            },
+            "TR20250510B": {
+                code: "TR20250510B",
+                status: "Layout Design",
+                date: "May 10, 2025",
+                deadline: "May 25, 2025",
+                customer: "CV XYZ Mandiri",
+                description: "Sticker vinyl ukuran custom 100pcs",
+                progress: 28,
+                timeline: [
+                    { stage: "PO Received", status: "completed", date: "May 10, 2025 11:00", user: "Admin Satu", notes: "Purchase order received" },
+                    { stage: "Layout Design", status: "in-progress", date: "May 11, 2025 09:00", user: "Designer Kreatif", notes: "Working on design" },
+                    { stage: "Film Printing", status: "pending", date: null, user: null, notes: null },
+                    { stage: "Production", status: "pending", date: null, user: null, notes: null },
+                    { stage: "Quality Control", status: "pending", date: null, user: null, notes: null },
+                    { stage: "Shipping", status: "pending", date: null, user: null, notes: null },
+                    { stage: "Payment", status: "pending", date: null, user: null, notes: null }
+                ]
+            },
+            "TR20250505C": {
+                code: "TR20250505C",
+                status: "Completed",
+                date: "May 5, 2025",
+                deadline: "May 15, 2025",
+                customer: "Toko Jaya Abadi",
+                description: "Poster A3 glossy 50 lembar",
+                progress: 100,
+                timeline: [
+                    { stage: "PO Received", status: "completed", date: "May 5, 2025 10:00", user: "Admin Satu", notes: "Purchase order received" },
+                    { stage: "Layout Design", status: "completed", date: "May 6, 2025 15:00", user: "Designer Kreatif", notes: "Design completed" },
+                    { stage: "Film Printing", status: "completed", date: "May 7, 2025 09:00", user: "Designer Kreatif", notes: "Film printed" },
+                    { stage: "Production", status: "completed", date: "May 9, 2025 12:00", user: "Produksi Team", notes: "Production finished" },
+                    { stage: "Quality Control", status: "completed", date: "May 10, 2025 14:00", user: "QC Team", notes: "All items passed QC" },
+                    { stage: "Shipping", status: "completed", date: "May 12, 2025 16:00", user: "Admin Satu", notes: "Shipped via JNE" },
+                    { stage: "Payment", status: "completed", date: "May 15, 2025 11:00", user: "Finance Team", notes: "Payment received in full" }
+                ]
+            }
+        };
+        
+        // Icons for each stage
+        const stageIcons = {
+            "PO Received": "fa-file-invoice",
+            "Layout Design": "fa-paint-brush",
+            "Film Printing": "fa-film",
+            "Production": "fa-industry",
+            "Quality Control": "fa-check-circle",
+            "Shipping": "fa-truck",
+            "Payment": "fa-money-bill-wave"
+        };
+        
         document.getElementById('trackForm').onsubmit = function(e) {
             e.preventDefault();
             const code = document.getElementById('code').value.toUpperCase();
             
-            if (code === 'TR20250511A') {
-                document.getElementById('showCode').textContent = code;
-                document.getElementById('showStatus').textContent = 'Production';
-                document.getElementById('showProgress').textContent = '50';
+            if (orders[code]) {
+                const order = orders[code];
+                
+                // Update order details
+                document.getElementById('showCode').textContent = order.code;
+                document.getElementById('showDate').textContent = order.date;
+                document.getElementById('showCustomer').textContent = order.customer;
+                document.getElementById('showStatus').textContent = order.status;
+                document.getElementById('showDeadline').textContent = order.deadline;
+                document.getElementById('showDescription').textContent = order.description;
+                
+                // Update progress bar
+                document.getElementById('progressBar').style.width = order.progress + '%';
+                document.getElementById('progressText').textContent = order.progress + '%';
+                
+                // Set progress bar color based on percentage
+                const progressBar = document.getElementById('progressBar');
+                progressBar.className = 'progress-bar progress-bar-striped progress-bar-animated';
+                if (order.progress < 30) {
+                    progressBar.classList.add('bg-danger');
+                } else if (order.progress < 70) {
+                    progressBar.classList.add('bg-warning');
+                } else {
+                    progressBar.classList.add('bg-success');
+                }
+                
+                // Create timeline
+                const timelineEl = document.getElementById('timeline');
+                timelineEl.innerHTML = '';
+                
+                order.timeline.forEach((item, index) => {
+                    const isLeft = index % 2 === 0;
+                    const timelineItem = document.createElement('div');
+                    timelineItem.className = 'timeline-item';
+                    
+                    let badgeClass = '';
+                    let badgeIcon = '';
+                    
+                    if (item.status === 'completed') {
+                        badgeClass = 'completed';
+                        badgeIcon = '<i class="fas fa-check"></i>';
+                    } else if (item.status === 'in-progress') {
+                        badgeClass = 'in-progress';
+                        badgeIcon = '<i class="fas fa-spinner fa-spin"></i>';
+                    } else {
+                        badgeIcon = '<i class="fas fa-clock"></i>';
+                    }
+                    
+                    timelineItem.innerHTML = `
+                        <div class="timeline-left ${!isLeft ? 'order-2' : ''}">
+                            ${isLeft ? `
+                                <div class="timeline-card">
+                                    <h6><i class="fas ${stageIcons[item.stage]} me-2"></i>${item.stage}</h6>
+                                    ${item.date ? `<p class="timeline-date mb-1"><i class="far fa-calendar me-1"></i>${item.date}</p>` : ''}
+                                    ${item.user ? `<p class="mb-1"><i class="fas fa-user me-1"></i>${item.user}</p>` : ''}
+                                    ${item.notes ? `<p class="mb-0 text-muted"><i class="fas fa-comment me-1"></i>${item.notes}</p>` : ''}
+                                    ${!item.date ? '<p class="mb-0 text-muted">Waiting...</p>' : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="timeline-badge ${badgeClass}">
+                            ${badgeIcon}
+                        </div>
+                        <div class="timeline-right ${!isLeft ? 'order-1' : ''}">
+                            ${!isLeft ? `
+                                <div class="timeline-card">
+                                    <h6><i class="fas ${stageIcons[item.stage]} me-2"></i>${item.stage}</h6>
+                                    ${item.date ? `<p class="timeline-date mb-1"><i class="far fa-calendar me-1"></i>${item.date}</p>` : ''}
+                                    ${item.user ? `<p class="mb-1"><i class="fas fa-user me-1"></i>${item.user}</p>` : ''}
+                                    ${item.notes ? `<p class="mb-0 text-muted"><i class="fas fa-comment me-1"></i>${item.notes}</p>` : ''}
+                                    ${!item.date ? '<p class="mb-0 text-muted">Waiting...</p>' : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                    
+                    timelineEl.appendChild(timelineItem);
+                });
+                
                 document.getElementById('result').style.display = 'block';
             } else {
-                alert('Order not found!');
+                alert('Order not found! Please check your tracking code.');
                 document.getElementById('result').style.display = 'none';
             }
         };
