@@ -141,6 +141,7 @@
                 ],
                 actions: [
                     '<button class="btn btn-primary btn-sm" id="create-new-order-btn">Create New Order</button>',
+                    '<button class="btn btn-success btn-sm" id="add-user-btn">Add User</button>',
                     '<button class="btn btn-secondary btn-sm">Export Report</button>'
                 ],
                 content: `
@@ -543,6 +544,11 @@
                     handleCreateOrder();
                 }
                 
+                // Add User button (Manager)
+                if (e.target.matches('#add-user-btn')) {
+                    handleAddUser();
+                }
+                
                 // Export Report button
                 if (e.target.matches('.btn-secondary') && e.target.textContent.includes('Export')) {
                     handleExportReport();
@@ -605,6 +611,320 @@
                 default:
                     loadDashboard(); // Reload main dashboard
             }
+        }
+        
+        function handleAddUser() {
+            showAddUserForm();
+        }
+        
+        function showAddUserForm() {
+            const content = document.getElementById('dashboard-content');
+            content.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Add New User</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="add-user-form">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Username <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="new-username" required 
+                                               pattern="[a-zA-Z0-9]+" 
+                                               title="Username should only contain letters and numbers">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="new-fullname" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="new-email" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Role <span class="text-danger">*</span></label>
+                                        <select class="form-control" id="new-role" required>
+                                            <option value="">Select Role</option>
+                                            <option value="manager">Manager</option>
+                                            <option value="admin">Admin</option>
+                                            <option value="designer">Designer</option>
+                                            <option value="production">Production</option>
+                                            <option value="qc">Quality Control</option>
+                                            <option value="finance">Finance</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Password <span class="text-danger">*</span></label>
+                                        <input type="password" class="form-control" id="new-password" required 
+                                               minlength="6">
+                                        <small class="text-muted">Minimum 6 characters</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Confirm Password <span class="text-danger">*</span></label>
+                                        <input type="password" class="form-control" id="confirm-password" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <hr>
+                            
+                            <!-- Permissions/Access Section -->
+                            <h6 class="mb-3">Permissions</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="can-create-orders">
+                                        <label class="form-check-label" for="can-create-orders">
+                                            Can create new orders
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="can-edit-orders">
+                                        <label class="form-check-label" for="can-edit-orders">
+                                            Can edit orders
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="can-delete-orders">
+                                        <label class="form-check-label" for="can-delete-orders">
+                                            Can delete orders
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="can-view-reports">
+                                        <label class="form-check-label" for="can-view-reports">
+                                            Can view reports
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="can-manage-users">
+                                        <label class="form-check-label" for="can-manage-users">
+                                            Can manage users
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="can-export-data">
+                                        <label class="form-check-label" for="can-export-data">
+                                            Can export data
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <button type="submit" class="btn btn-primary">Create User</button>
+                                <button type="button" class="btn btn-secondary" onclick="loadDashboard()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Current Users List -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Current Users</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-list">
+                                    <!-- Users will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Load existing users
+            loadUsersList();
+            
+            // Add form submit handler
+            document.getElementById('add-user-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form values
+                const username = document.getElementById('new-username').value;
+                const fullname = document.getElementById('new-fullname').value;
+                const email = document.getElementById('new-email').value;
+                const role = document.getElementById('new-role').value;
+                const password = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                
+                // Validate passwords match
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match!');
+                    return;
+                }
+                
+                // Get permissions based on role
+                const permissions = {
+                    canCreateOrders: document.getElementById('can-create-orders').checked,
+                    canEditOrders: document.getElementById('can-edit-orders').checked,
+                    canDeleteOrders: document.getElementById('can-delete-orders').checked,
+                    canViewReports: document.getElementById('can-view-reports').checked,
+                    canManageUsers: document.getElementById('can-manage-users').checked,
+                    canExportData: document.getElementById('can-export-data').checked
+                };
+                
+                // Create user object
+                const newUser = {
+                    username: username,
+                    name: fullname,
+                    email: email,
+                    role: role,
+                    password: password, // In real app, this would be hashed
+                    permissions: permissions,
+                    status: 'active',
+                    createdAt: new Date().toISOString(),
+                    createdBy: JSON.parse(localStorage.getItem('currentUser')).username
+                };
+                
+                // Check if username already exists
+                let users = JSON.parse(localStorage.getItem('users') || '[]');
+                if (users.find(u => u.username === username)) {
+                    alert('Username already exists!');
+                    return;
+                }
+                
+                // Add user to storage
+                users.push(newUser);
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                alert('User created successfully!');
+                showAddUserForm(); // Reload the form to show updated user list
+            });
+            
+            // Auto-select permissions based on role
+            document.getElementById('new-role').addEventListener('change', function() {
+                const role = this.value;
+                
+                // Reset all checkboxes
+                document.querySelectorAll('.form-check-input').forEach(cb => cb.checked = false);
+                
+                // Set permissions based on role
+                switch(role) {
+                    case 'manager':
+                        document.getElementById('can-create-orders').checked = true;
+                        document.getElementById('can-edit-orders').checked = true;
+                        document.getElementById('can-delete-orders').checked = true;
+                        document.getElementById('can-view-reports').checked = true;
+                        document.getElementById('can-manage-users').checked = true;
+                        document.getElementById('can-export-data').checked = true;
+                        break;
+                    case 'admin':
+                        document.getElementById('can-create-orders').checked = true;
+                        document.getElementById('can-edit-orders').checked = true;
+                        document.getElementById('can-view-reports').checked = true;
+                        document.getElementById('can-export-data').checked = true;
+                        break;
+                    case 'designer':
+                        document.getElementById('can-edit-orders').checked = true;
+                        break;
+                    case 'production':
+                        document.getElementById('can-edit-orders').checked = true;
+                        break;
+                    case 'qc':
+                        document.getElementById('can-edit-orders').checked = true;
+                        break;
+                    case 'finance':
+                        document.getElementById('can-view-reports').checked = true;
+                        document.getElementById('can-export-data').checked = true;
+                        break;
+                }
+            });
+        }
+        
+        function loadUsersList() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const tbody = document.getElementById('users-list');
+            
+            // Add default users if list is empty
+            if (users.length === 0) {
+                const defaultUsers = [
+                    { username: 'manager1', name: 'Manager Utama', email: 'manager@company.com', role: 'manager', status: 'active' },
+                    { username: 'admin1', name: 'Admin Satu', email: 'admin@company.com', role: 'admin', status: 'active' },
+                    { username: 'designer1', name: 'Designer Kreatif', email: 'designer@company.com', role: 'designer', status: 'active' },
+                    { username: 'prod1', name: 'Produksi Team', email: 'production@company.com', role: 'production', status: 'active' }
+                ];
+                users.push(...defaultUsers);
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+            
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user.username}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td><span class="badge bg-primary">${user.role}</span></td>
+                    <td>
+                        <span class="badge ${user.status === 'active' ? 'bg-success' : 'bg-danger'}">
+                            ${user.status}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-info" onclick="editUser('${user.username}')">Edit</button>
+                        <button class="btn btn-sm btn-${user.status === 'active' ? 'warning' : 'success'}" 
+                                onclick="toggleUserStatus('${user.username}')">
+                            ${user.status === 'active' ? 'Disable' : 'Enable'}
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteUser('${user.username}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function toggleUserStatus(username) {
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users.find(u => u.username === username);
+            
+            if (user) {
+                user.status = user.status === 'active' ? 'inactive' : 'active';
+                localStorage.setItem('users', JSON.stringify(users));
+                loadUsersList();
+            }
+        }
+        
+        function deleteUser(username) {
+            if (!confirm(`Are you sure you want to delete user: ${username}?`)) {
+                return;
+            }
+            
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            users = users.filter(u => u.username !== username);
+            localStorage.setItem('users', JSON.stringify(users));
+            loadUsersList();
+        }
+        
+        function editUser(username) {
+            alert(`Edit functionality for ${username} would be implemented here`);
         }
         
         function handleCreateOrder() {
@@ -700,50 +1020,14 @@
         }
         
         function showUsersPage() {
-            const content = document.getElementById('dashboard-content');
-            content.innerHTML = `
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">User Management</h5>
-                        <button class="btn btn-primary btn-sm">Add New User</button>
-                    </div>
-                    <div class="card-body">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Role</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Manager Utama</td>
-                                    <td>manager@company.com</td>
-                                    <td><span class="badge bg-primary">Manager</span></td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info">Edit</button>
-                                        <button class="btn btn-sm btn-danger">Disable</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Admin Satu</td>
-                                    <td>admin@company.com</td>
-                                    <td><span class="badge bg-info">Admin</span></td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info">Edit</button>
-                                        <button class="btn btn-sm btn-danger">Disable</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            `;
+            // Redirect to add user form for manager
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (user.role === 'manager') {
+                showAddUserForm();
+            } else {
+                alert('You do not have permission to manage users');
+                loadDashboard();
+            }
         }
         
         function showSettingsPage() {
