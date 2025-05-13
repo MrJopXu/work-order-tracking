@@ -1,31 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Test Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Work Order System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>GitHub Pages Works!</h1>
-    <p>If you see this, GitHub Pages is working properly.</p>
-    <h2>Available Pages:</h2>
-    <ul>
-        <li><a href="index.html">Go to Index</a></li>
-        <li><a href="login.html">Go to Login</a></li>
-        <li><a href="tracking.html">Go to Tracking</a></li>
-        <li><a href="tracking-simple.html">Go to Simple Tracking</a></li>
-        <li><a href="login-simple.html">Go to Simple Login</a></li>
-        <li><a href="dashboard-simple.html">Go to Simple Dashboard</a></li>
-    </ul>
+    <nav class="navbar navbar-dark bg-primary">
+        <div class="container">
+            <span class="navbar-brand">Work Order Dashboard</span>
+            <button class="btn btn-light btn-sm" id="logout">Logout</button>
+        </div>
+    </nav>
     
-    <h2>Test LocalStorage:</h2>
-    <button onclick="testStorage()">Test Storage</button>
-    <p id="storage-test"></p>
+    <div class="container mt-4">
+        <div class="alert alert-success">
+            <h4>Welcome to Dashboard!</h4>
+            <p>User: <span id="user-name">-</span></p>
+            <p>Role: <span id="user-role">-</span></p>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <h5>Quick Links</h5>
+                <a href="tracking.html" class="btn btn-primary">Track Order</a>
+                <a href="index.html" class="btn btn-secondary">Home</a>
+            </div>
+        </div>
+    </div>
     
     <script>
-        function testStorage() {
-            localStorage.setItem('test', 'Working!');
-            document.getElementById('storage-test').textContent = 
-                'LocalStorage test: ' + localStorage.getItem('test');
+        // Check login
+        const userStr = localStorage.getItem('currentUser');
+        if (!userStr) {
+            alert('Please login first');
+            window.location.href = 'login.html';
+        } else {
+            const user = JSON.parse(userStr);
+            document.getElementById('user-name').textContent = user.name || 'Unknown';
+            document.getElementById('user-role').textContent = user.role || 'Unknown';
         }
+        
+        // Logout
+        document.getElementById('logout').onclick = function() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        };
     </script>
 </body>
 </html>
