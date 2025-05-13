@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Order Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        
+        .card {
+            box-shadow: 0 0 10px rgba(0,0,0,.05);
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .stat-card.primary {
+            border-left-color: #007bff;
+        }
+        
+        .stat-card.success {
+            border-left-color: #28a745;
+        }
+        
+        .stat-card.warning {
+            border-left-color: #ffc107;
+        }
+        
+        .stat-card.danger {
+            border-left-color: #dc3545;
+        }
+        
+        .material-row {
+            padding: 10px;
+            background-color: #f1f3f4;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .section-title {
+            color: #007bff;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .form-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        #content-area {
+            min-height: 500px;
+        }
+        
+        .order-item {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            transition: background-color 0.2s;
+        }
+        
+        .order-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .badge-status {
+            font-size: 12px;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-clipboard-list me-2"></i>Work Order System
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text text-white me-3">
+                    <i class="fas fa-user me-1"></i> 
+                    <span id="user-name">User</span> 
+                    (<span id="user-role">Role</span>)
+                </span>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-1"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Menu</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            <a href="#" class="list-group-item list-group-item-action" onclick="showDashboard()">
+                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action" onclick="showCreateOrder()">
+                                <i class="fas fa-plus me-2"></i> Create Order
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action" onclick="showOrders()">
+                                <i class="fas fa-list me-2"></i> All Orders
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action" onclick="showTracking()">
+                                <i class="fas fa-search me-2"></i> Track Order
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9">
+                <div id="content-area">
+                    <!-- Content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Check authentication on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!user.username) {
+                alert('Please login first');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            document.getElementById('user-name').textContent = user.name || user.username;
+            document.getElementById('user-role').textContent = user.role || 'User';
+            
+            // Load dashboard by default
+            showDashboard();
+        });
+
+        // Show Dashboard
+        function showDashboard() {
+            const content = document.getElementById('content-area');
+            content.innerHTML = `
+                <h2 class="section-title">Dashboard Overview</h2>
+                
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card stat-card primary">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Orders</h5>
+                                <h2 class="text-primary">45</h2>
+                                <small class="text-muted">All time</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card success">
+                            <div class="card-body">
+                                <h5 class="card-title">Completed</h5>
+                                <h2 class="text-success">28</h2>
+                                <small class="text-muted">This month</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card warning">
+                            <div class="card-body">
+                                <h5 class="card-title">In Progress</h5>
+                                <h2 class="text-warning">15</h2>
+                                <small class="text-muted">Active orders</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card danger">
+                            <div class="card-body">
+                                <h5 class="card-title">Pending</h5>
+                                <h2 class="text-danger">2</h2>
+                                <small class="text-muted">Need attention</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Recent Orders</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="order-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">TR20250514A</h6>
+                                            <p class="mb-0 text-muted">PT ABC - Label (500 pcs)</p>
+                                        </div>
+                                        <span class="badge bg-warning badge-status">In Production</span>
+                                    </div>
+                                </div>
+                                <div class="order-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">TR20250513B</h6>
+                                            <p class="mb-0 text-muted">CV XYZ - Hangtag (1000 pcs)</p>
+                                        </div>
+                                        <span class="badge bg-success badge-status">Completed</span>
+                                    </div>
+                                </div>
+                                <div class="order-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">TR20250512C</h6>
+                                            <p class="mb-0 text-muted">Toko Jaya - Woven Label (250 pcs)</p>
+                                        </div>
+                                        <span class="badge bg-primary badge-status">In Layout</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Quick Actions</h5>
+                            </div>
+                            <div class="card-body">
+                                <button class="btn btn-primary w-100 mb-2" onclick="showCreateOrder()">
+                                    <i class="fas fa-plus me-2"></i>New Order
+                                </button>
+                                <button class="btn btn-info w-100 mb-2" onclick="showTracking()">
+                                    <i class="fas fa-search me-2"></i>Track Order
+                                </button>
+                                <button class="btn btn-success w-100">
+                                    <i class="fas fa-file-export me-2"></i>Export Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Show Create Order Form
+        function showCreateOrder() {
+            const content = document.getElementById('content-area');
+            content.innerHTML = `
+                <h2 class="section-title">Create New Order</h2>
+                
+                <form id="create-order-form" onsubmit="submitOrder(event)">
+                    <!-- Customer Information -->
+                    <div class="form-section">
+                        <h5 class="mb-3"><i class="fas fa-user me-2"></i>Customer Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Customer Name *</label>
+                                <input type="text" class="form-control" id="customer-name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone *</label>
+                                <input type="tel" class="form-control" id="customer-phone" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Details -->
+                    <div class="form-section">
+                        <h5 class="mb-3"><i class="fas fa-shopping-cart me-2"></i>Order Details</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">PO Number *</label>
+                                <input type="text" class="form-control" id="po-number" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Deadline *</label>
+                                <input type="date" class="form-control" id="deadline" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Information -->
+                    <div class="form-section">
+                        <h5 class="mb-3"><i class="fas fa-box me-2"></i>Product Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Product Type *</label>
+                                <select class="form-control" id="product-type" onchange="toggleCustomProduct()" required>
+                                    <option value="">Select Product</option>
+                                    <option value="label">Label</option>
+                                    <option value="hangtag">Hangtag</option>
+                                    <option value="woven-label">Woven Label</option>
+                                    <option value="custom">Custom (Manual Input)</option>
+                                </select>
+                                <input type="text" class="form-control mt-2" id="custom-product" 
+                                       placeholder="Enter product type" style="display:none;">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Quantity *</label>
+                                <input type="number" class="form-control" id="quantity" min="1" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Size</label>
+                                <input type="text" class="form-control" id="size" placeholder="e.g., 5x7 cm">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Finishing</label>
+                                <select class="form-control" id="finishing">
+                                    <option value="cut">Cut</option>
+                                    <option value="uncut">Uncut</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" id="description" rows="2"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Raw Materials -->
+                    <div class="form-section">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0"><i class="fas fa-layer-group me-2"></i>Raw Materials</h5>
+                            <button type="button" class="btn btn-success btn-sm" onclick="addMaterial()">
+                                <i class="fas fa-plus me-1"></i> Add Material
+                            </button>
+                        </div>
+                        <div id="materials-container">
+                            <div class="material-row">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control" placeholder="Material name">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="number" class="form-control" placeholder="Quantity">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" placeholder="Unit">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="removeMaterial(this)">
+                                            Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-save me-1"></i> Create Order
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="showDashboard()">
+                            <i class="fas fa-times me-1"></i> Cancel
+                        </button>
+                    </div>
+                </form>
+            `;
+        }
+
+        // Show Orders List
+        function showOrders() {
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            
+            const content = document.getElementById('content-area');
+            content.innerHTML = `
+                <h2 class="section-title">All Orders</h2>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Order Code</th>
+                                        <th>Customer</th>
+                                        <th>Product</th>
+                                        <th>Quantity</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orders-tbody">
+                                    ${orders.map(order => `
+                                        <tr>
+                                            <td>${order.code}</td>
+                                            <td>${order.customerName}</td>
+                                            <td>${order.productType}</td>
+                                            <td>${order.quantity}</td>
+                                            <td><span class="badge bg-primary">${order.status}</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-info">View</button>
+                                            </td>
+                                        </tr>
+                                    `).join('') || '<tr><td colspan="6" class="text-center">No orders found</td></tr>'}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Show Order Tracking
+        function showTracking() {
+            const content = document.getElementById('content-area');
+            content.innerHTML = `
+                <h2 class="section-title">Track Order</h2>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row justify-content-center">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Enter Order Code</label>
+                                    <input type="text" class="form-control" id="tracking-code" placeholder="e.g., TR20250514A">
+                                </div>
+                                <button class="btn btn-primary w-100" onclick="trackOrder()">
+                                    <i class="fas fa-search me-2"></i>Track Order
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="tracking-result" class="mt-4" style="display:none;">
+                            <!-- Tracking result will be shown here -->
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Form Functions
+        function toggleCustomProduct() {
+            const select = document.getElementById('product-type');
+            const customInput = document.getElementById('custom-product');
+            
+            if (select.value === 'custom') {
+                customInput.style.display = 'block';
+                customInput.required = true;
+            } else {
+                customInput.style.display = 'none';
+                customInput.required = false;
+            }
+        }
+
+        function addMaterial() {
+            const container = document.getElementById('materials-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'material-row';
+            newRow.innerHTML = `
+                <div class="row">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" placeholder="Material name">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" class="form-control" placeholder="Quantity">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Unit">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeMaterial(this)">
+                            Remove
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newRow);
+        }
+
+        function removeMaterial(button) {
+            button.closest('.material-row').remove();
+        }
+
+        function submitOrder(event) {
+            event.preventDefault();
+            
+            // Generate order code
+            const date = new Date();
+            const code = `TR${date.getFullYear()}${String(date.getMonth()+1).padStart(2,'0')}${String(date.getDate()).padStart(2,'0')}${String(Math.floor(Math.random()*1000)).padStart(3,'0')}`;
+            
+            // Get form values
+            const productType = document.getElementById('product-type').value;
+            const finalProduct = productType === 'custom' ? 
+                document.getElementById('custom-product').value : productType;
+            
+            // Collect materials
+            const materials = [];
+            document.querySelectorAll('.material-row').forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs[0].value && inputs[1].value) {
+                    materials.push({
+                        name: inputs[0].value,
+                        quantity: inputs[1].value,
+                        unit: inputs[2].value
+                    });
+                }
+            });
+            
+            // Create order object
+            const order = {
+                code: code,
+                customerName: document.getElementById('customer-name').value,
+                customerPhone: document.getElementById('customer-phone').value,
+                poNumber: document.getElementById('po-number').value,
+                deadline: document.getElementById('deadline').value,
+                productType: finalProduct,
+                quantity: document.getElementById('quantity').value,
+                size: document.getElementById('size').value,
+                finishing: document.getElementById('finishing').value,
+                description: document.getElementById('description').value,
+                materials: materials,
+                status: 'New',
+                createdAt: new Date().toISOString()
+            };
+            
+            // Save to localStorage
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            orders.push(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
+            alert(`Order created successfully!\nOrder Code: ${code}`);
+            showDashboard();
+        }
+
+        function trackOrder() {
+            const code = document.getElementById('tracking-code').value;
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const order = orders.find(o => o.code === code.toUpperCase());
+            
+            const resultDiv = document.getElementById('tracking-result');
+            
+            if (order) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        <h5>Order Found!</h5>
+                        <hr>
+                        <p><strong>Code:</strong> ${order.code}</p>
+                        <p><strong>Customer:</strong> ${order.customerName}</p>
+                        <p><strong>Product:</strong> ${order.productType} (${order.quantity} pcs)</p>
+                        <p><strong>Status:</strong> <span class="badge bg-primary">${order.status}</span></p>
+                        <p><strong>Deadline:</strong> ${order.deadline}</p>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h5>Order Not Found</h5>
+                        <p>No order found with code: ${code}</p>
+                    </div>
+                `;
+            }
+            
+            resultDiv.style.display = 'block';
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>
