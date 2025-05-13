@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Test</title>
+</head>
+<body>
+    <h1>Dashboard Works!</h1>
+    <p id="user-info">Loading user...</p>
+    
+    <script>
+        const user = localStorage.getItem('currentUser');
+        if (user) {
+            document.getElementById('user-info').textContent = 'Logged in as: ' + user;
+        } else {
+            document.getElementById('user-info').textContent = 'No user logged in';
+        }
+    </script>
+</body>
+</html>
