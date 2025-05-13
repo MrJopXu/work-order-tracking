@@ -66,6 +66,17 @@
             justify-content: center;
             margin-top: 30px;
         }
+        
+        .material-row {
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .card-header.bg-light {
+            background-color: #f8f9fa !important;
+        }
     </style>
 </head>
 <body>
@@ -149,14 +160,12 @@
                                 <label for="product-type" class="form-label required">Product Type</label>
                                 <select class="form-control" id="product-type" required>
                                     <option value="">Select Product Type</option>
-                                    <option value="banner">Banner</option>
-                                    <option value="sticker">Sticker</option>
-                                    <option value="poster">Poster</option>
-                                    <option value="vinyl">Vinyl</option>
-                                    <option value="billboard">Billboard</option>
-                                    <option value="signage">Signage</option>
-                                    <option value="other">Other</option>
+                                    <option value="label">Label</option>
+                                    <option value="hangtag">Hangtag</option>
+                                    <option value="woven-label">Woven Label</option>
+                                    <option value="custom">Custom (Manual Input)</option>
                                 </select>
+                                <input type="text" class="form-control mt-2" id="custom-product-type" placeholder="Enter custom product type" style="display:none;" />
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="quantity" class="form-label required">Quantity</label>
@@ -201,16 +210,46 @@
                             <div class="col-md-6 mb-3">
                                 <label for="finishing" class="form-label">Finishing</label>
                                 <select class="form-control" id="finishing">
-                                    <option value="none">None</option>
-                                    <option value="laminate">Laminate</option>
-                                    <option value="uv">UV Coating</option>
-                                    <option value="cutting">Die Cutting</option>
+                                    <option value="cut">Cut</option>
+                                    <option value="uncut">Uncut</option>
                                 </select>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="special-instructions" class="form-label">Special Instructions</label>
                             <textarea class="form-control" id="special-instructions" rows="2"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Raw Materials Section -->
+                    <div class="card mt-4 mb-3">
+                        <div class="card-header bg-light">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">Raw Materials</h6>
+                                <button type="button" class="btn btn-sm btn-success" onclick="addMaterialRow()">
+                                    <i class="fas fa-plus"></i> Add Material
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="materials-container">
+                                <div class="material-row mb-3">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <input type="text" class="form-control" placeholder="Material name" name="material-name[]">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="number" class="form-control" placeholder="Quantity" name="material-quantity[]">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" placeholder="Unit (pcs, meter, kg)" name="material-unit[]">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="button" class="btn btn-danger btn-sm" onclick="removeMaterialRow(this)">Remove</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -292,7 +331,55 @@
             
             // Add real-time preview update
             addPreviewListeners();
+            
+            // Add product type change listener
+            document.getElementById('product-type').addEventListener('change', toggleCustomProductType);
         });
+
+        // Toggle custom product type input
+        function toggleCustomProductType() {
+            const select = document.getElementById('product-type');
+            const customInput = document.getElementById('custom-product-type');
+            
+            if (select.value === 'custom') {
+                customInput.style.display = 'block';
+                customInput.required = true;
+            } else {
+                customInput.style.display = 'none';
+                customInput.required = false;
+                customInput.value = '';
+            }
+        }
+
+        // Add new material row
+        function addMaterialRow() {
+            const container = document.getElementById('materials-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'material-row mb-3';
+            newRow.innerHTML = `
+                <div class="row">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" placeholder="Material name" name="material-name[]">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="number" class="form-control" placeholder="Quantity" name="material-quantity[]">
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Unit (pcs, meter, kg)" name="material-unit[]">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeMaterialRow(this)">Remove</button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newRow);
+        }
+
+        // Remove material row
+        function removeMaterialRow(button) {
+            const row = button.closest('.material-row');
+            row.remove();
+        }
 
         // Add preview listeners
         function addPreviewListeners() {
@@ -364,6 +451,24 @@
             // Generate order code
             const orderCode = generateOrderCode();
             
+            // Get product type (check if custom)
+            const productType = document.getElementById('product-type').value;
+            const finalProductType = productType === 'custom' ? 
+                document.getElementById('custom-product-type').value : productType;
+            
+            // Collect materials
+            const materials = [];
+            const materialRows = document.querySelectorAll('.material-row');
+            materialRows.forEach(row => {
+                const name = row.querySelector('input[name="material-name[]"]').value;
+                const quantity = row.querySelector('input[name="material-quantity[]"]').value;
+                const unit = row.querySelector('input[name="material-unit[]"]').value;
+                
+                if (name && quantity) {
+                    materials.push({ name, quantity, unit });
+                }
+            });
+            
             // Collect form data
             const orderData = {
                 code: orderCode,
@@ -380,7 +485,7 @@
                     priority: document.getElementById('priority').value
                 },
                 product: {
-                    type: document.getElementById('product-type').value,
+                    type: finalProductType,
                     quantity: document.getElementById('quantity').value,
                     size: document.getElementById('size').value + ' ' + document.getElementById('size-unit').value,
                     material: document.getElementById('material').value,
@@ -391,6 +496,7 @@
                     finishing: document.getElementById('finishing').value,
                     specialInstructions: document.getElementById('special-instructions').value
                 },
+                rawMaterials: materials,
                 stages: {
                     po: { completed: true, date: new Date().toLocaleDateString(), user: 'Admin' },
                     layout: { completed: false },
@@ -414,12 +520,12 @@
                 customer: orderData.customer.name,
                 date: orderData.order.orderDate,
                 status: 'New',
-                product: orderData.product.type
+                product: finalProductType
             });
             localStorage.setItem('orderList', JSON.stringify(orderList));
             
             // Show success message and redirect
-            alert(`Order created successfully!\nOrder Code: ${orderCode}`);
+            alert(`Order created successfully!\nOrder Code: ${orderCode}\nProduct Type: ${finalProductType}\nMaterials: ${materials.length} items`);
             window.location.href = `order-detail.html?code=${orderCode}`;
         });
 
