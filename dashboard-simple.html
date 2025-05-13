@@ -6,10 +6,26 @@
 <body>
     <h1>GitHub Pages Works!</h1>
     <p>If you see this, GitHub Pages is working properly.</p>
+    <h2>Available Pages:</h2>
     <ul>
         <li><a href="index.html">Go to Index</a></li>
         <li><a href="login.html">Go to Login</a></li>
         <li><a href="tracking.html">Go to Tracking</a></li>
+        <li><a href="tracking-simple.html">Go to Simple Tracking</a></li>
+        <li><a href="login-simple.html">Go to Simple Login</a></li>
+        <li><a href="dashboard-simple.html">Go to Simple Dashboard</a></li>
     </ul>
+    
+    <h2>Test LocalStorage:</h2>
+    <button onclick="testStorage()">Test Storage</button>
+    <p id="storage-test"></p>
+    
+    <script>
+        function testStorage() {
+            localStorage.setItem('test', 'Working!');
+            document.getElementById('storage-test').textContent = 
+                'LocalStorage test: ' + localStorage.getItem('test');
+        }
+    </script>
 </body>
 </html>
