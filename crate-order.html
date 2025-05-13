@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Order - Work Order System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .order-form {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .form-section h5 {
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+        
+        .preview-section {
+            position: sticky;
+            top: 20px;
+        }
+        
+        .preview-card {
+            background: #fff;
+            border: 2px dashed #dee2e6;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .preview-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .required::after {
+            content: " *";
+            color: #dc3545;
+        }
+        
+        .input-group-text {
+            background-color: #f8f9fa;
+        }
+        
+        .btn-group-custom {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-clipboard-list me-2"></i>Work Order Tracker</a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">
+                    <i class="fas fa-user me-1"></i> <span id="user-name">User</span>
+                </span>
+                <a class="btn btn-outline-light btn-sm" href="dashboard-simple.html">Back to Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <h2 class="mb-4">Create New Work Order</h2>
+                
+                <form id="create-order-form" class="order-form">
+                    <!-- Customer Information Section -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-user-tie me-2"></i>Customer Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="customer-name" class="form-label required">Customer Name</label>
+                                <input type="text" class="form-control" id="customer-name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="customer-company" class="form-label">Company</label>
+                                <input type="text" class="form-control" id="customer-company">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="customer-email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="customer-email">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="customer-phone" class="form-label required">Phone</label>
+                                <input type="tel" class="form-control" id="customer-phone" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Information Section -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-shopping-cart me-2"></i>Order Information</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="po-number" class="form-label required">PO Number</label>
+                                <input type="text" class="form-control" id="po-number" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="order-date" class="form-label required">Order Date</label>
+                                <input type="date" class="form-control" id="order-date" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="deadline" class="form-label required">Deadline</label>
+                                <input type="date" class="form-control" id="deadline" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="priority" class="form-label">Priority</label>
+                                <select class="form-control" id="priority">
+                                    <option value="normal">Normal</option>
+                                    <option value="urgent">Urgent</option>
+                                    <option value="high">High Priority</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Details Section -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-box me-2"></i>Product Details</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="product-type" class="form-label required">Product Type</label>
+                                <select class="form-control" id="product-type" required>
+                                    <option value="">Select Product Type</option>
+                                    <option value="banner">Banner</option>
+                                    <option value="sticker">Sticker</option>
+                                    <option value="poster">Poster</option>
+                                    <option value="vinyl">Vinyl</option>
+                                    <option value="billboard">Billboard</option>
+                                    <option value="signage">Signage</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="quantity" class="form-label required">Quantity</label>
+                                <input type="number" class="form-control" id="quantity" min="1" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="size" class="form-label required">Size</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="size" placeholder="e.g., 3x4" required>
+                                    <select class="form-control" id="size-unit" style="max-width: 100px;">
+                                        <option value="m">meter</option>
+                                        <option value="cm">cm</option>
+                                        <option value="inch">inch</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="material" class="form-label">Material</label>
+                                <input type="text" class="form-control" id="material" placeholder="e.g., Flexi, Vinyl">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" rows="3" placeholder="Additional details about the order..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Additional Options Section -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-cog me-2"></i>Additional Options</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="design-source" class="form-label">Design Source</label>
+                                <select class="form-control" id="design-source">
+                                    <option value="customer">Customer Provided</option>
+                                    <option value="inhouse">Create In-House</option>
+                                    <option value="modify">Modify Existing</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="finishing" class="form-label">Finishing</label>
+                                <select class="form-control" id="finishing">
+                                    <option value="none">None</option>
+                                    <option value="laminate">Laminate</option>
+                                    <option value="uv">UV Coating</option>
+                                    <option value="cutting">Die Cutting</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="special-instructions" class="form-label">Special Instructions</label>
+                            <textarea class="form-control" id="special-instructions" rows="2"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Button Group -->
+                    <div class="btn-group-custom">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save me-2"></i>Create Order
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-lg" onclick="resetForm()">
+                            <i class="fas fa-undo me-2"></i>Reset Form
+                        </button>
+                        <a href="dashboard-simple.html" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="col-md-4">
+                <div class="preview-section">
+                    <h4 class="mb-3">Order Preview</h4>
+                    <div class="preview-card">
+                        <div class="preview-item">
+                            <strong>Order Code:</strong> <span id="preview-code">Will be generated</span>
+                        </div>
+                        <div class="preview-item">
+                            <strong>Customer:</strong> <span id="preview-customer">-</span>
+                        </div>
+                        <div class="preview-item">
+                            <strong>PO Number:</strong> <span id="preview-po">-</span>
+                        </div>
+                        <div class="preview-item">
+                            <strong>Product:</strong> <span id="preview-product">-</span>
+                        </div>
+                        <div class="preview-item">
+                            <strong>Quantity:</strong> <span id="preview-quantity">-</span>
+                        </div>
+                        <div class="preview-item">
+                            <strong>Size:</strong> <span id="preview-size">-</span>
+                        </div>
+                        <div class="preview-item">
+                            <strong>Deadline:</strong> <span id="preview-deadline">-</span>
+                        </div>
+                        <div class="preview-item">
+                            <strong>Status:</strong> <span class="badge bg-secondary">Draft</span>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <small class="text-muted">Preview updates as you fill the form</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check login
+            const userStr = localStorage.getItem('currentUser');
+            if (!userStr) {
+                alert('Please login first');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            const user = JSON.parse(userStr);
+            document.getElementById('user-name').textContent = user.name;
+            
+            // Set default date to today
+            document.getElementById('order-date').valueAsDate = new Date();
+            
+            // Set minimum deadline to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('deadline').min = tomorrow.toISOString().split('T')[0];
+            
+            // Add real-time preview update
+            addPreviewListeners();
+        });
+
+        // Add preview listeners
+        function addPreviewListeners() {
+            // Customer name
+            document.getElementById('customer-name').addEventListener('input', function() {
+                document.getElementById('preview-customer').textContent = this.value || '-';
+            });
+            
+            // PO Number
+            document.getElementById('po-number').addEventListener('input', function() {
+                document.getElementById('preview-po').textContent = this.value || '-';
+            });
+            
+            // Product type
+            document.getElementById('product-type').addEventListener('change', function() {
+                document.getElementById('preview-product').textContent = 
+                    this.options[this.selectedIndex].text || '-';
+            });
+            
+            // Quantity
+            document.getElementById('quantity').addEventListener('input', function() {
+                document.getElementById('preview-quantity').textContent = this.value || '-';
+            });
+            
+            // Size
+            ['size', 'size-unit'].forEach(id => {
+                document.getElementById(id).addEventListener('input', updateSizePreview);
+            });
+            
+            // Deadline
+            document.getElementById('deadline').addEventListener('change', function() {
+                if (this.value) {
+                    const date = new Date(this.value);
+                    document.getElementById('preview-deadline').textContent = 
+                        date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                } else {
+                    document.getElementById('preview-deadline').textContent = '-';
+                }
+            });
+        }
+
+        // Update size preview
+        function updateSizePreview() {
+            const size = document.getElementById('size').value;
+            const unit = document.getElementById('size-unit').value;
+            
+            if (size) {
+                document.getElementById('preview-size').textContent = `${size} ${unit}`;
+            } else {
+                document.getElementById('preview-size').textContent = '-';
+            }
+        }
+
+        // Generate order code
+        function generateOrderCode() {
+            const date = new Date();
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const random = Math.random().toString(36).substring(2, 5).toUpperCase();
+            
+            return `TR${year}${month}${day}${random}`;
+        }
+
+        // Handle form submission
+        document.getElementById('create-order-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Generate order code
+            const orderCode = generateOrderCode();
+            
+            // Collect form data
+            const orderData = {
+                code: orderCode,
+                customer: {
+                    name: document.getElementById('customer-name').value,
+                    company: document.getElementById('customer-company').value,
+                    email: document.getElementById('customer-email').value,
+                    phone: document.getElementById('customer-phone').value
+                },
+                order: {
+                    poNumber: document.getElementById('po-number').value,
+                    orderDate: document.getElementById('order-date').value,
+                    deadline: document.getElementById('deadline').value,
+                    priority: document.getElementById('priority').value
+                },
+                product: {
+                    type: document.getElementById('product-type').value,
+                    quantity: document.getElementById('quantity').value,
+                    size: document.getElementById('size').value + ' ' + document.getElementById('size-unit').value,
+                    material: document.getElementById('material').value,
+                    description: document.getElementById('description').value
+                },
+                options: {
+                    designSource: document.getElementById('design-source').value,
+                    finishing: document.getElementById('finishing').value,
+                    specialInstructions: document.getElementById('special-instructions').value
+                },
+                stages: {
+                    po: { completed: true, date: new Date().toLocaleDateString(), user: 'Admin' },
+                    layout: { completed: false },
+                    film: { completed: false },
+                    production: { completed: false },
+                    qc: { completed: false },
+                    shipping: { completed: false },
+                    payment: { completed: false }
+                },
+                createdBy: JSON.parse(localStorage.getItem('currentUser')).name,
+                createdAt: new Date().toISOString()
+            };
+            
+            // Save to localStorage (in real app, this would be sent to backend)
+            localStorage.setItem(`order_${orderCode}`, JSON.stringify(orderData));
+            
+            // Save to order list
+            let orderList = JSON.parse(localStorage.getItem('orderList') || '[]');
+            orderList.push({
+                code: orderCode,
+                customer: orderData.customer.name,
+                date: orderData.order.orderDate,
+                status: 'New',
+                product: orderData.product.type
+            });
+            localStorage.setItem('orderList', JSON.stringify(orderList));
+            
+            // Show success message and redirect
+            alert(`Order created successfully!\nOrder Code: ${orderCode}`);
+            window.location.href = `order-detail.html?code=${orderCode}`;
+        });
+
+        // Reset form
+        function resetForm() {
+            if (confirm('Are you sure you want to reset the form?')) {
+                document.getElementById('create-order-form').reset();
+                
+                // Reset preview
+                document.getElementById('preview-customer').textContent = '-';
+                document.getElementById('preview-po').textContent = '-';
+                document.getElementById('preview-product').textContent = '-';
+                document.getElementById('preview-quantity').textContent = '-';
+                document.getElementById('preview-size').textContent = '-';
+                document.getElementById('preview-deadline').textContent = '-';
+                
+                // Reset dates
+                document.getElementById('order-date').valueAsDate = new Date();
+            }
+        }
+    </script>
+</body>
+</html>
