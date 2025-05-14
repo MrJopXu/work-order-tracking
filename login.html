@@ -13,12 +13,12 @@
     <form id="login-form">
       <div class="mb-3">
         <label for="username" class="form-label">Username</label>
-        <input type="text" id="username" class="form-control" required/>
+        <input type="text" id="username" class="form-control" required />
       </div>
       <div class="mb-3">
         <label for="password" class="form-label">Password</label>
         <div class="input-group">
-          <input type="password" id="password" class="form-control" required/>
+          <input type="password" id="password" class="form-control" required />
           <button class="btn btn-outline-secondary" type="button" id="toggle-password">
             <i class="fas fa-eye"></i>
           </button>
@@ -28,14 +28,51 @@
     </form>
   </div>
 
-  <script src="user-DYNAMIC.js"></script>
+  <script>
+    // Inject dummy users if not already in localStorage
+    if (!localStorage.getItem("users")) {
+      const dummyUsers = [
+        { username: "manager1", password: "pass123", name: "Manager Utama", role: "manager" },
+        { username: "admin1", password: "pass123", name: "Admin Satu", role: "admin" },
+        { username: "designer1", password: "pass123", name: "Designer Kreatif", role: "designer" },
+        { username: "prod1", password: "pass123", name: "Produksi Team", role: "production" },
+        { username: "qc1", password: "pass123", name: "Quality Control", role: "qc" },
+        { username: "finance1", password: "pass123", name: "Finance Team", role: "finance" }
+      ];
+      localStorage.setItem("users", JSON.stringify(dummyUsers));
+    }
 
-<script>
-  if (!localStorage.getItem('users')) {
-    localStorage.setItem('users', '[{"username": "manager1", "password": "pass123", "name": "Manager Utama", "role": "manager"}, {"username": "admin1", "password": "pass123", "name": "Admin Satu", "role": "admin"}, {"username": "designer1", "password": "pass123", "name": "Designer Kreatif", "role": "designer"}, {"username": "prod1", "password": "pass123", "name": "Produksi Team", "role": "production"}, {"username": "qc1", "password": "pass123", "name": "Quality Control", "role": "qc"}, {"username": "finance1", "password": "pass123", "name": "Finance Team", "role": "finance"}]');
-    console.log("Dummy users injected to localStorage!");
-  }
-</script>
+    // Toggle password visibility
+    document.getElementById("toggle-password").addEventListener("click", function () {
+      const input = document.getElementById("password");
+      const icon = this.querySelector("i");
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+      } else {
+        input.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+      }
+    });
 
+    // Login logic
+    document.getElementById("login-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+
+      const user = users.find(u => u.username === username && u.password === password);
+      if (user) {
+        localStorage.setItem("currentUser", JSON.stringify(user));
+        alert(`Login berhasil! Selamat datang ${user.name}`);
+        window.location.href = "dashboard-simple.html"; // ganti sesuai kebutuhan
+      } else {
+        alert("Username atau password salah!");
+      }
+    });
+  </script>
 </body>
 </html>
