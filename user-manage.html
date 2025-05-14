@@ -94,6 +94,29 @@
 
     function addUser(e) {
       e.preventDefault();
+      const name = document.getElementById("user-name").value.trim();
+      const password = document.getElementById("user-password").value.trim();
+      const role = document.getElementById("user-role").value;
+      
+      if (!name || !password || !role) {
+        alert("Semua field harus diisi!");
+        return;
+      }
+      
+      const exists = users.find(u => u.name === name);
+      if (exists) {
+        alert("User dengan nama ini sudah ada!");
+        return;
+      }
+
+      const newUser = { name, password, role };
+      users.push(newUser);
+      localStorage.setItem("users", JSON.stringify(users));
+      renderUsers();
+      e.target.reset();
+      hideAddForm();
+    
+      e.preventDefault();
       const name = document.getElementById("user-name").value;
       const password = document.getElementById("user-password").value;
       const role = document.getElementById("user-role").value;
@@ -116,6 +139,3 @@
   </script>
 </body>
 </html>
-function showUsers() {
-  window.location.href = 'user-manage.html';
-}
