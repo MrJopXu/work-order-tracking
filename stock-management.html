@@ -1,48 +1,348 @@
-// Load menu based on role
-function loadMenu(role) {
-    const menu = document.getElementById('sidebar-menu');
-    
-    const menuItems = {
-        manager: [
-            { icon: 'fa-tachometer-alt', text: 'Dashboard', action: 'loadDashboard()' },
-            { icon: 'fa-plus', text: 'Create Order', action: 'showCreateOrder()' },
-            { icon: 'fa-list', text: 'All Orders', action: 'showAllOrders()' },
-            { icon: 'fa-boxes', text: 'Stock Management', action: 'showStockManagement()' },
-            { icon: 'fa-chart-bar', text: 'Reports', action: 'showReports()' },
-            { icon: 'fa-users', text: 'Users', action: 'showUsers()' },
-            { icon: 'fa-cog', text: 'Settings', action: 'showSettings()' }
-        ],
-        admin: [
-            { icon: 'fa-tachometer-alt', text: 'Dashboard', action: 'loadDashboard()' },
-            { icon: 'fa-plus', text: 'New Order', action: 'showCreateOrder()' },
-            { icon: 'fa-boxes', text: 'Stock Management', action: 'showStockManagement()' },
-            { icon: 'fa-truck', text: 'Shipping', action: 'showShipping()' },
-            { icon: 'fa-users', text: 'Customers', action: 'showCustomers()' }
-        ],
-        designer: [
-            { icon: 'fa-tachometer-alt', text: 'Dashboard', action: 'loadDashboard()' },
-            { icon: 'fa-palette', text: 'Layout Tasks', action: 'showLayoutTasks()' },
-            { icon: 'fa-print', text: 'Film Tasks', action: 'showFilmTasks()' },
-            { icon: 'fa-tasks', text: 'My Tasks', action: 'showMyTasks()' }
-        ],
-        production: [
-            { icon: 'fa-tachometer-alt', text: 'Dashboard', action: 'loadDashboard()' },
-            { icon: 'fa-industry', text: 'Production Queue', action: 'showProductionQueue()' },
-            { icon: 'fa-tasks', text: 'My Tasks', action: 'showMyTasks()' }
-        ]
+// === CONSTANTS ===
+const ICONS = {
+  TACHOMETER: 'fa-tachometer-alt',
+  PLUS: 'fa-plus',
+  LIST: 'fa-list',
+  ALL_ORDERS: 'fa-boxes',
+  USERS: 'fa-users', 
+  COG: 'fa-cog',
+  CHART_BAR: 'fa-chart-bar',
+  TASKS: 'fa-tasks',
+  PRINT: 'fa-print'
+};
+
+const ACTIONS = {
+  SHOW_DASHBOARD: 'showDashboard',
+  SHOW_CREATE_ORDER: 'showCreateOrder',
+  SHOW_ALL_ORDERS: 'showAllOrders',
+  SHOW_USERS: 'showUsers',
+  SHOW_SETTINGS: 'showSettings',
+  SHOW_STOCK_MANAGEMENT: 'showStockManagement',
+  SHOW_REPORTS: 'showReports',
+  SHOW_MY_TASKS: 'showMyTasks',
+  SHOW_FILM_TASKS: 'showFilmTasks',
+  LOAD_DASHBOARD: 'loadDashboard',
+  SHOW_SHIPPING: 'showShipping',
+  SHOW_LAYOUT_TASKS: 'showLayoutTasks',
+  SHOW_CUSTOMERS: 'showCustomers'
+};
+
+// === MENU CONFIGURATION ===
+const menuConfig = {
+  dashboard: {
+    text: 'Dashboard',
+    icon: ICONS.TACHOMETER,
+    action: ACTIONS.LOAD_DASHBOARD
+  },
+  createOrder: {
+    text: 'Create Order',
+    icon: ICONS.PLUS,
+    action: ACTIONS.SHOW_CREATE_ORDER
+  },
+  stockManagement: {
+    text: 'Stock Management', 
+    icon: ICONS.LIST,
+    action: ACTIONS.SHOW_STOCK_MANAGEMENT
+  },
+  shipping: {
+    text: 'Shipping',
+    icon: ICONS.TACHOMETER,
+    action: ACTIONS.SHOW_SHIPPING
+  },
+  users: {
+    text: 'Customers',
+    icon: ICONS.USERS,
+    action: ACTIONS.SHOW_CUSTOMERS
+  },
+  myTasks: {
+    text: 'My Tasks',
+    icon: ICONS.TACHOMETER,
+    action: ACTIONS.SHOW_MY_TASKS
+  },
+  productionQueue: {
+    text: 'Production Queue',
+    icon: ICONS.TASKS,
+    action: ACTIONS.SHOW_MY_TASKS
+  },
+  reports: {
+    text: 'Reports',
+    icon: ICONS.CHART_BAR,
+    action: ACTIONS.SHOW_REPORTS
+  },
+  tasks: {
+    text: 'My Tasks',
+    icon: ICONS.TACHOMETER,
+    action: ACTIONS.SHOW_MY_TASKS
+  },
+  layoutTasks: {
+    text: 'Layout Tasks',
+    icon: ICONS.PALETTE,
+    action: ACTIONS.SHOW_LAYOUT_TASKS
+  },
+  allOrders: {
+    text: 'All Orders',
+    icon: ICONS.ALL_ORDERS,
+    action: ACTIONS.SHOW_ALL_ORDERS
+  },
+  users: {
+    text: 'Users',
+    icon: ICONS.USERS,
+    action: ACTIONS.SHOW_USERS
+  },
+  settings: {
+    text: 'Settings',
+    icon: ICONS.COG,
+    action: ACTIONS.SHOW_SETTINGS
+  },
+  newOrder: {
+    text: 'New Order',
+    icon: ICONS.PLUS,
+    action: ACTIONS.SHOW_CREATE_ORDER
+  },
+  filmTasks: {
+    text: 'Film Tasks',
+    icon: ICONS.PRINT,
+    action: ACTIONS.SHOW_FILM_TASKS
+  }
+};
+
+// === ROLE-BASED MENU ACCESS ===
+const roleMenuAccess = {
+  dashboard: [
+    'dashboard',
+    'createOrder',
+    'stockManagement',
+    'shipping',
+    'users',
+    'reports',
+    'allOrders',
+    'users',
+    'settings'
+  ],
+  stockManagement: [
+    'dashboard',
+    'stockManagement'
+  ],
+  production: [
+    'dashboard',
+    'myTasks',
+    'productionQueue'
+  ],
+  designer: [
+    'dashboard',
+    'myTasks',
+    'productionQueue'
+  ],
+  tasks: [
+    'myTasks',
+    'layoutTasks'
+  ],
+  tachometerAlt: [
+    'dashboard',
+    'myTasks'
+  ],
+  newOrder: [
+    'dashboard',
+    'newOrder'
+  ],
+  filmTasks: [
+    'tasks',
+    'myTasks'
+  ],
+  layoutTasks: [
+    'print',
+    'filmTasks'
+  ]
+};
+
+// === MENU BUILDER CLASS ===
+class MenuBuilder {
+  constructor(config, roleAccess) {
+    this.config = config;
+    this.roleAccess = roleAccess;
+  }
+
+  createMenuItem(itemKey) {
+    const item = this.config[itemKey];
+    if (!item) return null;
+
+    return {
+      id: `${item.text.replace(/\s+/g, '')}`,
+      text: item.text,
+      icon: `fa ${item.icon}`,
+      action: item.action,
+      admin: {
+        text: item.text,
+        action: item.action
+      }
     };
+  }
+
+  buildMenuByRole(role) {
+    const menuKeys = this.roleAccess[role];
+    if (!menuKeys) return null;
+
+    const items = menuKeys
+      .map(key => this.createMenuItem(key))
+      .filter(item => item !== null);
+
+    return {
+      role,
+      items
+    };
+  }
+
+  buildSubMenu(parentKey, subMenuKeys) {
+    const parentItem = this.config[parentKey];
+    if (!parentItem) return null;
+
+    const subItems = subMenuKeys
+      .map(key => this.createMenuItem(key))
+      .filter(item => item !== null);
+
+    return {
+      ...this.createMenuItem(parentKey),
+      subMenu: subItems
+    };
+  }
+}
+
+// === MENU INITIALIZATION ===
+function initializeMenu(role) {
+  const builder = new MenuBuilder(menuConfig, roleMenuAccess);
+  const menu = builder.buildMenuByRole(role);
+  
+  if (!menu) {
+    console.error(`No menu configuration found for role: ${role}`);
+    return null;
+  }
+
+  // Create HTML structure
+  const menuHTML = createMenuHTML(menu.items);
+  
+  // Insert into DOM
+  const menuContainer = document.getElementById('sidebar-menu');
+  if (menuContainer) {
+    menuContainer.innerHTML = menuHTML;
+  }
+
+  return menu;
+}
+
+// === HTML GENERATION ===
+function createMenuHTML(items) {
+  return `
+    <ul class="nav flex-column">
+      ${items.map(item => createMenuItemHTML(item)).join('')}
+    </ul>
+  `;
+}
+
+function createMenuItemHTML(item) {
+  const hasSubMenu = item.subMenu && item.subMenu.length > 0;
+  
+  if (hasSubMenu) {
+    return `
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="${item.id}" 
+           role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="${item.icon}"></i> ${item.text}
+        </a>
+        <div class="dropdown-menu" aria-labelledby="${item.id}">
+          ${item.subMenu.map(subItem => `
+            <a class="dropdown-item" href="#" onclick="${subItem.action}()">
+              <i class="${subItem.icon}"></i> ${subItem.text}
+            </a>
+          `).join('')}
+        </div>
+      </li>
+    `;
+  }
+  
+  return `
+    <li class="nav-item">
+      <a class="nav-link" href="#" onclick="${item.action}()">
+        <i class="${item.icon}"></i> ${item.text}
+      </a>
+    </li>
+  `;
+}
+
+// === EXAMPLE USAGE ===
+function loadMenuBasedOnRole(role) {
+  const menu = initializeMenu(role);
+  
+  if (menu) {
+    console.log(`Menu loaded for role: ${role}`);
     
-    const items = menuItems[role] || menuItems.admin;
-    
-    let menuHTML = '';
-    items.forEach((item, index) => {
-        menuHTML += `
-            <button class="sidebar-item ${index === 0 ? 'active' : ''}" onclick="${item.action}">
-                <i class="fas ${item.icon}"></i>
-                ${item.text}
-            </button>
-        `;
+    // Set up event listeners for menu items
+    menu.items.forEach(item => {
+      if (window[item.action]) {
+        // Action function exists
+      } else {
+        // Create placeholder function
+        window[item.action] = () => {
+          console.log(`Action triggered: ${item.action}`);
+          // Implement actual functionality here
+        };
+      }
     });
-    
-    menu.innerHTML = menuHTML;
+  }
+}
+
+// === STOCK MANAGEMENT SPECIFIC FUNCTIONS ===
+const stockManagement = {
+  inventory: [],
+  
+  addItem(item) {
+    this.inventory.push({
+      id: Date.now(),
+      ...item,
+      addedDate: new Date().toISOString()
+    });
+  },
+  
+  removeItem(itemId) {
+    this.inventory = this.inventory.filter(item => item.id !== itemId);
+  },
+  
+  updateItem(itemId, updates) {
+    const index = this.inventory.findIndex(item => item.id === itemId);
+    if (index !== -1) {
+      this.inventory[index] = { ...this.inventory[index], ...updates };
+    }
+  },
+  
+  getInventory() {
+    return this.inventory;
+  },
+  
+  searchItems(query) {
+    return this.inventory.filter(item => 
+      item.name.toLowerCase().includes(query.toLowerCase()) ||
+      item.sku?.toLowerCase().includes(query.toLowerCase())
+    );
+  }
+};
+
+// === INITIALIZATION ===
+document.addEventListener('DOMContentLoaded', () => {
+  // Detect user role (you would get this from your authentication system)
+  const userRole = 'dashboard'; // Example role
+  
+  // Load appropriate menu
+  loadMenuBasedOnRole(userRole);
+  
+  // Initialize stock management
+  console.log('Stock Management System Initialized');
+});
+
+// Export for module usage if needed
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    MenuBuilder,
+    stockManagement,
+    initializeMenu,
+    loadMenuBasedOnRole
+  };
 }
