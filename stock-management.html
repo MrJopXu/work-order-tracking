@@ -1,15 +1,9 @@
-from zipfile import ZipFile
-import os
-
-# Buat struktur direktori proyek
-project_dir = "/mnt/data/simple-stock-management"
-os.makedirs(project_dir, exist_ok=True)
-
-# Isi HTML
-html_content = """<!DOCTYPE html>
-<html>
+# Membuat file HTML baru dengan script JavaScript eksternal yang sudah benar
+revised_html_content = """<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Stock Management</title>
+    <meta charset="UTF-8">
+    <title>Simple Stock Management</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -47,205 +41,192 @@ html_content = """<!DOCTYPE html>
             <!-- Content will be here -->
         </div>
     </div>
-    <script src="simple-stock-management.js"></script>
+    <script>
+        // Simple Stock Management System
+
+        // Global variables
+        let inventory = [];
+
+        // Initialize system
+        function init() {
+          console.log('Initializing Stock Management...');
+          
+          const saved = localStorage.getItem('inventory');
+          if (saved) {
+            inventory = JSON.parse(saved);
+          } else {
+            addDemoData(); // Auto add demo data if no saved data
+          }
+          
+          createMenu();
+          showDashboard();
+        }
+
+        // Create menu
+        function createMenu() {
+          const menu = document.getElementById('sidebar-menu');
+          if (!menu) {
+            console.error('Menu container not found!');
+            return;
+          }
+          
+          menu.innerHTML = `
+            <h3>Menu</h3>
+            <ul>
+              <li><a href="#" onclick="showDashboard()">Dashboard</a></li>
+              <li><a href="#" onclick="showStock()">Stock Management</a></li>
+            </ul>
+          `;
+        }
+
+        // Show dashboard
+        function showDashboard() {
+          const content = document.getElementById('main-content');
+          if (!content) {
+            console.error('Content container not found!');
+            return;
+          }
+          
+          const lowStock = inventory.filter(item => item.quantity < 10);
+          
+          content.innerHTML = `
+            <h1>Dashboard</h1>
+            <div style="display: flex; gap: 20px;">
+              <div style="border: 1px solid #ccc; padding: 20px;">
+                <h3>Total Items</h3>
+                <p>${inventory.length}</p>
+              </div>
+              <div style="border: 1px solid #ccc; padding: 20px;">
+                <h3>Low Stock</h3>
+                <p>${lowStock.length}</p>
+              </div>
+            </div>
+            ${lowStock.length > 0 ? `
+              <h3>Low Stock Items:</h3>
+              <ul>
+                ${lowStock.map(item => `<li>${item.name} - ${item.quantity}</li>`).join('')}
+              </ul>
+            ` : ''}
+          `;
+        }
+
+        // Show stock management
+        function showStock() {
+          const content = document.getElementById('main-content');
+          if (!content) return;
+          
+          content.innerHTML = `
+            <h1>Stock Management</h1>
+            <button onclick="addNewItem()">Add Item</button>
+            <br><br>
+            <input type="text" id="search" placeholder="Search..." onkeyup="searchItems()">
+            <br><br>
+            <table border="1" cellpadding="10">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Quantity</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="stockTable">
+                ${renderTable(inventory)}
+              </tbody>
+            </table>
+          `;
+        }
+
+        // Render table
+        function renderTable(items) {
+          if (items.length === 0) {
+            return '<tr><td colspan="3">No items</td></tr>';
+          }
+          
+          return items.map((item, index) => `
+            <tr>
+              <td>${item.name}</td>
+              <td>${item.quantity}</td>
+              <td>
+                <button onclick="deleteItem(${index})">Delete</button>
+              </td>
+            </tr>
+          `).join('');
+        }
+
+        // Add new item
+        function addNewItem() {
+          const name = prompt('Enter item name:');
+          if (!name) return;
+          
+          const quantity = prompt('Enter quantity:');
+          const quantityNum = parseInt(quantity);
+          if (!quantity || isNaN(quantityNum)) {
+            alert('Quantity harus berupa angka');
+            return;
+          }
+          
+          inventory.push({
+            name: name,
+            quantity: quantityNum,
+            createdAt: new Date().toISOString()
+          });
+          
+          saveData();
+          showStock();
+        }
+
+        // Delete item
+        function deleteItem(index) {
+          if (confirm('Delete this item?')) {
+            inventory.splice(index, 1);
+            saveData();
+            showStock();
+          }
+        }
+
+        // Search items
+        function searchItems() {
+          const search = document.getElementById('search').value.toLowerCase();
+          const filtered = inventory.filter(item => 
+            item.name.toLowerCase().includes(search)
+          );
+          
+          const table = document.getElementById('stockTable');
+          table.innerHTML = renderTable(filtered);
+        }
+
+        // Save data
+        function saveData() {
+          localStorage.setItem('inventory', JSON.stringify(inventory));
+        }
+
+        // Start when page loads
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', init);
+        } else {
+          init();
+        }
+
+        // Demo data function
+        function addDemoData() {
+          inventory = [
+            { name: 'Item A', quantity: 5 },
+            { name: 'Item B', quantity: 20 },
+            { name: 'Item C', quantity: 8 },
+            { name: 'Item D', quantity: 100 }
+          ];
+          saveData();
+          showStock();
+          console.log('Demo data added!');
+        }
+    </script>
 </body>
 </html>
 """
 
-# Isi JavaScript
-js_content = """// Simple Stock Management System
+# Simpan file revisi
+revised_html_path = "/mnt/data/stock-management.html"
+with open(revised_html_path, "w") as f:
+    f.write(revised_html_content)
 
-// Global variables
-let inventory = [];
-
-// Initialize system
-function init() {
-  console.log('Initializing Stock Management...');
-  
-  const saved = localStorage.getItem('inventory');
-  if (saved) {
-    inventory = JSON.parse(saved);
-  } else {
-    addDemoData(); // Auto add demo data if no saved data
-  }
-  
-  createMenu();
-  showDashboard();
-}
-
-// Create menu
-function createMenu() {
-  const menu = document.getElementById('sidebar-menu');
-  if (!menu) {
-    console.error('Menu container not found!');
-    return;
-  }
-  
-  menu.innerHTML = `
-    <h3>Menu</h3>
-    <ul>
-      <li><a href="#" onclick="showDashboard()">Dashboard</a></li>
-      <li><a href="#" onclick="showStock()">Stock Management</a></li>
-    </ul>
-  `;
-}
-
-// Show dashboard
-function showDashboard() {
-  const content = document.getElementById('main-content');
-  if (!content) {
-    console.error('Content container not found!');
-    return;
-  }
-  
-  const lowStock = inventory.filter(item => item.quantity < 10);
-  
-  content.innerHTML = `
-    <h1>Dashboard</h1>
-    <div style="display: flex; gap: 20px;">
-      <div style="border: 1px solid #ccc; padding: 20px;">
-        <h3>Total Items</h3>
-        <p>${inventory.length}</p>
-      </div>
-      <div style="border: 1px solid #ccc; padding: 20px;">
-        <h3>Low Stock</h3>
-        <p>${lowStock.length}</p>
-      </div>
-    </div>
-    ${lowStock.length > 0 ? `
-      <h3>Low Stock Items:</h3>
-      <ul>
-        ${lowStock.map(item => `<li>${item.name} - ${item.quantity}</li>`).join('')}
-      </ul>
-    ` : ''}
-  `;
-}
-
-// Show stock management
-function showStock() {
-  const content = document.getElementById('main-content');
-  if (!content) return;
-  
-  content.innerHTML = `
-    <h1>Stock Management</h1>
-    <button onclick="addNewItem()">Add Item</button>
-    <br><br>
-    <input type="text" id="search" placeholder="Search..." onkeyup="searchItems()">
-    <br><br>
-    <table border="1" cellpadding="10">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Quantity</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="stockTable">
-        ${renderTable(inventory)}
-      </tbody>
-    </table>
-  `;
-}
-
-// Render table
-function renderTable(items) {
-  if (items.length === 0) {
-    return '<tr><td colspan="3">No items</td></tr>';
-  }
-  
-  return items.map((item, index) => `
-    <tr>
-      <td>${item.name}</td>
-      <td>${item.quantity}</td>
-      <td>
-        <button onclick="deleteItem(${index})">Delete</button>
-      </td>
-    </tr>
-  `).join('');
-}
-
-// Add new item
-function addNewItem() {
-  const name = prompt('Enter item name:');
-  if (!name) return;
-  
-  const quantity = prompt('Enter quantity:');
-  const quantityNum = parseInt(quantity);
-  if (!quantity || isNaN(quantityNum)) {
-    alert('Quantity harus berupa angka');
-    return;
-  }
-  
-  inventory.push({
-    name: name,
-    quantity: quantityNum,
-    createdAt: new Date().toISOString()
-  });
-  
-  saveData();
-  showStock();
-}
-
-// Delete item
-function deleteItem(index) {
-  if (confirm('Delete this item?')) {
-    inventory.splice(index, 1);
-    saveData();
-    showStock();
-  }
-}
-
-// Search items
-function searchItems() {
-  const search = document.getElementById('search').value.toLowerCase();
-  const filtered = inventory.filter(item => 
-    item.name.toLowerCase().includes(search)
-  );
-  
-  const table = document.getElementById('stockTable');
-  table.innerHTML = renderTable(filtered);
-}
-
-// Save data
-function saveData() {
-  localStorage.setItem('inventory', JSON.stringify(inventory));
-}
-
-// Start when page loads
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
-
-// Demo data function
-function addDemoData() {
-  inventory = [
-    { name: 'Item A', quantity: 5 },
-    { name: 'Item B', quantity: 20 },
-    { name: 'Item C', quantity: 8 },
-    { name: 'Item D', quantity: 100 }
-  ];
-  saveData();
-  showStock();
-  console.log('Demo data added!');
-}
-"""
-
-# Simpan file HTML dan JS
-html_path = os.path.join(project_dir, "index.html")
-js_path = os.path.join(project_dir, "simple-stock-management.js")
-
-with open(html_path, "w") as f:
-    f.write(html_content)
-
-with open(js_path, "w") as f:
-    f.write(js_content)
-
-# Buat zip file
-zip_path = "/mnt/data/simple-stock-management.zip"
-with ZipFile(zip_path, 'w') as zipf:
-    zipf.write(html_path, arcname="index.html")
-    zipf.write(js_path, arcname="simple-stock-management.js")
-
-zip_path
+revised_html_path
