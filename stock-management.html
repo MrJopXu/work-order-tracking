@@ -1,455 +1,172 @@
-// Stock Management System - Clean and Working Version
+// Simple Stock Management System
 
-// ======================
-// CONFIGURATION
-// ======================
-const CONFIG = {
-  icons: {
-    dashboard: 'fa-tachometer-alt',
-    plus: 'fa-plus',
-    list: 'fa-list',
-    boxes: 'fa-boxes',
-    users: 'fa-users',
-    cog: 'fa-cog',
-    chart: 'fa-chart-bar',
-    tasks: 'fa-tasks'
+// Global variables
+let inventory = [];
+
+// Initialize system
+function init() {
+  console.log('Initializing Stock Management...');
+  
+  // Load saved data
+  const saved = localStorage.getItem('inventory');
+  if (saved) {
+    inventory = JSON.parse(saved);
   }
-};
-
-// ======================
-// MENU STRUCTURE
-// ======================
-const MENU_ITEMS = {
-  dashboard: {
-    id: 'dashboard',
-    text: 'Dashboard',
-    icon: CONFIG.icons.dashboard,
-    action: () => showDashboard()
-  },
-  stockManagement: {
-    id: 'stock-management',
-    text: 'Stock Management',
-    icon: CONFIG.icons.list,
-    action: () => showStockManagement()
-  },
-  users: {
-    id: 'users',
-    text: 'Users',
-    icon: CONFIG.icons.users,
-    action: () => showUsers()
-  },
-  settings: {
-    id: 'settings',
-    text: 'Settings',
-    icon: CONFIG.icons.cog,
-    action: () => showSettings()
-  }
-};
-
-// ======================
-// ROLE PERMISSIONS
-// ======================
-const ROLE_PERMISSIONS = {
-  admin: ['dashboard', 'stockManagement', 'users', 'settings'],
-  stockManager: ['dashboard', 'stockManagement'],
-  user: ['dashboard']
-};
-
-// ======================
-// STOCK MANAGEMENT CLASS
-// ======================
-class StockManagement {
-  constructor() {
-    this.items = [];
-    this.loadFromStorage();
-  }
-
-  loadFromStorage() {
-    const saved = localStorage.getItem('stockItems');
-    if (saved) {
-      this.items = JSON.parse(saved);
-    }
-  }
-
-  saveToStorage() {
-    localStorage.setItem('stockItems', JSON.stringify(this.items));
-  }
-
-  addItem(item) {
-    const newItem = {
-      id: Date.now(),
-      ...item,
-      createdAt: new Date().toISOString()
-    };
-    this.items.push(newItem);
-    this.saveToStorage();
-    return newItem;
-  }
-
-  removeItem(id) {
-    this.items = this.items.filter(item => item.id !== id);
-    this.saveToStorage();
-  }
-
-  updateItem(id, updates) {
-    const index = this.items.findIndex(item => item.id === id);
-    if (index !== -1) {
-      this.items[index] = { ...this.items[index], ...updates };
-      this.saveToStorage();
-      return this.items[index];
-    }
-    return null;
-  }
-
-  getAllItems() {
-    return this.items;
-  }
-
-  searchItems(query) {
-    const searchTerm = query.toLowerCase();
-    return this.items.filter(item => 
-      item.name?.toLowerCase().includes(searchTerm) ||
-      item.sku?.toLowerCase().includes(searchTerm)
-    );
-  }
-
-  getLowStockItems(threshold = 10) {
-    return this.items.filter(item => item.quantity < threshold);
-  }
+  
+  // Create menu
+  createMenu();
+  
+  // Show dashboard
+  showDashboard();
 }
 
-// ======================
-// MENU BUILDER
-// ======================
-class MenuBuilder {
-  constructor() {
-    this.currentRole = null;
+// Create menu
+function createMenu() {
+  const menu = document.getElementById('sidebar-menu');
+  if (!menu) {
+    console.error('Menu container not found!');
+    return;
   }
-
-  buildMenu(role) {
-    this.currentRole = role;
-    const permissions = ROLE_PERMISSIONS[role] || [];
-    const menuContainer = document.getElementById('sidebar-menu');
-    
-    if (!menuContainer) {
-      console.error('Menu container not found');
-      return;
-    }
-
-    // Clear existing menu
-    menuContainer.innerHTML = '';
-
-    // Create menu HTML
-    const menuHTML = `
-      <h2>Stock Management System</h2>
-      <ul class="nav flex-column">
-        ${permissions.map(permission => this.createMenuItem(permission)).join('')}
-      </ul>
-    `;
-
-    menuContainer.innerHTML = menuHTML;
-    this.attachEventListeners(permissions);
-  }
-
-  createMenuItem(permission) {
-    const item = MENU_ITEMS[permission];
-    if (!item) return '';
-
-    return `
-      <li class="nav-item">
-        <a class="nav-link" href="#" data-action="${item.id}">
-          <i class="fa ${item.icon}"></i> ${item.text}
-        </a>
-      </li>
-    `;
-  }
-
-  attachEventListeners(permissions) {
-    permissions.forEach(permission => {
-      const item = MENU_ITEMS[permission];
-      if (!item) return;
-
-      const link = document.querySelector(`[data-action="${item.id}"]`);
-      if (link) {
-        link.addEventListener('click', (e) => {
-          e.preventDefault();
-          item.action();
-        });
-      }
-    });
-  }
+  
+  menu.innerHTML = `
+    <h3>Menu</h3>
+    <ul>
+      <li><a href="#" onclick="showDashboard()">Dashboard</a></li>
+      <li><a href="#" onclick="showStock()">Stock Management</a></li>
+    </ul>
+  `;
 }
 
-// ======================
-// VIEW FUNCTIONS
-// ======================
+// Show dashboard
 function showDashboard() {
   const content = document.getElementById('main-content');
-  if (!content) return;
-
-  const lowStockItems = stockManager.getLowStockItems();
+  if (!content) {
+    console.error('Content container not found!');
+    return;
+  }
+  
+  const lowStock = inventory.filter(item => item.quantity < 10);
   
   content.innerHTML = `
-    <div class="container-fluid">
-      <h1>Dashboard</h1>
-      <div class="row mt-4">
-        <div class="col-md-3">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Total Items</h5>
-              <p class="card-text">${stockManager.getAllItems().length}</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Low Stock Items</h5>
-              <p class="card-text">${lowStockItems.length}</p>
-            </div>
-          </div>
-        </div>
+    <h1>Dashboard</h1>
+    <div style="display: flex; gap: 20px;">
+      <div style="border: 1px solid #ccc; padding: 20px;">
+        <h3>Total Items</h3>
+        <p>${inventory.length}</p>
       </div>
-      ${lowStockItems.length > 0 ? `
-        <div class="row mt-4">
-          <div class="col-12">
-            <h3>Low Stock Items</h3>
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>SKU</th>
-                  <th>Name</th>
-                  <th>Quantity</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${lowStockItems.map(item => `
-                  <tr>
-                    <td>${item.sku || '-'}</td>
-                    <td>${item.name}</td>
-                    <td>${item.quantity}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      ` : ''}
+      <div style="border: 1px solid #ccc; padding: 20px;">
+        <h3>Low Stock</h3>
+        <p>${lowStock.length}</p>
+      </div>
     </div>
+    ${lowStock.length > 0 ? `
+      <h3>Low Stock Items:</h3>
+      <ul>
+        ${lowStock.map(item => `<li>${item.name} - ${item.quantity}</li>`).join('')}
+      </ul>
+    ` : ''}
   `;
 }
 
-function showStockManagement() {
+// Show stock management
+function showStock() {
   const content = document.getElementById('main-content');
   if (!content) return;
   
   content.innerHTML = `
-    <div class="container-fluid">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Stock Management</h1>
-        <button class="btn btn-primary" onclick="showAddItemModal()">
-          <i class="fa fa-plus"></i> Add Item
-        </button>
-      </div>
-      
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <input type="text" id="searchInput" class="form-control" 
-                 placeholder="Search items..." onkeyup="handleSearch()">
-        </div>
-      </div>
-      
-      <div class="table-responsive">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>SKU</th>
-              <th>Name</th>
-              <th>Quantity</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="stockTableBody">
-            ${renderStockTable(stockManager.getAllItems())}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <h1>Stock Management</h1>
+    <button onclick="addNewItem()">Add Item</button>
+    <br><br>
+    <input type="text" id="search" placeholder="Search..." onkeyup="searchItems()">
+    <br><br>
+    <table border="1" cellpadding="10">
+      <tr>
+        <th>Name</th>
+        <th>Quantity</th>
+        <th>Actions</th>
+      </tr>
+      <tbody id="stockTable">
+        ${renderTable(inventory)}
+      </tbody>
+    </table>
   `;
 }
 
-function renderStockTable(items) {
+// Render table
+function renderTable(items) {
   if (items.length === 0) {
-    return '<tr><td colspan="4" class="text-center">No items found</td></tr>';
+    return '<tr><td colspan="3">No items</td></tr>';
   }
   
-  return items.map(item => `
+  return items.map((item, index) => `
     <tr>
-      <td>${item.sku || '-'}</td>
       <td>${item.name}</td>
       <td>${item.quantity}</td>
       <td>
-        <button class="btn btn-sm btn-info" onclick="editItem(${item.id})">
-          <i class="fa fa-edit"></i>
-        </button>
-        <button class="btn btn-sm btn-danger" onclick="deleteItem(${item.id})">
-          <i class="fa fa-trash"></i>
-        </button>
+        <button onclick="deleteItem(${index})">Delete</button>
       </td>
     </tr>
   `).join('');
 }
 
-function showUsers() {
-  const content = document.getElementById('main-content');
-  if (!content) return;
+// Add new item
+function addNewItem() {
+  const name = prompt('Enter item name:');
+  if (!name) return;
   
-  content.innerHTML = `
-    <div class="container-fluid">
-      <h1>Users</h1>
-      <p>User management section coming soon...</p>
-    </div>
-  `;
+  const quantity = prompt('Enter quantity:');
+  if (!quantity) return;
+  
+  inventory.push({
+    name: name,
+    quantity: parseInt(quantity)
+  });
+  
+  saveData();
+  showStock();
 }
 
-function showSettings() {
-  const content = document.getElementById('main-content');
-  if (!content) return;
-  
-  content.innerHTML = `
-    <div class="container-fluid">
-      <h1>Settings</h1>
-      <p>Settings section coming soon...</p>
-    </div>
-  `;
-}
-
-// ======================
-// MODAL FUNCTIONS
-// ======================
-function showAddItemModal() {
-  const modalHTML = `
-    <div class="modal fade show" id="addItemModal" style="display: block; background: rgba(0,0,0,0.5);">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Add New Item</h5>
-            <button type="button" class="close" onclick="closeModal()">
-              <span>&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form id="addItemForm">
-              <div class="form-group">
-                <label>SKU</label>
-                <input type="text" class="form-control" name="sku" required>
-              </div>
-              <div class="form-group">
-                <label>Name</label>
-                <input type="text" class="form-control" name="name" required>
-              </div>
-              <div class="form-group">
-                <label>Quantity</label>
-                <input type="number" class="form-control" name="quantity" required>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-            <button type="button" class="btn btn-primary" onclick="saveNewItem()">Save</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  document.body.insertAdjacentHTML('beforeend', modalHTML);
-}
-
-function closeModal() {
-  const modal = document.getElementById('addItemModal');
-  if (modal) {
-    modal.remove();
+// Delete item
+function deleteItem(index) {
+  if (confirm('Delete this item?')) {
+    inventory.splice(index, 1);
+    saveData();
+    showStock();
   }
 }
 
-function saveNewItem() {
-  const form = document.getElementById('addItemForm');
-  const formData = new FormData(form);
+// Search items
+function searchItems() {
+  const search = document.getElementById('search').value.toLowerCase();
+  const filtered = inventory.filter(item => 
+    item.name.toLowerCase().includes(search)
+  );
   
-  const item = {
-    sku: formData.get('sku'),
-    name: formData.get('name'),
-    quantity: parseInt(formData.get('quantity'))
-  };
-  
-  stockManager.addItem(item);
-  closeModal();
-  showStockManagement();
+  const table = document.getElementById('stockTable');
+  table.innerHTML = renderTable(filtered);
 }
 
-// ======================
-// UTILITY FUNCTIONS
-// ======================
-function handleSearch() {
-  const query = document.getElementById('searchInput').value;
-  const items = query ? stockManager.searchItems(query) : stockManager.getAllItems();
-  const tableBody = document.getElementById('stockTableBody');
-  if (tableBody) {
-    tableBody.innerHTML = renderStockTable(items);
-  }
+// Save data
+function saveData() {
+  localStorage.setItem('inventory', JSON.stringify(inventory));
 }
 
-function editItem(id) {
-  const item = stockManager.getAllItems().find(i => i.id === id);
-  if (!item) return;
-  
-  // For now, just log - you can implement edit modal similar to add modal
-  console.log('Edit item:', item);
-  alert(`Edit functionality for "${item.name}" coming soon!`);
+// Start when page loads
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
 }
 
-function deleteItem(id) {
-  if (confirm('Are you sure you want to delete this item?')) {
-    stockManager.removeItem(id);
-    showStockManagement();
-  }
-}
-
-// ======================
-// INITIALIZATION
-// ======================
-let stockManager;
-let menuBuilder;
-
-document.addEventListener('DOMContentLoaded', () => {
-  // Initialize managers
-  stockManager = new StockManagement();
-  menuBuilder = new MenuBuilder();
-  
-  // Get user role (in real app, this would come from authentication)
-  const userRole = 'admin'; // Change to 'stockManager' or 'user' to test different roles
-  
-  // Build menu for user role
-  menuBuilder.buildMenu(userRole);
-  
-  // Show dashboard by default
-  showDashboard();
-  
-  console.log(`Stock Management System initialized for role: ${userRole}`);
-});
-
-// ======================
-// DEMO DATA (Remove in production)
-// ======================
+// Demo data function
 function addDemoData() {
-  const demoItems = [
-    { sku: 'ITEM001', name: 'Widget A', quantity: 25 },
-    { sku: 'ITEM002', name: 'Widget B', quantity: 8 },
-    { sku: 'ITEM003', name: 'Widget C', quantity: 150 },
-    { sku: 'ITEM004', name: 'Widget D', quantity: 3 }
+  inventory = [
+    { name: 'Item A', quantity: 5 },
+    { name: 'Item B', quantity: 20 },
+    { name: 'Item C', quantity: 8 },
+    { name: 'Item D', quantity: 100 }
   ];
-  
-  demoItems.forEach(item => stockManager.addItem(item));
-  console.log('Demo data added');
+  saveData();
+  showStock();
+  console.log('Demo data added!');
 }
