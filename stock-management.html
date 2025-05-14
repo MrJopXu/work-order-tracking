@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Management - Work Order System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --light-bg: #f8fafc;
+            --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--light-bg);
+            padding-top: 60px;
+        }
+        
+        /* Navbar */
+        .navbar {
+            background: white;
+            box-shadow: var(--card-shadow);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1rem;
+        }
+        
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Main content */
+        .main-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border: none;
+            border-radius: 0.75rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            background: none;
+            border: none;
+            padding: 1.5rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: #111827;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        /* Stats cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .stat-card.primary {
+            border-left-color: var(--primary-color);
+        }
+        
+        .stat-card.success {
+            border-left-color: var(--success-color);
+        }
+        
+        .stat-card.warning {
+            border-left-color: var(--warning-color);
+        }
+        
+        .stat-card.danger {
+            border-left-color: var(--danger-color);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        
+        .stat-label {
+            color: var(--secondary-color);
+            font-size: 0.875rem;
+        }
+        
+        /* Buttons */
+        .btn {
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
+        /* Stock status badges */
+        .badge-stock {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .badge-stock.in-stock {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-stock.low-stock {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-stock.out-of-stock {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        /* Tables */
+        .table th {
+            background: var(--light-bg);
+            font-weight: 600;
+            color: #374151;
+            border: none;
+            padding: 0.75rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+        
+        .table td {
+            padding: 0.75rem;
+            border-color: #f3f4f6;
+            vertical-align: middle;
+        }
+        
+        /* Tab navigation */
+        .nav-tabs {
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 1.5rem;
+        }
+        
+        .nav-tabs .nav-link {
+            color: #6b7280;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        
+        .nav-tabs .nav-link:hover {
+            color: var(--primary-color);
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            background: none;
+        }
+        
+        /* Modal styles */
+        .modal-content {
+            border-radius: 0.75rem;
+            border: none;
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1.5rem;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid #e5e7eb;
+            padding: 1.5rem;
+        }
+        
+        /* QR Code */
+        #qr-code-display {
+            padding: 1rem;
+            background: white;
+            border-radius: 0.5rem;
+            display: inline-block;
+            margin: 1rem 0;
+        }
+        
+        /* Action buttons */
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Form styles */
+        .form-label {
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .form-control,
+        .form-select {
+            border: 1.5px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+        
+        .required::after {
+            content: " *";
+            color: var(--danger-color);
+        }
+        
+        /* Stock movement history */
+        .movement-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .movement-item:last-child {
+            border-bottom: none;
+        }
+        
+        .movement-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .movement-type.in {
+            color: var(--success-color);
+        }
+        
+        .movement-type.out {
+            color: var(--danger-color);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .action-btns {
+                flex-direction: column;
+            }
+            
+            .table {
+                font-size: 0.875rem;
+            }
+            
+            .hide-mobile {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard-simple.html" class="navbar-brand">
+                <i class="fas fa-clipboard-list me-2"></i>
+                Work Order System
+            </a>
+            <div class="navbar-menu">
+                <span id="user-name" class="me-3">User</span>
+                <a href="dashboard-simple.html" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-left"></i>
+                    <span class="d-none d-sm-inline">Back</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <h2 class="mb-4">Stock Management</h2>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card primary">
+                <div class="stat-label">Total Materials</div>
+                <div class="stat-value" id="total-materials">0</div>
+                <small class="text-muted">Active items</small>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-label">In Stock</div>
+                <div class="stat-value" id="in-stock">0</div>
+                <small class="text-muted">Available</small>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-label">Low Stock</div>
+                <div class="stat-value" id="low-stock">0</div>
+                <small class="text-muted">Need reorder</small>
+            </div>
+            <div class="stat-card danger">
+                <div class="stat-label">Out of Stock</div>
+                <div class="stat-value" id="out-of-stock">0</div>
+                <small class="text-muted">Urgent</small>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="action-btns">
+                <button class="btn btn-primary" onclick="showAddMaterial()">
+                    <i class="fas fa-plus"></i> Add Material
+                </button>
+                <button class="btn btn-success" onclick="showStockIn()">
+                    <i class="fas fa-arrow-down"></i> Stock In
+                </button>
+                <button class="btn btn-warning" onclick="showStockOut()">
+                    <i class="fas fa-arrow-up"></i> Stock Out
+                </button>
+            </div>
+            <div class="action-btns">
+                <button class="btn btn-secondary" onclick="printReport()">
+                    <i class="fas fa-print"></i> Print Report
+                </button>
+                <button class="btn btn-secondary" onclick="exportData()">
+                    <i class="fas fa-download"></i> Export
+                </button>
+            </div>
+        </div>
+        
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#inventory-tab">
+                    <i class="fas fa-boxes"></i> Inventory
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#movement-tab">
+                    <i class="fas fa-exchange-alt"></i> Stock Movement
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#suppliers-tab">
+                    <i class="fas fa-truck"></i> Suppliers
+                </button>
+            </li>
+        </ul>
+        
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Inventory Tab -->
+            <div class="tab-pane fade show active" id="inventory-tab">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Search and Filter -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="search-material" placeholder="Search by code or name...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="filter-category">
+                                    <option value="">All Categories</option>
+                                    <option value="paper">Paper</option>
+                                    <option value="ink">Ink</option>
+                                    <option value="vinyl">Vinyl</option>
+                                    <option value="chemical">Chemical</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="filter-status">
+                                    <option value="">All Status</option>
+                                    <option value="in-stock">In Stock</option>
+                                    <option value="low-stock">Low Stock</option>
+                                    <option value="out-of-stock">Out of Stock</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Materials Table -->
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Material Name</th>
+                                        <th>Category</th>
+                                        <th class="text-center">Current Stock</th>
+                                        <th class="text-center">Min Stock</th>
+                                        <th class="text-center">Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="materials-tbody">
+                                    <!-- Materials will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stock Movement Tab -->
+            <div class="tab-pane fade" id="movement-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Stock Movement History</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="movement-history">
+                            <!-- Movement history will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Suppliers Tab -->
+            <div class="tab-pane fade" id="suppliers-tab">
+                <div class="card">
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-3" onclick="showAddSupplier()">
+                            <i class="fas fa-plus"></i> Add Supplier
+                        </button>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Supplier Name</th>
+                                        <th>Contact</th>
+                                        <th>Materials</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="suppliers-tbody">
+                                    <!-- Suppliers will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Add Material Modal -->
+    <div class="modal fade" id="addMaterialModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Material</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="add-material-form">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label required">Material Code</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="material-code" required readonly>
+                                <button type="button" class="btn btn-secondary" onclick="generateCode()">
+                                    <i class="fas fa-sync"></i> Generate
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label required">Material Name</label>
+                            <input type="text" class="form-control" id="material-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label required">Category</label>
+                            <select class="form-select" id="material-category" required>
+                                <option value="">Select Category</option>
+                                <option value="paper">Paper</option>
+                                <option value="ink">Ink</option>
+                                <option value="vinyl">Vinyl</option>
+                                <option value="chemical">Chemical</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label required">Unit</label>
+                                    <select class="form-select" id="material-unit" required>
+                                        <option value="">Select Unit</option>
+                                        <option value="sheet">Sheet</option>
+                                        <option value="roll">Roll</option>
+                                        <option value="bottle">Bottle</option>
+                                        <option value="kg">Kilogram</option>
+                                        <option value="liter">Liter</option>
+                                        <option value="meter">Meter</option>
+                                        <option value="box">Box</option>
+                                        <option value="pcs">Pieces</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label required">Minimum Stock</label>
+                                    <input type="number" class="form-control" id="material-min-stock" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" id="material-description" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Material</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stock In Modal -->
+    <div class="modal fade" id="stockInModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Stock In</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="stock-in-form">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label required">Material</label>
+                            <select class="form-select" id="stock-in-material" required>
+                                <option value="">Select Material</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label required">Quantity</label>
+                            <input type="number" class="form-control" id="stock-in-quantity" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Supplier</label>
+                            <select class="form-select" id="stock-in-supplier">
+                                <option value="">Select Supplier</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Reference (PO/Invoice)</label>
+                            <input type="text" class="form-control" id="stock-in-reference">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-control" id="stock-in-notes" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Add Stock</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stock Out Modal -->
+    <div class="modal fade" id="stockOutModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Stock Out</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="stock-out-form">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label required">Material</label>
+                            <select class="form-select" id="stock-out-material" required onchange="checkStock()">
+                                <option value="">Select Material</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label required">Quantity</label>
+                            <input type="number" class="form-control" id="stock-out-quantity" min="1" required>
+                            <small class="text-muted">Available stock: <span id="available-stock">-</span></small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Work Order</label>
+                            <input type="text" class="form-control" id="stock-out-workorder" placeholder="e.g., TR20250514ABC">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-control" id="stock-out-notes" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-warning">Remove Stock</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Material Detail Modal -->
+    <div class="modal fade" id="materialDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Material Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Code:</strong></td>
+                                    <td id="detail-code">-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Name:</strong></td>
+                                    <td id="detail-name">-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Category:</strong></td>
+                                    <td id="detail-category">-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Current Stock:</strong></td>
+                                    <td id="detail-stock">-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Minimum Stock:</strong></td>
+                                    <td id="detail-min-stock">-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Status:</strong></td>
+                                    <td id="detail-status">-</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <h6>QR Code</h6>
+                            <div id="qr-code-display"></div>
+                            <button class="btn btn-primary btn-sm" onclick="printQRCode()">
+                                <i class="fas fa-print"></i> Print QR
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6>Recent Movement</h6>
+                    <div id="detail-recent-movement">
+                        <!-- Recent movement will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize data
+        let materials = [];
+        let movements = [];
+        let suppliers = [];
+        let qrcode = null;
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadData();
+            generateCode();
+            
+            // Setup form handlers
+            document.getElementById('add-material-form').addEventListener('submit', addMaterial);
+            document.getElementById('stock-in-form').addEventListener('submit', stockIn);
+            document.getElementById('stock-out-form').addEventListener('submit', stockOut);
+            
+            // Setup search and filters
+            document.getElementById('search-material').addEventListener('input', filterMaterials);
+            document.getElementById('filter-category').addEventListener('change', filterMaterials);
+            document.getElementById('filter-status').addEventListener('change', filterMaterials);
+        });
+        
+        // Check authentication
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (!user.username) {
+                window.location.href = 'login.html';
+                return;
+            }
+            document.getElementById('user-name').textContent = user.name || user.username;
+        }
+        
+        // Load data from localStorage
+        function loadData() {
+            materials = JSON.parse(localStorage.getItem('materials') || '[]');
+            movements = JSON.parse(localStorage.getItem('stockMovements') || '[]');
+            suppliers = JSON.parse(localStorage.getItem('suppliers') || '[]');
+            
+            // Add sample data if empty
+            if (materials.length === 0) {
+                materials = [
+                    {
+                        code: 'MAT001',
+                        name: 'Art Paper 150gsm',
+                        category: 'paper',
+                        unit: 'sheet',
+                        stock: 500,
+                        minStock: 100,
+                        description: 'High quality art paper for posters'
+                    },
+                    {
+                        code: 'INK002',
+                        name: 'Eco Solvent Ink - Black',
+                        category: 'ink',
+                        unit: 'liter',
+                        stock: 10,
+                        minStock: 5,
+                        description: 'Eco-friendly solvent ink'
+                    },
+                    {
+                        code: 'VNL003',
+                        name: 'White Vinyl Sticker',
+                        category: 'vinyl',
+                        unit: 'roll',
+                        stock: 2,
+                        minStock: 5,
+                        description: 'Premium white vinyl for stickers'
+                    }
+                ];
+                localStorage.setItem('materials', JSON.stringify(materials));
+            }
+            
+            updateDashboard();
+            renderMaterials();
+            renderMovements();
+            renderSuppliers();
+        }
+        
+        // Update dashboard stats
+        function updateDashboard() {
+            const stats = {
+                total: materials.length,
+                inStock: materials.filter(m => m.stock > m.minStock).length,
+                lowStock: materials.filter(m => m.stock > 0 && m.stock <= m.minStock).length,
+                outOfStock: materials.filter(m => m.stock === 0).length
+            };
+            
+            document.getElementById('total-materials').textContent = stats.total;
+            document.getElementById('in-stock').textContent = stats.inStock;
+            document.getElementById('low-stock').textContent = stats.lowStock;
+            document.getElementById('out-of-stock').textContent = stats.outOfStock;
+        }
+        
+        // Generate unique material code
+        function generateCode() {
+            const category = document.getElementById('material-category').value || 'MAT';
+            const prefix = category.substring(0, 3).toUpperCase();
+            const number = (materials.filter(m => m.code.startsWith(prefix)).length + 1).toString().padStart(3, '0');
+            document.getElementById('material-code').value = `${prefix}${number}`;
+        }
+        
+        // Render materials table
+        function renderMaterials() {
+            const tbody = document.getElementById('materials-tbody');
+            const filteredMaterials = getFilteredMaterials();
+            
+            if (filteredMaterials.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">No materials found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = filteredMaterials.map(material => {
+                const status = getStockStatus(material);
+                return `
+                    <tr>
+                        <td>
+                            <strong>${material.code}</strong>
+                            <button class="btn btn-sm btn-link p-0 ms-1" onclick="showQRCode('${material.code}')">
+                                <i class="fas fa-qrcode"></i>
+                            </button>
+                        </td>
+                        <td>${material.name}</td>
+                        <td>${material.category}</td>
+                        <td class="text-center">${material.stock} ${material.unit}</td>
+                        <td class="text-center">${material.minStock} ${material.unit}</td>
+                        <td class="text-center">
+                            <span class="badge-stock ${status.class}">${status.text}</span>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn btn-sm btn-info" onclick="viewMaterial('${material.code}')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning" onclick="editMaterial('${material.code}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteMaterial('${material.code}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // Get stock status
+        function getStockStatus(material) {
+            if (material.stock === 0) {
+                return { class: 'out-of-stock', text: 'Out of Stock' };
+            } else if (material.stock <= material.minStock) {
+                return { class: 'low-stock', text: 'Low Stock' };
+            } else {
+                return { class: 'in-stock', text: 'In Stock' };
+            }
+        }
+        
+        // Filter materials
+        function getFilteredMaterials() {
+            const search = document.getElementById('search-material').value.toLowerCase();
+            const category = document.getElementById('filter-category').value;
+            const status = document.getElementById('filter-status').value;
+            
+            return materials.filter(material => {
+                // Search filter
+                if (search && !material.code.toLowerCase().includes(search) && 
+                    !material.name.toLowerCase().includes(search)) {
+                    return false;
+                }
+                
+                // Category filter
+                if (category && material.category !== category) {
+                    return false;
+                }
+                
+                // Status filter
+                if (status) {
+                    const materialStatus = getStockStatus(material);
+                    if (status === 'in-stock' && materialStatus.class !== 'in-stock') return false;
+                    if (status === 'low-stock' && materialStatus.class !== 'low-stock') return false;
+                    if (status === 'out-of-stock' && materialStatus.class !== 'out-of-stock') return false;
+                }
+                
+                return true;
+            });
+        }
+        
+        // Filter materials on input
+        function filterMaterials() {
+            renderMaterials();
+        }
+        
+        // Show add material modal
+        function showAddMaterial() {
+            document.getElementById('add-material-form').reset();
+            generateCode();
+            const modal = new bootstrap.Modal(document.getElementById('addMaterialModal'));
+            modal.show();
+        }
+        
+        // Add material
+        function addMaterial(e) {
+            e.preventDefault();
+            
+            const material = {
+                code: document.getElementById('material-code').value,
+                name: document.getElementById('material-name').value,
+                category: document.getElementById('material-category').value,
+                unit: document.getElementById('material-unit').value,
+                stock: 0,
+                minStock: parseInt(document.getElementById('material-min-stock').value),
+                description: document.getElementById('material-description').value
+            };
+            
+            materials.push(material);
+            localStorage.setItem('materials', JSON.stringify(materials));
+            
+            // Update UI
+            updateDashboard();
+            renderMaterials();
+            
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('addMaterialModal')).hide();
+            
+            alert('Material added successfully!');
+        }
+        
+        // Show stock in modal
+        function showStockIn() {
+            document.getElementById('stock-in-form').reset();
+            
+            // Populate materials dropdown
+            const select = document.getElementById('stock-in-material');
+            select.innerHTML = '<option value="">Select Material</option>' +
+                materials.map(m => `<option value="${m.code}">${m.code} - ${m.name}</option>`).join('');
+            
+            // Populate suppliers dropdown
+            const supplierSelect = document.getElementById('stock-in-supplier');
+            supplierSelect.innerHTML = '<option value="">Select Supplier</option>' +
+                suppliers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            
+            const modal = new bootstrap.Modal(document.getElementById('stockInModal'));
+            modal.show();
+        }
+        
+        // Stock in
+        function stockIn(e) {
+            e.preventDefault();
+            
+            const materialCode = document.getElementById('stock-in-material').value;
+            const quantity = parseInt(document.getElementById('stock-in-quantity').value);
+            const supplier = document.getElementById('stock-in-supplier').value;
+            const reference = document.getElementById('stock-in-reference').value;
+            const notes = document.getElementById('stock-in-notes').value;
+            
+            // Update material stock
+            const material = materials.find(m => m.code === materialCode);
+            if (material) {
+                material.stock += quantity;
+                
+                // Add movement record
+                const movement = {
+                    id: Date.now(),
+                    type: 'in',
+                    materialCode: materialCode,
+                    materialName: material.name,
+                    quantity: quantity,
+                    supplier: supplier,
+                    reference: reference,
+                    notes: notes,
+                    date: new Date().toISOString(),
+                    user: JSON.parse(localStorage.getItem('currentUser')).name
+                };
+                
+                movements.push(movement);
+                
+                // Save data
+                localStorage.setItem('materials', JSON.stringify(materials));
+                localStorage.setItem('stockMovements', JSON.stringify(movements));
+                
+                // Update UI
+                updateDashboard();
+                renderMaterials();
+                renderMovements();
+                
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('stockInModal')).hide();
+                
+                alert('Stock added successfully!');
+            }
+        }
+        
+        // Show stock out modal
+        function showStockOut() {
+            document.getElementById('stock-out-form').reset();
+            
+            // Populate materials dropdown (only with stock > 0)
+            const select = document.getElementById('stock-out-material');
+            const availableMaterials = materials.filter(m => m.stock > 0);
+            
+            select.innerHTML = '<option value="">Select Material</option>' +
+                availableMaterials.map(m => `<option value="${m.code}">${m.code} - ${m.name} (${m.stock} ${m.unit})</option>`).join('');
+            
+            const modal = new bootstrap.Modal(document.getElementById('stockOutModal'));
+            modal.show();
+        }
+        
+        // Check available stock
+        function checkStock() {
+            const materialCode = document.getElementById('stock-out-material').value;
+            const material = materials.find(m => m.code === materialCode);
+            
+            if (material) {
+                document.getElementById('available-stock').textContent = `${material.stock} ${material.unit}`;
+                document.getElementById('stock-out-quantity').max = material.stock;
+            } else {
+                document.getElementById('available-stock').textContent = '-';
+            }
+        }
+        
+        // Stock out
+        function stockOut(e) {
+            e.preventDefault();
+            
+            const materialCode = document.getElementById('stock-out-material').value;
+            const quantity = parseInt(document.getElementById('stock-out-quantity').value);
+            const workOrder = document.getElementById('stock-out-workorder').value;
+            const notes = document.getElementById('stock-out-notes').value;
+            
+            // Update material stock
+            const material = materials.find(m => m.code === materialCode);
+            if (material) {
+                if (quantity > material.stock) {
+                    alert('Insufficient stock!');
+                    return;
+                }
+                
+                material.stock -= quantity;
+                
+                // Add movement record
+                const movement = {
+                    id: Date.now(),
+                    type: 'out',
+                    materialCode: materialCode,
+                    materialName: material.name,
+                    quantity: quantity,
+                    workOrder: workOrder,
+                    notes: notes,
+                    date: new Date().toISOString(),
+                    user: JSON.parse(localStorage.getItem('currentUser')).name
+                };
+                
+                movements.push(movement);
+                
+                // Save data
+                localStorage.setItem('materials', JSON.stringify(materials));
+                localStorage.setItem('stockMovements', JSON.stringify(movements));
+                
+                // Update UI
+                updateDashboard();
+                renderMaterials();
+                renderMovements();
+                
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('stockOutModal')).hide();
+                
+                alert('Stock removed successfully!');
+            }
+        }
+        
+        // Render movements
+        function renderMovements() {
+            const container = document.getElementById('movement-history');
+            const recentMovements = movements.slice(-20).reverse();
+            
+            if (recentMovements.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted">No stock movements yet</p>';
+                return;
+            }
+            
+            container.innerHTML = recentMovements.map(movement => {
+                const icon = movement.type === 'in' ? 'fa-arrow-down' : 'fa-arrow-up';
+                const typeText = movement.type === 'in' ? 'Stock In' : 'Stock Out';
+                
+                return `
+                    <div class="movement-item">
+                        <div>
+                            <div class="movement-type ${movement.type}">
+                                <i class="fas ${icon}"></i>
+                                ${typeText}
+                            </div>
+                            <div><strong>${movement.materialCode}</strong> - ${movement.materialName}</div>
+                            <div>Quantity: ${movement.quantity} | By: ${movement.user}</div>
+                            ${movement.reference ? `<div>Ref: ${movement.reference}</div>` : ''}
+                            ${movement.workOrder ? `<div>Work Order: ${movement.workOrder}</div>` : ''}
+                            ${movement.notes ? `<div>Notes: ${movement.notes}</div>` : ''}
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted">${formatDate(movement.date)}</small>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Render suppliers
+        function renderSuppliers() {
+            const tbody = document.getElementById('suppliers-tbody');
+            
+            if (suppliers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">No suppliers added yet</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = suppliers.map(supplier => `
+                <tr>
+                    <td>${supplier.name}</td>
+                    <td>${supplier.contact}</td>
+                    <td>${supplier.materials.join(', ')}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning" onclick="editSupplier('${supplier.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteSupplier('${supplier.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // View material details
+        function viewMaterial(code) {
+            const material = materials.find(m => m.code === code);
+            if (!material) return;
+            
+            // Update detail modal
+            document.getElementById('detail-code').textContent = material.code;
+            document.getElementById('detail-name').textContent = material.name;
+            document.getElementById('detail-category').textContent = material.category;
+            document.getElementById('detail-stock').textContent = `${material.stock} ${material.unit}`;
+            document.getElementById('detail-min-stock').textContent = `${material.minStock} ${material.unit}`;
+            
+            const status = getStockStatus(material);
+            document.getElementById('detail-status').innerHTML = `<span class="badge-stock ${status.class}">${status.text}</span>`;
+            
+            // Generate QR code
+            showQRCode(code);
+            
+            // Show recent movements
+            const recentMovements = movements.filter(m => m.materialCode === code).slice(-5).reverse();
+            const movementContainer = document.getElementById('detail-recent-movement');
+            
+            if (recentMovements.length === 0) {
+                movementContainer.innerHTML = '<p class="text-muted">No recent movements</p>';
+            } else {
+                movementContainer.innerHTML = recentMovements.map(movement => {
+                    const icon = movement.type === 'in' ? 'fa-arrow-down text-success' : 'fa-arrow-up text-danger';
+                    const sign = movement.type === 'in' ? '+' : '-';
+                    
+                    return `
+                        <div class="mb-2">
+                            <i class="fas ${icon}"></i>
+                            ${sign}${movement.quantity} ${material.unit} - ${formatDate(movement.date)}
+                            ${movement.notes ? `<br><small class="text-muted">${movement.notes}</small>` : ''}
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById('materialDetailModal'));
+            modal.show();
+        }
+        
+        // Show QR Code
+        function showQRCode(code) {
+            const qrContainer = document.getElementById('qr-code-display');
+            qrContainer.innerHTML = '';
+            
+            qrcode = new QRCode(qrContainer, {
+                text: `MATERIAL:${code}`,
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+        
+        // Print QR Code
+        function printQRCode() {
+            const qrImage = document.querySelector('#qr-code-display img');
+            if (!qrImage) return;
+            
+            const printWindow = window.open('', '_blank', 'width=400,height=400');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Print QR Code</title>
+                    <style>
+                        body { text-align: center; padding: 20px; }
+                        img { margin: 20px 0; }
+                    </style>
+                </head>
+                <body>
+                    <h3>${document.getElementById('detail-code').textContent}</h3>
+                    <img src="${qrImage.src}" width="200" height="200">
+                    <p>${document.getElementById('detail-name').textContent}</p>
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            printWindow.print();
+        }
+        
+        // Edit material
+        function editMaterial(code) {
+            alert('Edit functionality to be implemented');
+        }
+        
+        // Delete material
+        function deleteMaterial(code) {
+            if (!confirm('Are you sure you want to delete this material?')) return;
+            
+            materials = materials.filter(m => m.code !== code);
+            localStorage.setItem('materials', JSON.stringify(materials));
+            
+            updateDashboard();
+            renderMaterials();
+        }
+        
+        // Format date
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
+        
+        // Print report
+        function printReport() {
+            window.print();
+        }
+        
+        // Export data
+        function exportData() {
+            const data = {
+                materials: materials,
+                movements: movements,
+                suppliers: suppliers,
+                exportDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `stock_data_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
