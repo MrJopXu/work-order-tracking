@@ -1,66 +1,59 @@
 
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>User Management</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Management</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
 </head>
 <body>
-  <div class="container py-4">
-    <h2 class="mb-4 text-center">User Management</h2>
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="mb-0">User List</h5>
-      <button class="btn btn-primary" onclick="showAddForm()">
-        <i class="fas fa-user-plus me-1"></i> Add User
+<div class="container py-4">
+<h2 class="mb-4 text-center">User Management</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h5 class="mb-0">User List</h5>
+<button class="btn btn-primary" onclick="showAddForm()">
+<i class="fas fa-user-plus me-1"></i> Add User
       </button>
-    </div>
-
-    <div class="table-responsive">
-      <table class="table table-bordered table-striped">
-        <thead class="table-light">
-          <tr>
-            <th>Name</th>
-            <th>Role</th>
-            <th style="width: 100px;">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="user-table-body"></tbody>
-      </table>
-    </div>
-
-    <!-- Form Section -->
-    <div id="add-user-form" class="card mt-4 d-none">
-      <div class="card-body">
-        <h5 class="card-title">Add New User</h5>
-        <form onsubmit="addUser(event)">
-          <div class="mb-3">
-            <label class="form-label">Name</label>
-            <input type="text" class="form-control" id="user-name" required/>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Password</label>
-            <input type="password" class="form-control" id="user-password" required/>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Role</label>
-            <select class="form-select" id="user-role" required>
-              <option value="Admin">Admin</option>
-              <option value="Manager">Manager</option>
-              <option value="Operator">Operator</option>
-            </select>
-          </div>
-          <button class="btn btn-success" type="submit"><i class="fas fa-save me-1"></i> Save</button>
-          <button class="btn btn-secondary ms-2" type="button" onclick="hideAddForm()">Cancel</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <script>
+</div>
+<div class="table-responsive">
+<table class="table table-bordered table-striped">
+<thead class="table-light">
+<tr>
+<th>Name</th>
+<th>Role</th>
+<th style="width: 100px;">Actions</th>
+</tr>
+</thead>
+<tbody id="user-table-body"></tbody>
+</table>
+</div>
+<!-- Form Section -->
+<div class="card mt-4 d-none" id="add-user-form">
+<div class="card-body">
+<h5 class="card-title">Add New User</h5>
+<form onsubmit="addUser(event)"><div class="mb-3"><label class="form-label">Username</label><input class="form-control" id="user-username" required="True" type="text"/></div>
+<div class="mb-3">
+<label class="form-label">Name</label>
+<input class="form-control" id="user-name" required="" type="text"/>
+</div>
+<div class="mb-3">
+<label class="form-label">Password</label>
+<input class="form-control" id="user-password" required="" type="password"/>
+</div>
+<div class="mb-3">
+<label class="form-label">Role</label>
+<select class="form-select" id="user-role" required=""><option value="admin">Admin</option><option value="manager">Manager</option><option value="operator">Operator</option><option value="designer">Designer</option><option value="production">Production</option><option value="qc">Qc</option><option value="finance">Finance</option></select>
+</div>
+<button class="btn btn-success" type="submit"><i class="fas fa-save me-1"></i> Save</button>
+<button class="btn btn-secondary ms-2" onclick="hideAddForm()" type="button">Cancel</button>
+</form>
+</div>
+</div>
+</div>
+<script>
     let users = [];
 
     function loadUsers() {
@@ -71,17 +64,17 @@
 
     function renderUsers() {
       const tbody = document.getElementById("user-table-body");
-      tbody.innerHTML = users.map((u, i) => \`
+      tbody.innerHTML = users.map((u, i) => `
         <tr>
-          <td>\${u.name}</td>
-          <td>\${u.role}</td>
+          <td>${u.name} <br/><small class="text-muted">@${u.username}</small></td>
+          <td>${u.role}</td>
           <td>
-            <button class="btn btn-sm btn-danger" onclick="deleteUser(\${i})">
+            <button class="btn btn-sm btn-danger" onclick="deleteUser(${i})">
               <i class="fas fa-trash"></i>
             </button>
           </td>
         </tr>
-      \`).join("");
+      `).join("");
     }
 
     function showAddForm() {
@@ -94,41 +87,32 @@
 
     function addUser(e) {
       e.preventDefault();
+      const username = document.getElementById("user-username").value.trim();
       const name = document.getElementById("user-name").value.trim();
       const password = document.getElementById("user-password").value.trim();
       const role = document.getElementById("user-role").value;
-      
-      if (!name || !password || !role) {
+
+      if (!username || !name || !password || !role) {
         alert("Semua field harus diisi!");
         return;
       }
-      
-      const exists = users.find(u => u.name === name);
+
+      const exists = users.find(u => u.username === username);
       if (exists) {
-        alert("User dengan nama ini sudah ada!");
+        alert("Username sudah digunakan!");
         return;
       }
 
-      const newUser = { name, password, role };
+      const newUser = { username, name, password, role };
       users.push(newUser);
       localStorage.setItem("users", JSON.stringify(users));
       renderUsers();
       e.target.reset();
       hideAddForm();
-    
-      e.preventDefault();
-      const name = document.getElementById("user-name").value;
-      const password = document.getElementById("user-password").value;
-      const role = document.getElementById("user-role").value;
-      users.push({ name, password, role });
-      localStorage.setItem("users", JSON.stringify(users));
-      e.target.reset();
-      hideAddForm();
-      renderUsers();
     }
 
     function deleteUser(index) {
-      if (confirm("Delete this user?")) {
+      if (confirm("Hapus user ini?")) {
         users.splice(index, 1);
         localStorage.setItem("users", JSON.stringify(users));
         renderUsers();
@@ -136,6 +120,6 @@
     }
 
     document.addEventListener("DOMContentLoaded", loadUsers);
-  </script>
+</script>
 </body>
 </html>
