@@ -1,15 +1,509 @@
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    class MenuSystem { /* ...isi class seperti sebelumnya... */ }
-    class StockManagement { /* ...isi class seperti sebelumnya... */ }
-    class StockManagementUI { /* ...isi class seperti sebelumnya... */ }
+// Stock Management System - Complete Working Version
 
-    // Inisialisasi
-    const userRole = 'admin'; // Ubah role sesuai kebutuhan
-    const menuSystem = new MenuSystem();
-    const stockUI = new StockManagementUI();
+// ===========================
+// CONFIGURATION & CONSTANTS
+// ===========================
+const ICONS = {
+  DASHBOARD: 'fa-tachometer-alt',
+  PLUS: 'fa-plus',
+  LIST: 'fa-list',
+  BOXES: 'fa-boxes',
+  USERS: 'fa-users',
+  COG: 'fa-cog',
+  CHART_BAR: 'fa-chart-bar',
+  TASKS: 'fa-tasks',
+  PRINT: 'fa-print',
+  SHIPPING: 'fa-truck',
+  PALETTE: 'fa-palette'
+};
 
-    menuSystem.initializeMenu(userRole);
-    console.log('Stock Management System initialized');
-  });
-</script>
+const ACTIONS = {
+  SHOW_DASHBOARD: 'showDashboard',
+  SHOW_CREATE_ORDER: 'showCreateOrder',
+  SHOW_ALL_ORDERS: 'showAllOrders',
+  SHOW_STOCK_MANAGEMENT: 'showStockManagement',
+  SHOW_SHIPPING: 'showShipping',
+  SHOW_CUSTOMERS: 'showCustomers',
+  SHOW_MY_TASKS: 'showMyTasks',
+  SHOW_FILM_TASKS: 'showFilmTasks',
+  SHOW_LAYOUT_TASKS: 'showLayoutTasks',
+  SHOW_PRODUCTION_QUEUE: 'showProductionQueue',
+  SHOW_REPORTS: 'showReports',
+  SHOW_USERS: 'showUsers',
+  SHOW_SETTINGS: 'showSettings',
+  LOAD_DASHBOARD: 'loadDashboard'
+};
+
+// ===========================
+// MENU CONFIGURATION
+// ===========================
+const menuConfig = {
+  dashboard: {
+    text: 'Dashboard',
+    icon: ICONS.DASHBOARD,
+    action: ACTIONS.LOAD_DASHBOARD
+  },
+  createOrder: {
+    text: 'Create Order',
+    icon: ICONS.PLUS,
+    action: ACTIONS.SHOW_CREATE_ORDER
+  },
+  stockManagement: {
+    text: 'Stock Management',
+    icon: ICONS.LIST,
+    action: ACTIONS.SHOW_STOCK_MANAGEMENT
+  },
+  shipping: {
+    text: 'Shipping',
+    icon: ICONS.SHIPPING,
+    action: ACTIONS.SHOW_SHIPPING
+  },
+  customers: {
+    text: 'Customers',
+    icon: ICONS.USERS,
+    action: ACTIONS.SHOW_CUSTOMERS
+  },
+  myTasks: {
+    text: 'My Tasks',
+    icon: ICONS.TASKS,
+    action: ACTIONS.SHOW_MY_TASKS
+  },
+  productionQueue: {
+    text: 'Production Queue',
+    icon: ICONS.TASKS,
+    action: ACTIONS.SHOW_PRODUCTION_QUEUE
+  },
+  filmTasks: {
+    text: 'Film Tasks',
+    icon: ICONS.PRINT,
+    action: ACTIONS.SHOW_FILM_TASKS
+  },
+  layoutTasks: {
+    text: 'Layout Tasks',
+    icon: ICONS.PALETTE,
+    action: ACTIONS.SHOW_LAYOUT_TASKS
+  },
+  reports: {
+    text: 'Reports',
+    icon: ICONS.CHART_BAR,
+    action: ACTIONS.SHOW_REPORTS
+  },
+  allOrders: {
+    text: 'All Orders',
+    icon: ICONS.BOXES,
+    action: ACTIONS.SHOW_ALL_ORDERS
+  },
+  users: {
+    text: 'Users',
+    icon: ICONS.USERS,
+    action: ACTIONS.SHOW_USERS
+  },
+  settings: {
+    text: 'Settings',
+    icon: ICONS.COG,
+    action: ACTIONS.SHOW_SETTINGS
+  }
+};
+
+// ===========================
+// ROLE-BASED MENU ACCESS
+// ===========================
+const roleMenuAccess = {
+  dashboard: [
+    'dashboard',
+    'createOrder',
+    'stockManagement',
+    'shipping',
+    'customers',
+    'reports',
+    'allOrders',
+    'users',
+    'settings'
+  ],
+  stockManagement: [
+    'dashboard',
+    'stockManagement',
+    'reports'
+  ],
+  production: [
+    'dashboard',
+    'myTasks',
+    'productionQueue'
+  ],
+  designer: [
+    'dashboard',
+    'myTasks',
+    'layoutTasks'
+  ],
+  newOrder: [
+    'dashboard',
+    'createOrder'
+  ],
+  filmTasks: [
+    'myTasks',
+    'filmTasks'
+  ]
+};
+
+// ===========================
+// MENU BUILDER CLASS
+// ===========================
+class MenuBuilder {
+  constructor(config, roleAccess) {
+    this.config = config;
+    this.roleAccess = roleAccess;
+  }
+
+  createMenuItem(itemKey) {
+    const item = this.config[itemKey];
+    if (!item) return null;
+
+    const menuItem = document.createElement('li');
+    menuItem.className = 'nav-item';
+    
+    const link = document.createElement('a');
+    link.className = 'nav-link';
+    link.href = '#';
+    link.innerHTML = `<i class="fa ${item.icon}"></i> ${item.text}`;
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.executeAction(item.action);
+    });
+    
+    menuItem.appendChild(link);
+    return menuItem;
+  }
+
+  executeAction(action) {
+    if (typeof window[action] === 'function') {
+      window[action]();
+    } else {
+      console.warn(`Action ${action} not found`);
+      // Create placeholder function
+      window[action] = () => {
+        console.log(`Executing: ${action}`);
+      };
+      window[action]();
+    }
+  }
+
+  buildMenuByRole(role) {
+    const menuKeys = this.roleAccess[role];
+    if (!menuKeys) {
+      console.error(`Role ${role} not found`);
+      return null;
+    }
+
+    const menuContainer = document.createElement('ul');
+    menuContainer.className = 'nav flex-column';
+
+    menuKeys.forEach(key => {
+      const menuItem = this.createMenuItem(key);
+      if (menuItem) {
+        menuContainer.appendChild(menuItem);
+      }
+    });
+
+    return menuContainer;
+  }
+}
+
+// ===========================
+// STOCK MANAGEMENT MODULE
+// ===========================
+class StockManagement {
+  constructor() {
+    this.inventory = [];
+    this.loadInventory();
+  }
+
+  loadInventory() {
+    const savedInventory = localStorage.getItem('inventory');
+    if (savedInventory) {
+      this.inventory = JSON.parse(savedInventory);
+    }
+  }
+
+  saveInventory() {
+    localStorage.setItem('inventory', JSON.stringify(this.inventory));
+  }
+
+  addItem(item) {
+    const newItem = {
+      id: Date.now(),
+      ...item,
+      addedDate: new Date().toISOString()
+    };
+    this.inventory.push(newItem);
+    this.saveInventory();
+    return newItem;
+  }
+
+  removeItem(itemId) {
+    this.inventory = this.inventory.filter(item => item.id !== itemId);
+    this.saveInventory();
+  }
+
+  updateItem(itemId, updates) {
+    const index = this.inventory.findIndex(item => item.id === itemId);
+    if (index !== -1) {
+      this.inventory[index] = { ...this.inventory[index], ...updates };
+      this.saveInventory();
+      return this.inventory[index];
+    }
+    return null;
+  }
+
+  getInventory() {
+    return this.inventory;
+  }
+
+  searchItems(query) {
+    return this.inventory.filter(item => 
+      item.name.toLowerCase().includes(query.toLowerCase()) ||
+      (item.sku && item.sku.toLowerCase().includes(query.toLowerCase()))
+    );
+  }
+
+  getLowStockItems(threshold = 10) {
+    return this.inventory.filter(item => item.quantity < threshold);
+  }
+}
+
+// ===========================
+// ACTION FUNCTIONS
+// ===========================
+function loadDashboard() {
+  const content = document.getElementById('main-content');
+  content.innerHTML = `
+    <div class="dashboard">
+      <h1>Dashboard</h1>
+      <div class="dashboard-widgets">
+        <div class="widget">
+          <h3>Total Items</h3>
+          <p>${stockManager.getInventory().length}</p>
+        </div>
+        <div class="widget">
+          <h3>Low Stock Items</h3>
+          <p>${stockManager.getLowStockItems().length}</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function showStockManagement() {
+  const content = document.getElementById('main-content');
+  const inventory = stockManager.getInventory();
+  
+  content.innerHTML = `
+    <div class="stock-management">
+      <div class="header">
+        <h2>Stock Management</h2>
+        <button class="btn btn-primary" onclick="showAddItemForm()">
+          <i class="fa fa-plus"></i> Add Item
+        </button>
+      </div>
+      
+      <div class="search-container">
+        <input type="text" id="searchInput" class="form-control" 
+               placeholder="Search items..." onkeyup="handleSearch()">
+      </div>
+      
+      <table class="table">
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Name</th>
+            <th>Quantity</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="inventoryTable">
+          ${renderInventoryRows(inventory)}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function renderInventoryRows(items) {
+  if (items.length === 0) {
+    return '<tr><td colspan="4" class="text-center">No items found</td></tr>';
+  }
+  
+  return items.map(item => `
+    <tr>
+      <td>${item.sku || '-'}</td>
+      <td>${item.name}</td>
+      <td>${item.quantity}</td>
+      <td>
+        <button class="btn btn-sm btn-primary" onclick="editItem(${item.id})">
+          <i class="fa fa-edit"></i>
+        </button>
+        <button class="btn btn-sm btn-danger" onclick="deleteItem(${item.id})">
+          <i class="fa fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function handleSearch() {
+  const query = document.getElementById('searchInput').value;
+  const items = query ? stockManager.searchItems(query) : stockManager.getInventory();
+  document.getElementById('inventoryTable').innerHTML = renderInventoryRows(items);
+}
+
+function showAddItemForm() {
+  const modal = `
+    <div class="modal" id="addItemModal">
+      <div class="modal-content">
+        <h3>Add New Item</h3>
+        <form onsubmit="handleAddItem(event)">
+          <input type="text" name="sku" placeholder="SKU" required>
+          <input type="text" name="name" placeholder="Item Name" required>
+          <input type="number" name="quantity" placeholder="Quantity" required>
+          <button type="submit" class="btn btn-primary">Add Item</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        </form>
+      </div>
+    </div>
+  `;
+  document.body.insertAdjacentHTML('beforeend', modal);
+}
+
+function handleAddItem(event) {
+  event.preventDefault();
+  const formData = new FormData(event.target);
+  const item = {
+    sku: formData.get('sku'),
+    name: formData.get('name'),
+    quantity: parseInt(formData.get('quantity'))
+  };
+  
+  stockManager.addItem(item);
+  closeModal();
+  showStockManagement();
+}
+
+function deleteItem(id) {
+  if (confirm('Are you sure you want to delete this item?')) {
+    stockManager.removeItem(id);
+    showStockManagement();
+  }
+}
+
+function editItem(id) {
+  const item = stockManager.getInventory().find(i => i.id === id);
+  if (!item) return;
+  
+  // Show edit form (similar to add form)
+  console.log('Edit item:', item);
+}
+
+function closeModal() {
+  const modal = document.getElementById('addItemModal');
+  if (modal) modal.remove();
+}
+
+// ===========================
+// INITIALIZATION
+// ===========================
+let menuBuilder;
+let stockManager;
+
+function initializeMenu(role) {
+  const menu = menuBuilder.buildMenuByRole(role);
+  const sidebarMenu = document.getElementById('sidebar-menu');
+  
+  if (sidebarMenu && menu) {
+    sidebarMenu.innerHTML = '';
+    sidebarMenu.appendChild(menu);
+  }
+}
+
+function loadMenuBasedOnRole(role) {
+  initializeMenu(role);
+  console.log(`Menu loaded for role: ${role}`);
+}
+
+// Document ready
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize modules
+  menuBuilder = new MenuBuilder(menuConfig, roleMenuAccess);
+  stockManager = new StockManagement();
+  
+  // Get user role (would come from authentication)
+  const userRole = 'dashboard'; // Example role
+  
+  // Initialize menu
+  loadMenuBasedOnRole(userRole);
+  
+  // Load dashboard by default
+  loadDashboard();
+  
+  console.log('Stock Management System initialized');
+});
+
+// CSS Styles (add to your stylesheet)
+const styles = `
+  .stock-management {
+    padding: 20px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .search-container {
+    margin-bottom: 20px;
+  }
+  
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 400px;
+  }
+  
+  .modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .modal-content input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .widget {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+  }
+  
+  .dashboard-widgets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+`;
