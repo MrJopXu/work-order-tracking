@@ -1,855 +1,172 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Track Order - Work Order System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://unpkg.com/html5-qrcode@2.3.4/html5-qrcode.min.js"></script>
-    <style>
-        :root {
-            --primary-color: #2563eb;
-            --secondary-color: #64748b;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --light-bg: #f8fafc;
-            --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--light-bg);
-            padding-top: 60px;
-        }
-        
-        /* Navbar */
-        .navbar {
-            background: white;
-            box-shadow: var(--card-shadow);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            padding: 1rem;
-        }
-        
-        .navbar-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        /* Hero section */
-        .hero-section {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #1d4ed8 100%);
-            color: white;
-            padding: 3rem 0;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-        
-        .hero-section h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-        
-        /* Main content */
-        .main-content {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-        
-        /* Card */
-        .card {
-            background: white;
-            border: none;
-            border-radius: 0.75rem;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-        }
-        
-        .card-header {
-            background: none;
-            border: none;
-            padding: 1.5rem;
-            font-weight: 600;
-            font-size: 1.125rem;
-            color: #111827;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .card-body {
-            padding: 1.5rem;
-        }
-        
-        /* Tab buttons */
-        .tab-buttons {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .tab-btn {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border: 2px solid #e5e7eb;
-            background: white;
-            border-radius: 0.5rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-            color: #374151;
-        }
-        
-        .tab-btn:hover {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-        
-        .tab-btn.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-        
-        /* Form controls */
-        .form-control {
-            border: 1.5px solid #e5e7eb;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            font-size: 1rem;
-            transition: all 0.2s;
-        }
-        
-        .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-            outline: none;
-        }
-        
-        .input-group-text {
-            background: var(--light-bg);
-            border: 1.5px solid #e5e7eb;
-            border-right: none;
-            color: var(--secondary-color);
-        }
-        
-        /* QR Scanner */
-        #qr-reader {
-            width: 100%;
-            border: 2px dashed #e5e7eb;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            min-height: 300px;
-        }
-        
-        #qr-reader video {
-            border-radius: 0.5rem;
-        }
-        
-        .scanner-info {
-            text-align: center;
-            color: var(--secondary-color);
-            margin: 1rem 0;
-        }
-        
-        /* Results */
-        .result-section {
-            display: none;
-        }
-        
-        .order-info {
-            background: var(--light-bg);
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .info-row:last-child {
-            border-bottom: none;
-        }
-        
-        .info-label {
-            font-weight: 500;
-            color: #6b7280;
-        }
-        
-        .info-value {
-            font-weight: 600;
-            color: #111827;
-        }
-        
-        /* Timeline */
-        .timeline {
-            position: relative;
-            padding: 1rem 0;
-        }
-        
-        .timeline-item {
-            position: relative;
-            padding: 1rem 0 1rem 3rem;
-            margin-bottom: 1rem;
-        }
-        
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: 0.75rem;
-            top: 2rem;
-            bottom: -1rem;
-            width: 2px;
-            background: #e5e7eb;
-        }
-        
-        .timeline-item:last-child::before {
-            display: none;
-        }
-        
-        .timeline-icon {
-            position: absolute;
-            left: 0;
-            top: 1rem;
-            width: 1.5rem;
-            height: 1.5rem;
-            border-radius: 50%;
-            background: #e5e7eb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            color: white;
-        }
-        
-        .timeline-item.completed .timeline-icon {
-            background: var(--success-color);
-        }
-        
-        .timeline-item.in-progress .timeline-icon {
-            background: var(--warning-color);
-        }
-        
-        .timeline-content {
-            background: white;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            box-shadow: var(--card-shadow);
-        }
-        
-        .timeline-header {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-        
-        .badge.completed {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        
-        .badge.in-progress {
-            background: #fef3c7;
-            color: #92400e;
-        }
-        
-        .badge.pending {
-            background: #f3f4f6;
-            color: #6b7280;
-        }
-        
-        /* Buttons */
-        .btn {
-            border: none;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            font-weight: 500;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1rem;
-        }
-        
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #1d4ed8;
-        }
-        
-        .btn-secondary {
-            background: #e5e7eb;
-            color: #374151;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero-section h1 {
-                font-size: 1.5rem;
-            }
-            
-            .info-row {
-                flex-direction: column;
-                gap: 0.25rem;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="navbar-container">
-            <a href="index.html" class="navbar-brand">
-                <i class="fas fa-clipboard-list me-2"></i>
-                Work Order System
-            </a>
-            <div>
-                <a href="index.html" class="btn btn-secondary btn-sm">
-                    <i class="fas fa-home"></i>
-                    <span class="d-none d-sm-inline">Home</span>
-                </a>
-            </div>
-        </div>
-    </nav>
-    
-    <!-- Hero Section -->
-    <div class="hero-section">
-        <h1>Track Your Order</h1>
-        <p>Enter your tracking code or scan QR code</p>
-    </div>
-    
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="card">
-            <div class="card-body">
-                <!-- Tab buttons -->
-                <div class="tab-buttons">
-                    <button class="tab-btn active" onclick="switchTab('code')">
-                        <i class="fas fa-keyboard"></i> Enter Code
-                    </button>
-                    <button class="tab-btn" onclick="switchTab('scan')">
-                        <i class="fas fa-qrcode"></i> Scan QR Code
-                    </button>
-                </div>
-                
-                <!-- Enter Code Tab -->
-                <div id="code-tab" class="tab-content">
-                    <form id="track-form">
-                        <div class="input-group">
-                            <span class="input-group-text">
-                                <i class="fas fa-search"></i>
-                            </span>
-                            <input type="text" 
-                                   class="form-control" 
-                                   id="tracking-code" 
-                                   placeholder="Enter tracking code (e.g., TR20250514ABC)"
-                                   required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 mt-3">
-                            <i class="fas fa-search"></i> Track Order
-                        </button>
-                    </form>
-                    
-                    <!-- Recent codes -->
-                    <div id="recent-codes" class="mt-3" style="display: none;">
-                        <small class="text-muted">Recently tracked:</small>
-                        <div id="recent-list" class="mt-2"></div>
-                    </div>
-                </div>
-                
-                <!-- Scan QR Tab -->
-                <div id="scan-tab" class="tab-content" style="display: none;">
-                    <div id="qr-reader"></div>
-                    <div class="scanner-info">
-                        <p>Position the QR code within the frame to scan</p>
-                        <button class="btn btn-secondary btn-sm" onclick="stopScanner()">
-                            <i class="fas fa-stop"></i> Stop Scanner
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Results Section -->
-        <div id="result-section" class="result-section">
-            <!-- Order Info -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Order Information</h5>
-                </div>
-                <div class="card-body">
-                    <div class="order-info">
-                        <div class="info-row">
-                            <span class="info-label">Tracking Code</span>
-                            <span class="info-value" id="result-code">-</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Customer</span>
-                            <span class="info-value" id="result-customer">-</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Product</span>
-                            <span class="info-value" id="result-product">-</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Order Date</span>
-                            <span class="info-value" id="result-date">-</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Expected Delivery</span>
-                            <span class="info-value" id="result-deadline">-</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Status</span>
-                            <span class="info-value" id="result-status">-</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Progress bar -->
-                    <div class="mt-3">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Overall Progress</span>
-                            <span id="progress-percent">0%</span>
-                        </div>
-                        <div class="progress" style="height: 10px;">
-                            <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Timeline -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Order Timeline</h5>
-                </div>
-                <div class="card-body">
-                    <div class="timeline" id="timeline">
-                        <!-- Timeline items will be added here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <script>
-        let html5QrCode = null;
-        let isScanning = false;
-        let recentCodes = [];
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load recent codes
-            recentCodes = JSON.parse(localStorage.getItem('recentTracking') || '[]');
-            showRecentCodes();
-            
-            // Handle form submission
-            document.getElementById('track-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const code = document.getElementById('tracking-code').value.trim();
-                if (code) {
-                    trackOrder(code);
-                }
-            });
-            
-            // Check URL params
-            const urlParams = new URLSearchParams(window.location.search);
-            const codeFromUrl = urlParams.get('code');
-            if (codeFromUrl) {
-                document.getElementById('tracking-code').value = codeFromUrl;
-                trackOrder(codeFromUrl);
-            }
-        });
-        
-        // Switch tabs
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.style.display = 'none';
-            });
-            
-            if (tab === 'code') {
-                document.querySelector('.tab-btn:first-child').classList.add('active');
-                document.getElementById('code-tab').style.display = 'block';
-                if (isScanning) {
-                    stopScanner();
-                }
-            } else {
-                document.querySelector('.tab-btn:last-child').classList.add('active');
-                document.getElementById('scan-tab').style.display = 'block';
-                startScanner();
-            }
-        }
-        
-        // Start QR scanner
-        function startScanner() {
-            if (!html5QrCode) {
-                html5QrCode = new Html5Qrcode("qr-reader");
-            }
-            
-            html5QrCode.start(
-                { facingMode: "environment" },
-                {
-                    fps: 10,
-                    qrbox: { width: 250, height: 250 }
-                },
-                (decodedText, decodedResult) => {
-                    console.log('QR Code detected:', decodedText);
-                    // Extract tracking code from URL or direct code
-                    let trackingCode = null;
-                    
-                    // Check if it's a URL with code parameter
-                    const urlMatch = decodedText.match(/code=([A-Z0-9]+)/);
-                    if (urlMatch) {
-                        trackingCode = urlMatch[1];
-                    } 
-                    // Check if it's a direct tracking code
-                    else if (decodedText.match(/^TR[0-9]{8}[A-Z0-9]+$/)) {
-                        trackingCode = decodedText;
-                    }
-                    // Try if it's just a simple tracking code format
-                    else if (decodedText.match(/^TR[0-9]+[A-Z]$/)) {
-                        trackingCode = decodedText;
-                    }
-                    
-                    if (trackingCode) {
-                        trackOrder(trackingCode);
-                        stopScanner();
-                        switchTab('code');
-                    } else {
-                        console.log('Unrecognized QR code format:', decodedText);
-                    }
-                },
-                (errorMessage) => {
-                    // ignore errors
-                }
-            ).catch((err) => {
-                console.error('Error starting scanner:', err);
-                alert('Unable to access camera. Please make sure you have granted camera permissions.');
-            });
-            
-            isScanning = true;
-        }
-        
-        // Stop QR scanner
-        function stopScanner() {
-            if (html5QrCode && isScanning) {
-                html5QrCode.stop().then(() => {
-                    console.log('Scanner stopped');
-                }).catch((err) => {
-                    console.error('Error stopping scanner:', err);
-                });
-                isScanning = false;
-            }
-        }
-        
-        // Track order
+// Track order
         function trackOrder(code) {
-            code = code.toUpperCase();
-            
-            // Sample data untuk demo
-            const sampleOrders = {
-                "TR20250511A": {
-                    code: "TR20250511A",
-                    customer: {
-                        name: "PT ABC Indonesia",
-                        company: "PT ABC Indonesia",
-                        email: "contact@abc.com",
-                        phone: "021-1234567"
-                    },
-                    order: {
-                        poNumber: "PO-ABC-2025-001",
-                        orderDate: "2025-05-11",
-                        deadline: "2025-05-20",
-                        priority: "normal"
-                    },
-                    product: {
-                        type: "Banner",
-                        quantity: "1",
-                        size: "3x4 meter",
-                        material: "Flexi",
-                        description: "Custom design banner untuk event"
-                    },
-                    stages: {
-                        po: { completed: true, date: "2025-05-11T09:00:00", user: "Admin Satu", notes: "PO received and confirmed" },
-                        layout: { completed: true, date: "2025-05-12T14:30:00", user: "Designer Kreatif", notes: "Design approved by customer" },
-                        film: { completed: true, date: "2025-05-13T10:00:00", user: "Designer Kreatif", notes: "Film ready for production" },
-                        production: { completed: false, inProgress: true, date: "2025-05-14T08:00:00", user: "Produksi Team", notes: "Production in progress - 60% completed" },
-                        qc: { completed: false },
-                        shipping: { completed: false },
-                        payment: { completed: false }
-                    },
-                    createdAt: "2025-05-11T09:00:00",
-                    createdBy: "Admin Satu"
-                },
-                "TR20250510B": {
-                    code: "TR20250510B",
-                    customer: {
-                        name: "CV XYZ Mandiri",
-                        company: "CV XYZ Mandiri",
-                        email: "info@xyz.com",
-                        phone: "021-7654321"
-                    },
-                    order: {
-                        poNumber: "PO-XYZ-2025-045",
-                        orderDate: "2025-05-10",
-                        deadline: "2025-05-25",
-                        priority: "urgent"
-                    },
-                    product: {
-                        type: "Sticker",
-                        quantity: "100",
-                        size: "10x10 cm",
-                        material: "Vinyl",
-                        description: "Sticker vinyl custom design"
-                    },
-                    stages: {
-                        po: { completed: true, date: "2025-05-10T11:00:00", user: "Admin Satu", notes: "Purchase order received" },
-                        layout: { completed: false, inProgress: true, date: "2025-05-11T09:00:00", user: "Designer Kreatif", notes: "Working on design layout" },
-                        film: { completed: false },
-                        production: { completed: false },
-                        qc: { completed: false },
-                        shipping: { completed: false },
-                        payment: { completed: false }
-                    },
-                    createdAt: "2025-05-10T11:00:00",
-                    createdBy: "Admin Satu"
-                },
-                "TR20250505C": {
-                    code: "TR20250505C",
-                    customer: {
-                        name: "Toko Jaya Abadi",
-                        company: "Toko Jaya Abadi",
-                        email: "tokojaya@gmail.com",
-                        phone: "021-5555555"
-                    },
-                    order: {
-                        poNumber: "PO-TJA-2025-012",
-                        orderDate: "2025-05-05",
-                        deadline: "2025-05-15",
-                        priority: "normal"
-                    },
-                    product: {
-                        type: "Poster",
-                        quantity: "50",
-                        size: "A3",
-                        material: "Art Paper Glossy",
-                        description: "Poster A3 untuk promosi produk"
-                    },
-                    stages: {
-                        po: { completed: true, date: "2025-05-05T10:00:00", user: "Admin Satu", notes: "Purchase order received" },
-                        layout: { completed: true, date: "2025-05-06T15:00:00", user: "Designer Kreatif", notes: "Design completed and approved" },
-                        film: { completed: true, date: "2025-05-07T09:00:00", user: "Designer Kreatif", notes: "Film printed successfully" },
-                        production: { completed: true, date: "2025-05-09T12:00:00", user: "Produksi Team", notes: "Production completed" },
-                        qc: { completed: true, date: "2025-05-10T14:00:00", user: "QC Team", notes: "All items passed quality control" },
-                        shipping: { completed: true, date: "2025-05-12T16:00:00", user: "Admin Satu", notes: "Shipped via JNE - Tracking: JNE123456789" },
-                        payment: { completed: true, date: "2025-05-15T11:00:00", user: "Finance Team", notes: "Payment received in full" }
-                    },
-                    createdAt: "2025-05-05T10:00:00",
-                    createdBy: "Admin Satu"
-                }
-            };
-            
-            // Try to get order from localStorage first
-            let order = null;
-            const storedData = localStorage.getItem(`order_${code}`);
-            
-            if (storedData) {
-                order = JSON.parse(storedData);
-            } else if (sampleOrders[code]) {
-                // Use sample data if not found in localStorage
-                order = sampleOrders[code];
-            }
-            
-            if (!order) {
-                alert('Order not found! Please check your tracking code.');
-                return;
-            }
-            
-            // Save to recent codes
-            if (!recentCodes.includes(code)) {
-                recentCodes.unshift(code);
-                recentCodes = recentCodes.slice(0, 5);
-                localStorage.setItem('recentTracking', JSON.stringify(recentCodes));
-                showRecentCodes();
-            }
-            
-            // Display order information
-            document.getElementById('result-code').textContent = order.code;
-            document.getElementById('result-customer').textContent = order.customer.name;
-            document.getElementById('result-product').textContent = `${order.product.type} - ${order.product.quantity} pcs`;
-            document.getElementById('result-date').textContent = formatDate(order.order.orderDate);
-            document.getElementById('result-deadline').textContent = formatDate(order.order.deadline);
-            
-            // Calculate progress and status
-            const { progress, status } = calculateProgress(order.stages);
-            document.getElementById('result-status').innerHTML = getStatusBadge(status);
-            document.getElementById('progress-percent').textContent = `${progress}%`;
-            document.getElementById('progress-bar').style.width = `${progress}%`;
-            
-            // Set progress bar color
-            const progressBar = document.getElementById('progress-bar');
-            progressBar.className = 'progress-bar';
-            if (progress < 30) {
-                progressBar.classList.add('bg-danger');
-            } else if (progress < 70) {
-                progressBar.classList.add('bg-warning');
-            } else {
-                progressBar.classList.add('bg-success');
-            }
-            
-            // Display timeline
-            displayTimeline(order.stages);
-            
-            // Show results
-            document.getElementById('result-section').style.display = 'block';
-            document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        // Calculate progress
-        function calculateProgress(stages) {
-            const stageList = ['po', 'layout', 'film', 'production', 'qc', 'shipping', 'payment'];
-            let completed = 0;
-            let currentStatus = 'New';
-            
-            stageList.forEach(stage => {
-                if (stages[stage] && stages[stage].completed) {
-                    completed++;
-                }
-                if (stages[stage] && (stages[stage].completed || stages[stage].inProgress)) {
-                    currentStatus = stage;
-                }
-            });
-            
-            const progress = Math.round((completed / stageList.length) * 100);
-            
-            return { progress, status: currentStatus };
-        }
-        
-        // Get status badge
-        function getStatusBadge(status) {
-            const statusNames = {
-                'po': 'PO Received',
-                'layout': 'Layout Design',
-                'film': 'Film Printing',
-                'production': 'Production',
-                'qc': 'Quality Control',
-                'shipping': 'Shipping',
-                'payment': 'Payment'
-            };
-            
-            const name = statusNames[status] || status;
-            const badgeClass = status === 'payment' ? 'completed' : 'in-progress';
-            
-            return `<span class="badge ${badgeClass}">${name}</span>`;
-        }
-        
-        // Display timeline
-        function displayTimeline(stages) {
-            const timeline = document.getElementById('timeline');
-            const stageInfo = [
-                { id: 'po', name: 'PO Received', icon: 'fa-file-invoice' },
-                { id: 'layout', name: 'Layout Design', icon: 'fa-palette' },
-                { id: 'film', name: 'Film Printing', icon: 'fa-print' },
-                { id: 'production', name: 'Production', icon: 'fa-industry' },
-                { id: 'qc', name: 'Quality Control', icon: 'fa-check-circle' },
-                { id: 'shipping', name: 'Shipping', icon: 'fa-truck' },
-                { id: 'payment', name: 'Payment', icon: 'fa-money-bill' }
-            ];
-            
-            timeline.innerHTML = stageInfo.map(stage => {
-                const data = stages[stage.id] || {};
-                let itemClass = '';
-                let badgeClass = 'pending';
-                let badgeText = 'Pending';
-                let iconHTML = `<i class="fas fa-clock"></i>`;
+            try {
+                code = code.toUpperCase();
                 
-                if (data.completed) {
-                    itemClass = 'completed';
-                    badgeClass = 'completed';
-                    badgeText = 'Completed';
-                    iconHTML = `<i class="fas fa-check"></i>`;
-                } else if (data.inProgress) {
-                    itemClass = 'in-progress';
-                    badgeClass = 'in-progress';
-                    badgeText = 'In Progress';
-                    iconHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+                // Sample data untuk demo
+                const sampleOrders = {
+                    "TR20250511A": {
+                        code: "TR20250511A",
+                        customer: {
+                            name: "PT ABC Indonesia",
+                            company: "PT ABC Indonesia",
+                            email: "contact@abc.com",
+                            phone: "021-1234567"
+                        },
+                        order: {
+                            poNumber: "PO-ABC-2025-001",
+                            orderDate: "2025-05-11",
+                            deadline: "2025-05-20",
+                            priority: "normal"
+                        },
+                        product: {
+                            type: "Banner",
+                            quantity: "1",
+                            size: "3x4 meter",
+                            material: "Flexi",
+                            description: "Custom design banner untuk event"
+                        },
+                        stages: {
+                            po: { completed: true, date: "2025-05-11T09:00:00", user: "Admin Satu", notes: "PO received and confirmed" },
+                            layout: { completed: true, date: "2025-05-12T14:30:00", user: "Designer Kreatif", notes: "Design approved by customer" },
+                            film: { completed: true, date: "2025-05-13T10:00:00", user: "Designer Kreatif", notes: "Film ready for production" },
+                            production: { completed: false, inProgress: true, date: "2025-05-14T08:00:00", user: "Produksi Team", notes: "Production in progress - 60% completed" },
+                            qc: { completed: false },
+                            shipping: { completed: false },
+                            payment: { completed: false }
+                        },
+                        createdAt: "2025-05-11T09:00:00",
+                        createdBy: "Admin Satu"
+                    },
+                    "TR20250510B": {
+                        code: "TR20250510B",
+                        customer: {
+                            name: "CV XYZ Mandiri",
+                            company: "CV XYZ Mandiri",
+                            email: "info@xyz.com",
+                            phone: "021-7654321"
+                        },
+                        order: {
+                            poNumber: "PO-XYZ-2025-045",
+                            orderDate: "2025-05-10",
+                            deadline: "2025-05-25",
+                            priority: "urgent"
+                        },
+                        product: {
+                            type: "Sticker",
+                            quantity: "100",
+                            size: "10x10 cm",
+                            material: "Vinyl",
+                            description: "Sticker vinyl custom design"
+                        },
+                        stages: {
+                            po: { completed: true, date: "2025-05-10T11:00:00", user: "Admin Satu", notes: "Purchase order received" },
+                            layout: { completed: false, inProgress: true, date: "2025-05-11T09:00:00", user: "Designer Kreatif", notes: "Working on design layout" },
+                            film: { completed: false },
+                            production: { completed: false },
+                            qc: { completed: false },
+                            shipping: { completed: false },
+                            payment: { completed: false }
+                        },
+                        createdAt: "2025-05-10T11:00:00",
+                        createdBy: "Admin Satu"
+                    },
+                    "TR20250505C": {
+                        code: "TR20250505C",
+                        customer: {
+                            name: "Toko Jaya Abadi",
+                            company: "Toko Jaya Abadi",
+                            email: "tokojaya@gmail.com",
+                            phone: "021-5555555"
+                        },
+                        order: {
+                            poNumber: "PO-TJA-2025-012",
+                            orderDate: "2025-05-05",
+                            deadline: "2025-05-15",
+                            priority: "normal"
+                        },
+                        product: {
+                            type: "Poster",
+                            quantity: "50",
+                            size: "A3",
+                            material: "Art Paper Glossy",
+                            description: "Poster A3 untuk promosi produk"
+                        },
+                        stages: {
+                            po: { completed: true, date: "2025-05-05T10:00:00", user: "Admin Satu", notes: "Purchase order received" },
+                            layout: { completed: true, date: "2025-05-06T15:00:00", user: "Designer Kreatif", notes: "Design completed and approved" },
+                            film: { completed: true, date: "2025-05-07T09:00:00", user: "Designer Kreatif", notes: "Film printed successfully" },
+                            production: { completed: true, date: "2025-05-09T12:00:00", user: "Produksi Team", notes: "Production completed" },
+                            qc: { completed: true, date: "2025-05-10T14:00:00", user: "QC Team", notes: "All items passed quality control" },
+                            shipping: { completed: true, date: "2025-05-12T16:00:00", user: "Admin Satu", notes: "Shipped via JNE - Tracking: JNE123456789" },
+                            payment: { completed: true, date: "2025-05-15T11:00:00", user: "Finance Team", notes: "Payment received in full" }
+                        },
+                        createdAt: "2025-05-05T10:00:00",
+                        createdBy: "Admin Satu"
+                    }
+                };
+                
+                // Try to get order from localStorage first
+                let order = null;
+                const storedData = localStorage.getItem(`order_${code}`);
+                
+                if (storedData) {
+                    try {
+                        order = JSON.parse(storedData);
+                    } catch (e) {
+                        console.error('Error parsing stored order data:', e);
+                    }
+                } else if (sampleOrders[code]) {
+                    // Use sample data if not found in localStorage
+                    order = sampleOrders[code];
                 }
                 
-                return `
-                    <div class="timeline-item ${itemClass}">
-                        <div class="timeline-icon">
-                            ${iconHTML}
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-header">
-                                <span>${stage.name}</span>
-                                <span class="badge ${badgeClass}">${badgeText}</span>
-                            </div>
-                            ${data.date ? `<small class="text-muted">Date: ${formatDate(data.date)}</small><br>` : ''}
-                            ${data.user ? `<small class="text-muted">By: ${data.user}</small><br>` : ''}
-                            ${data.notes ? `<small class="text-muted">Notes: ${data.notes}</small>` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        // Format date
-        function formatDate(dateStr) {
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-        }
-        
-        // Show recent codes
-        function showRecentCodes() {
-            if (recentCodes.length > 0) {
-                document.getElementById('recent-codes').style.display = 'block';
-                document.getElementById('recent-list').innerHTML = recentCodes.map(code => `
-                    <button class="btn btn-sm btn-outline-primary me-2 mb-2" onclick="selectRecentCode('${code}')">
-                        ${code}
-                    </button>
-                `).join('');
+                if (!order) {
+                    alert('Order not found! Please check your tracking code.');
+                    return;
+                }
+                
+                // Save to recent codes
+                if (!recentCodes.includes(code)) {
+                    recentCodes.unshift(code);
+                    recentCodes = recentCodes.slice(0, 5);
+                    localStorage.setItem('recentTracking', JSON.stringify(recentCodes));
+                    showRecentCodes();
+                }
+                
+                // Display order information
+                document.getElementById('result-code').textContent = order.code || '';
+                document.getElementById('result-customer').textContent = order.customer.name || '';
+                document.getElementById('result-product').textContent = `${order.product.type || ''} - ${order.product.quantity || ''} pcs`;
+                document.getElementById('result-date').textContent = formatDate(order.order.orderDate || '');
+                document.getElementById('result-deadline').textContent = formatDate(order.order.deadline || '');
+                
+                // Calculate progress and status
+                const { progress, status } = calculateProgress(order.stages || {});
+                document.getElementById('result-status').innerHTML = getStatusBadge(status);
+                document.getElementById('progress-percent').textContent = `${progress}%`;
+                document.getElementById('progress-bar').style.width = `${progress}%`;
+                
+                // Set progress bar color
+                const progressBar = document.getElementById('progress-bar');
+                progressBar.className = 'progress-bar';
+                if (progress < 30) {
+                    progressBar.classList.add('bg-danger');
+                } else if (progress < 70) {
+                    progressBar.classList.add('bg-warning');
+                } else {
+                    progressBar.classList.add('bg-success');
+                }
+                
+                // Display timeline
+                displayTimeline(order.stages || {});
+                
+                // Show results
+                document.getElementById('result-section').style.display = 'block';
+                document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                console.error('Error displaying order information:', error);
+                alert('Error displaying order information. Please try again.');
             }
         }
-        
-        // Select recent code
-        function selectRecentCode(code) {
-            document.getElementById('tracking-code').value = code;
-            trackOrder(code);
-        }
-    </script>
-</body>
-</html>
