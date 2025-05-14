@@ -390,15 +390,7 @@
                             Product Details
                         </h5>
                         <div class="row">
-                            
-<div class="col-md-6 mb-3">
-    <label class="form-label">Select SKU from Stock</label>
-    <select class="form-select" id="sku-select">
-        <option value="">-- Select SKU --</option>
-    </select>
-</div>
-
-<div class="col-md-6 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label required">Product Type</label>
                                 <select class="form-select" id="product-type" required>
                                     <option value="">Select Product Type</option>
@@ -742,46 +734,61 @@
         }
         
         
-// === SKU Inventory Connection ===
-function loadSKUFromInventory() {
+// === Multi-SKU Row Management ===
+function loadInventoryList() {
     const saved = localStorage.getItem('inventory');
-    if (saved) {
-        const inventory = JSON.parse(saved);
-        const skuSelect = document.getElementById('sku-select');
-        if (skuSelect) {
-            inventory.forEach(item => {
-                const opt = document.createElement('option');
-                opt.value = item.sku;
-                opt.textContent = `${item.name} - ${item.sku} (Stock: ${item.quantity})`;
-                skuSelect.appendChild(opt);
-            });
-        }
-    }
+    return saved ? JSON.parse(saved) : [];
 }
 
-function reduceStockAfterOrder(sku, qty) {
-    const saved = localStorage.getItem('inventory');
-    if (!saved) return;
-    const inventory = JSON.parse(saved);
-    const index = inventory.findIndex(item => item.sku === sku);
-    if (index !== -1 && inventory[index].quantity >= qty) {
-        inventory[index].quantity -= qty;
-        localStorage.setItem('inventory', JSON.stringify(inventory));
-    } else {
-        alert("SKU not found or insufficient stock.");
-    }
+function addSkuRow() {
+    const container = document.getElementById('sku-container');
+    const row = document.createElement('div');
+    row.className = 'row mb-2';
+
+    const inventory = loadInventoryList();
+    const selectOptions = inventory.map(item => 
+        `<option value="${}item.sku}">${}item.name} - ${}item.sku} (Stock: ${}item.quantity})</option>`
+    ).join('');
+
+    row.innerHTML = `
+        <div class="col-md-6 mb-2">
+            <select class="form-select sku-select">
+                <option value="">-- Select SKU --</option>
+                ${}selectOptions}
+            </select>
+        </div>
+        <div class="col-md-4 mb-2">
+            <input type="number" class="form-control sku-qty" placeholder="Quantity Used" min="1">
+        </div>
+        <div class="col-md-2 mb-2">
+            <button class="btn btn-danger w-100" onclick="this.closest('.row').remove()">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `;
+    container.appendChild(row);
 }
 
-// Panggil saat DOM siap
-document.addEventListener('DOMContentLoaded', loadSKUFromInventory);
-
-// Tambahkan ke submit handler
 document.getElementById('create-order-form').addEventListener('submit', function(e) {
-    const sku = document.getElementById('sku-select')?.value;
-    const qty = parseInt(document.getElementById('quantity')?.value);
-    if (sku && qty && !isNaN(qty)) {
-        reduceStockAfterOrder(sku, qty);
-    }
+    const rows = document.querySelectorAll('#sku-container .row');
+    const inventory = loadInventoryList();
+    let error = false;
+
+    rows.forEach(row => {
+        const sku = row.querySelector('.sku-select')?.value;
+        const qty = parseInt(row.querySelector('.sku-qty')?.value);
+        const idx = inventory.findIndex(item => item.sku === sku);
+        if (!sku || isNaN(qty)) return;
+        if (idx === -1 || inventory[idx].quantity < qty) {
+            alert('Invalid SKU or insufficient stock for ' + sku);
+            error = true;
+        } else {
+            inventory[idx].quantity -= qty;
+        }
+    });
+
+    if (error) e.preventDefault();
+    else localStorage.setItem('inventory', JSON.stringify(inventory));
 });
 
         // Remove material row
