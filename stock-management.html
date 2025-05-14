@@ -1,4 +1,59 @@
-// Simple Stock Management System
+from zipfile import ZipFile
+import os
+
+# Buat struktur direktori proyek
+project_dir = "/mnt/data/simple-stock-management"
+os.makedirs(project_dir, exist_ok=True)
+
+# Isi HTML
+html_content = """<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background: #eee;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        button {
+            padding: 6px 12px;
+            margin: 5px;
+        }
+        input {
+            padding: 6px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div style="display: flex;">
+        <div id="sidebar-menu" style="width: 200px; background: #f0f0f0; padding: 20px;">
+            <!-- Menu will be here -->
+        </div>
+        <div id="main-content" style="flex: 1; padding: 20px;">
+            <!-- Content will be here -->
+        </div>
+    </div>
+    <script src="simple-stock-management.js"></script>
+</body>
+</html>
+"""
+
+# Isi JavaScript
+js_content = """// Simple Stock Management System
 
 // Global variables
 let inventory = [];
@@ -7,16 +62,14 @@ let inventory = [];
 function init() {
   console.log('Initializing Stock Management...');
   
-  // Load saved data
   const saved = localStorage.getItem('inventory');
   if (saved) {
     inventory = JSON.parse(saved);
+  } else {
+    addDemoData(); // Auto add demo data if no saved data
   }
   
-  // Create menu
   createMenu();
-  
-  // Show dashboard
   showDashboard();
 }
 
@@ -80,11 +133,13 @@ function showStock() {
     <input type="text" id="search" placeholder="Search..." onkeyup="searchItems()">
     <br><br>
     <table border="1" cellpadding="10">
-      <tr>
-        <th>Name</th>
-        <th>Quantity</th>
-        <th>Actions</th>
-      </tr>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Quantity</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
       <tbody id="stockTable">
         ${renderTable(inventory)}
       </tbody>
@@ -115,11 +170,16 @@ function addNewItem() {
   if (!name) return;
   
   const quantity = prompt('Enter quantity:');
-  if (!quantity) return;
+  const quantityNum = parseInt(quantity);
+  if (!quantity || isNaN(quantityNum)) {
+    alert('Quantity harus berupa angka');
+    return;
+  }
   
   inventory.push({
     name: name,
-    quantity: parseInt(quantity)
+    quantity: quantityNum,
+    createdAt: new Date().toISOString()
   });
   
   saveData();
@@ -170,3 +230,22 @@ function addDemoData() {
   showStock();
   console.log('Demo data added!');
 }
+"""
+
+# Simpan file HTML dan JS
+html_path = os.path.join(project_dir, "index.html")
+js_path = os.path.join(project_dir, "simple-stock-management.js")
+
+with open(html_path, "w") as f:
+    f.write(html_content)
+
+with open(js_path, "w") as f:
+    f.write(js_content)
+
+# Buat zip file
+zip_path = "/mnt/data/simple-stock-management.zip"
+with ZipFile(zip_path, 'w') as zipf:
+    zipf.write(html_path, arcname="index.html")
+    zipf.write(js_path, arcname="simple-stock-management.js")
+
+zip_path
