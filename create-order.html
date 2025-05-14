@@ -443,6 +443,17 @@
                             </button>
                         </div>
                         <div id="materials-container">
+<!-- SKU Used from Stock -->
+<div class="form-section mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="section-title mb-0"><i class="fas fa-barcode"></i> SKU Used from Stock</h5>
+        <button type="button" class="btn btn-success btn-sm" onclick="addSkuRow()">
+            <i class="fas fa-plus"></i> Add SKU
+        </button>
+    </div>
+    <div id="sku-container"></div>
+</div>
+
                             <div class="material-row">
                                 <div class="row">
                                     <div class="col-md-4 mb-2">
@@ -734,7 +745,7 @@
         }
         
         
-// === Multi-SKU Row Management ===
+// === SKU Inventory for Raw Materials ===
 function loadInventoryList() {
     const saved = localStorage.getItem('inventory');
     return saved ? JSON.parse(saved) : [];
@@ -746,15 +757,15 @@ function addSkuRow() {
     row.className = 'row mb-2';
 
     const inventory = loadInventoryList();
-    const selectOptions = inventory.map(item => 
-        `<option value="${}item.sku}">${}item.name} - ${}item.sku} (Stock: ${}item.quantity})</option>`
+    const selectOptions = inventory.map(item =>
+        `<option value="${item.sku}">${item.name} - ${item.sku} (Stock: ${item.quantity})</option>`
     ).join('');
 
     row.innerHTML = `
         <div class="col-md-6 mb-2">
             <select class="form-select sku-select">
                 <option value="">-- Select SKU --</option>
-                ${}selectOptions}
+                ${selectOptions}
             </select>
         </div>
         <div class="col-md-4 mb-2">
@@ -787,8 +798,11 @@ document.getElementById('create-order-form').addEventListener('submit', function
         }
     });
 
-    if (error) e.preventDefault();
-    else localStorage.setItem('inventory', JSON.stringify(inventory));
+    if (error) {
+        e.preventDefault();
+    } else {
+        localStorage.setItem('inventory', JSON.stringify(inventory));
+    }
 });
 
         // Remove material row
