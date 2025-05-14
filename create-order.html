@@ -4,313 +4,537 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Order - Work Order System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        .order-form {
-            max-width: 800px;
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --light-bg: #f8fafc;
+            --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--light-bg);
+            padding-top: 60px;
+        }
+        
+        /* Navbar */
+        .navbar {
+            background: white;
+            box-shadow: var(--card-shadow);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1rem;
+        }
+        
+        .navbar-container {
+            max-width: 1200px;
             margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
-        .form-section {
-            background: #f8f9fa;
-            padding: 25px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #007bff;
+        /* Main content */
+        .main-content {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
         }
         
-        .form-section h5 {
-            margin-bottom: 20px;
-            color: #007bff;
+        /* Cards */
+        .card {
+            background: white;
+            border: none;
+            border-radius: 0.75rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
         }
         
-        .preview-section {
-            position: sticky;
-            top: 20px;
-        }
-        
-        .preview-card {
-            background: #fff;
-            border: 2px dashed #dee2e6;
-            padding: 20px;
-            border-radius: 10px;
-        }
-        
-        .preview-item {
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .preview-item:last-child {
-            border-bottom: none;
-        }
-        
-        .form-label {
+        .card-header {
+            background: none;
+            border: none;
+            padding: 1.5rem;
             font-weight: 600;
-            color: #495057;
+            font-size: 1.125rem;
+            color: #111827;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        /* Form sections */
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Form controls */
+        .form-label {
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .form-control,
+        .form-select {
+            border: 1.5px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
         }
         
         .required::after {
             content: " *";
-            color: #dc3545;
+            color: var(--danger-color);
         }
         
-        .input-group-text {
-            background-color: #f8f9fa;
-        }
-        
-        .btn-group-custom {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 30px;
-        }
-        
+        /* Material rows */
         .material-row {
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            margin-bottom: 10px;
+            background: var(--light-bg);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
         }
         
-        .card-header.bg-light {
-            background-color: #f8f9fa !important;
+        /* Buttons */
+        .btn {
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-lg {
+            padding: 0.875rem 1.5rem;
+            font-size: 1rem;
+        }
+        
+        /* Modal styles */
+        .modal-content {
+            border-radius: 0.75rem;
+            border: none;
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1.5rem;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid #e5e7eb;
+            padding: 1.5rem;
+        }
+        
+        /* Success modal content */
+        .success-content {
+            text-align: center;
+            padding: 2rem 0;
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: #d1fae5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.5rem;
+            color: var(--success-color);
+        }
+        
+        .tracking-info {
+            background: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .tracking-code {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0.5rem 0;
+        }
+        
+        #qrcode {
+            display: inline-block;
+            padding: 1rem;
+            background: white;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .navbar,
+            .btn-group-bottom,
+            .no-print {
+                display: none !important;
+            }
+            
+            .main-content {
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                margin-bottom: 1rem;
+            }
+            
+            .print-header {
+                display: block !important;
+                text-align: center;
+                margin-bottom: 2rem;
+                border-bottom: 2px solid #333;
+                padding-bottom: 1rem;
+            }
+            
+            .print-header h1 {
+                color: #333;
+                margin: 0;
+            }
+        }
+        
+        .print-header {
+            display: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+            
+            .tracking-code {
+                font-size: 1.25rem;
+            }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="#"><i class="fas fa-clipboard-list me-2"></i>Work Order Tracker</a>
-            <div class="navbar-nav ms-auto">
-                <span class="navbar-text me-3">
-                    <i class="fas fa-user me-1"></i> <span id="user-name">User</span>
-                </span>
-                <a class="btn btn-outline-light btn-sm" href="dashboard-simple.html">Back to Dashboard</a>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="dashboard-simple.html" class="navbar-brand">
+                <i class="fas fa-clipboard-list me-2"></i>
+                Work Order System
+            </a>
+            <div>
+                <span id="user-name" class="me-3">User</span>
+                <a href="dashboard-simple.html" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-left"></i>
+                    <span class="d-none d-sm-inline">Back</span>
+                </a>
             </div>
         </div>
     </nav>
-
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-md-8">
-                <h2 class="mb-4">Create New Work Order</h2>
-                
-                <form id="create-order-form" class="order-form">
-                    <!-- Customer Information Section -->
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Print Header (hidden on screen) -->
+        <div class="print-header">
+            <h1>Work Order Form</h1>
+            <p>PT. Your Company Name</p>
+            <p>Date: <span id="print-date"></span></p>
+        </div>
+        
+        <h2 class="mb-4">Create New Order</h2>
+        
+        <form id="create-order-form">
+            <div class="card">
+                <div class="card-body">
+                    <!-- Customer Information -->
                     <div class="form-section">
-                        <h5><i class="fas fa-user-tie me-2"></i>Customer Information</h5>
+                        <h5 class="section-title">
+                            <i class="fas fa-user"></i>
+                            Customer Information
+                        </h5>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="customer-name" class="form-label required">Customer Name</label>
+                                <label class="form-label required">Customer Name</label>
                                 <input type="text" class="form-control" id="customer-name" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="customer-company" class="form-label">Company</label>
+                                <label class="form-label">Company</label>
                                 <input type="text" class="form-control" id="customer-company">
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="customer-email" class="form-label">Email</label>
+                                <label class="form-label">Email</label>
                                 <input type="email" class="form-control" id="customer-email">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="customer-phone" class="form-label required">Phone</label>
+                                <label class="form-label required">Phone</label>
                                 <input type="tel" class="form-control" id="customer-phone" required>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Order Information Section -->
+                    
+                    <!-- Order Information -->
                     <div class="form-section">
-                        <h5><i class="fas fa-shopping-cart me-2"></i>Order Information</h5>
+                        <h5 class="section-title">
+                            <i class="fas fa-shopping-cart"></i>
+                            Order Information
+                        </h5>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="po-number" class="form-label required">PO Number</label>
+                                <label class="form-label required">PO Number</label>
                                 <input type="text" class="form-control" id="po-number" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="order-date" class="form-label required">Order Date</label>
-                                <input type="date" class="form-control" id="order-date" required>
+                                <label class="form-label required">Deadline</label>
+                                <input type="date" class="form-control" id="deadline" required>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="deadline" class="form-label required">Deadline</label>
-                                <input type="date" class="form-control" id="deadline" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="priority" class="form-label">Priority</label>
-                                <select class="form-control" id="priority">
+                                <label class="form-label">Priority</label>
+                                <select class="form-select" id="priority">
                                     <option value="normal">Normal</option>
                                     <option value="urgent">Urgent</option>
                                     <option value="high">High Priority</option>
                                 </select>
                             </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label required">Order Date</label>
+                                <input type="date" class="form-control" id="order-date" required readonly>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Product Details Section -->
+                    
+                    <!-- Product Details -->
                     <div class="form-section">
-                        <h5><i class="fas fa-box me-2"></i>Product Details</h5>
+                        <h5 class="section-title">
+                            <i class="fas fa-box"></i>
+                            Product Details
+                        </h5>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="product-type" class="form-label required">Product Type</label>
-                                <select class="form-control" id="product-type" required>
+                                <label class="form-label required">Product Type</label>
+                                <select class="form-select" id="product-type" required>
                                     <option value="">Select Product Type</option>
                                     <option value="label">Label</option>
                                     <option value="hangtag">Hangtag</option>
                                     <option value="woven-label">Woven Label</option>
-                                    <option value="custom">Custom (Manual Input)</option>
+                                    <option value="poster">Poster</option>
+                                    <option value="banner">Banner</option>
+                                    <option value="sticker">Sticker</option>
+                                    <option value="custom">Custom</option>
                                 </select>
-                                <input type="text" class="form-control mt-2" id="custom-product-type" placeholder="Enter custom product type" style="display:none;" />
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="quantity" class="form-label required">Quantity</label>
+                                <label class="form-label required">Quantity</label>
                                 <input type="number" class="form-control" id="quantity" min="1" required>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="size" class="form-label required">Size</label>
+                                <label class="form-label required">Size</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="size" placeholder="e.g., 3x4" required>
-                                    <select class="form-control" id="size-unit" style="max-width: 100px;">
-                                        <option value="m">meter</option>
+                                    <select class="form-select" id="size-unit" style="max-width: 100px;">
                                         <option value="cm">cm</option>
+                                        <option value="m">meter</option>
                                         <option value="inch">inch</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="material" class="form-label">Material</label>
-                                <input type="text" class="form-control" id="material" placeholder="e.g., Flexi, Vinyl">
+                                <label class="form-label">Material</label>
+                                <input type="text" class="form-control" id="material" placeholder="e.g., Vinyl, Paper">
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" rows="3" placeholder="Additional details about the order..."></textarea>
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" id="description" rows="3"></textarea>
                         </div>
                     </div>
-
-                    <!-- Additional Options Section -->
+                    
+                    <!-- Raw Materials -->
                     <div class="form-section">
-                        <h5><i class="fas fa-cog me-2"></i>Additional Options</h5>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="design-source" class="form-label">Design Source</label>
-                                <select class="form-control" id="design-source">
-                                    <option value="customer">Customer Provided</option>
-                                    <option value="inhouse">Create In-House</option>
-                                    <option value="modify">Modify Existing</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="finishing" class="form-label">Finishing</label>
-                                <select class="form-control" id="finishing">
-                                    <option value="cut">Cut</option>
-                                    <option value="uncut">Uncut</option>
-                                </select>
-                            </div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="section-title mb-0">
+                                <i class="fas fa-layer-group"></i>
+                                Raw Materials
+                            </h5>
+                            <button type="button" class="btn btn-success btn-sm" onclick="addMaterialRow()">
+                                <i class="fas fa-plus"></i> Add Material
+                            </button>
                         </div>
-                        <div class="mb-3">
-                            <label for="special-instructions" class="form-label">Special Instructions</label>
-                            <textarea class="form-control" id="special-instructions" rows="2"></textarea>
-                        </div>
-                    </div>
-
-                    <!-- Raw Materials Section -->
-                    <div class="card mt-4 mb-3">
-                        <div class="card-header bg-light">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0">Raw Materials</h6>
-                                <button type="button" class="btn btn-sm btn-success" onclick="addMaterialRow()">
-                                    <i class="fas fa-plus"></i> Add Material
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div id="materials-container">
-                                <div class="material-row mb-3">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <input type="text" class="form-control" placeholder="Material name" name="material-name[]">
-                                        </div>
-                                        <div class="col-md-3">
-                                            <input type="number" class="form-control" placeholder="Quantity" name="material-quantity[]">
-                                        </div>
-                                        <div class="col-md-3">
-                                            <input type="text" class="form-control" placeholder="Unit (pcs, meter, kg)" name="material-unit[]">
-                                        </div>
-                                        <div class="col-md-2">
-                                            <button type="button" class="btn btn-danger btn-sm" onclick="removeMaterialRow(this)">Remove</button>
-                                        </div>
+                        <div id="materials-container">
+                            <div class="material-row">
+                                <div class="row">
+                                    <div class="col-md-4 mb-2">
+                                        <input type="text" class="form-control" placeholder="Material name">
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <input type="number" class="form-control" placeholder="Quantity">
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <input type="text" class="form-control" placeholder="Unit">
+                                    </div>
+                                    <div class="col-md-2 mb-2">
+                                        <button type="button" class="btn btn-danger btn-sm w-100" onclick="removeMaterialRow(this)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Button Group -->
-                    <div class="btn-group-custom">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="fas fa-save me-2"></i>Create Order
-                        </button>
-                        <button type="button" class="btn btn-secondary btn-lg" onclick="resetForm()">
-                            <i class="fas fa-undo me-2"></i>Reset Form
-                        </button>
-                        <a href="dashboard-simple.html" class="btn btn-outline-secondary btn-lg">
-                            <i class="fas fa-times me-2"></i>Cancel
-                        </a>
-                    </div>
-                </form>
+                </div>
             </div>
-
-            <!-- Preview Section -->
-            <div class="col-md-4">
-                <div class="preview-section">
-                    <h4 class="mb-3">Order Preview</h4>
-                    <div class="preview-card">
-                        <div class="preview-item">
-                            <strong>Order Code:</strong> <span id="preview-code">Will be generated</span>
+            
+            <!-- Buttons -->
+            <div class="btn-group-bottom d-flex gap-2 justify-content-center no-print">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save"></i> Create Order
+                </button>
+                <button type="button" class="btn btn-secondary btn-lg" onclick="resetForm()">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
+                <a href="dashboard-simple.html" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Order Created Successfully!</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="success-content">
+                        <div class="success-icon">
+                            <i class="fas fa-check-circle"></i>
                         </div>
-                        <div class="preview-item">
-                            <strong>Customer:</strong> <span id="preview-customer">-</span>
+                        
+                        <h4>Order Created Successfully!</h4>
+                        
+                        <div class="tracking-info">
+                            <p class="mb-2">Your tracking number is:</p>
+                            <div class="tracking-code" id="tracking-number">TR20250514ABC</div>
+                            <p class="text-muted">Save this number to track your order</p>
                         </div>
-                        <div class="preview-item">
-                            <strong>PO Number:</strong> <span id="preview-po">-</span>
-                        </div>
-                        <div class="preview-item">
-                            <strong>Product:</strong> <span id="preview-product">-</span>
-                        </div>
-                        <div class="preview-item">
-                            <strong>Quantity:</strong> <span id="preview-quantity">-</span>
-                        </div>
-                        <div class="preview-item">
-                            <strong>Size:</strong> <span id="preview-size">-</span>
-                        </div>
-                        <div class="preview-item">
-                            <strong>Deadline:</strong> <span id="preview-deadline">-</span>
-                        </div>
-                        <div class="preview-item">
-                            <strong>Status:</strong> <span class="badge bg-secondary">Draft</span>
+                        
+                        <!-- QR Code -->
+                        <div class="mt-4">
+                            <h6>QR Code for Quick Tracking</h6>
+                            <div id="qrcode"></div>
+                            <p class="text-muted small">Scan this code to track your order</p>
                         </div>
                     </div>
-                    <div class="mt-3 text-center">
-                        <small class="text-muted">Preview updates as you fill the form</small>
-                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary" onclick="printOrder()">
+                        <i class="fas fa-print"></i> Print Order
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="saveQRCode()">
+                        <i class="fas fa-download"></i> Save QR Code
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="createAnother()">
+                        <i class="fas fa-plus"></i> Create Another
+                    </button>
+                    <a href="dashboard-simple.html" class="btn btn-secondary">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Initialize page
+        let currentOrderData = null;
+        let qrCode = null;
+        
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            // Check login
             const userStr = localStorage.getItem('currentUser');
             if (!userStr) {
                 alert('Please login first');
@@ -321,157 +545,85 @@
             const user = JSON.parse(userStr);
             document.getElementById('user-name').textContent = user.name;
             
-            // Set default date to today
-            document.getElementById('order-date').valueAsDate = new Date();
+            // Set today's date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('order-date').value = today;
+            document.getElementById('print-date').textContent = new Date().toLocaleDateString();
             
-            // Set minimum deadline to tomorrow
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            document.getElementById('deadline').min = tomorrow.toISOString().split('T')[0];
-            
-            // Add real-time preview update
-            addPreviewListeners();
-            
-            // Add product type change listener
-            document.getElementById('product-type').addEventListener('change', toggleCustomProductType);
+            // Set minimum deadline
+            document.getElementById('deadline').min = today;
         });
-
-        // Toggle custom product type input
-        function toggleCustomProductType() {
-            const select = document.getElementById('product-type');
-            const customInput = document.getElementById('custom-product-type');
+        
+        // Form submission
+        document.getElementById('create-order-form').addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            if (select.value === 'custom') {
-                customInput.style.display = 'block';
-                customInput.required = true;
-            } else {
-                customInput.style.display = 'none';
-                customInput.required = false;
-                customInput.value = '';
-            }
-        }
-
-        // Add new material row
-        function addMaterialRow() {
-            const container = document.getElementById('materials-container');
-            const newRow = document.createElement('div');
-            newRow.className = 'material-row mb-3';
-            newRow.innerHTML = `
-                <div class="row">
-                    <div class="col-md-4">
-                        <input type="text" class="form-control" placeholder="Material name" name="material-name[]">
-                    </div>
-                    <div class="col-md-3">
-                        <input type="number" class="form-control" placeholder="Quantity" name="material-quantity[]">
-                    </div>
-                    <div class="col-md-3">
-                        <input type="text" class="form-control" placeholder="Unit (pcs, meter, kg)" name="material-unit[]">
-                    </div>
-                    <div class="col-md-2">
-                        <button type="button" class="btn btn-danger btn-sm" onclick="removeMaterialRow(this)">Remove</button>
-                    </div>
-                </div>
-            `;
-            container.appendChild(newRow);
-        }
-
-        // Remove material row
-        function removeMaterialRow(button) {
-            const row = button.closest('.material-row');
-            row.remove();
-        }
-
-        // Add preview listeners
-        function addPreviewListeners() {
-            // Customer name
-            document.getElementById('customer-name').addEventListener('input', function() {
-                document.getElementById('preview-customer').textContent = this.value || '-';
+            // Generate tracking code
+            const trackingCode = generateTrackingCode();
+            
+            // Collect form data
+            const formData = collectFormData();
+            formData.code = trackingCode;
+            formData.createdAt = new Date().toISOString();
+            formData.createdBy = JSON.parse(localStorage.getItem('currentUser')).name;
+            
+            // Add workflow stages
+            formData.stages = {
+                po: { completed: true, date: new Date().toISOString(), user: formData.createdBy },
+                layout: { completed: false },
+                film: { completed: false },
+                production: { completed: false },
+                qc: { completed: false },
+                shipping: { completed: false },
+                payment: { completed: false }
+            };
+            
+            // Save to localStorage
+            localStorage.setItem(`order_${trackingCode}`, JSON.stringify(formData));
+            
+            // Update order list
+            let orderList = JSON.parse(localStorage.getItem('orderList') || '[]');
+            orderList.push({
+                code: trackingCode,
+                customer: formData.customer.name,
+                date: formData.order.orderDate,
+                status: 'New',
+                product: formData.product.type
             });
+            localStorage.setItem('orderList', JSON.stringify(orderList));
             
-            // PO Number
-            document.getElementById('po-number').addEventListener('input', function() {
-                document.getElementById('preview-po').textContent = this.value || '-';
-            });
+            // Store current order data
+            currentOrderData = formData;
             
-            // Product type
-            document.getElementById('product-type').addEventListener('change', function() {
-                document.getElementById('preview-product').textContent = 
-                    this.options[this.selectedIndex].text || '-';
-            });
-            
-            // Quantity
-            document.getElementById('quantity').addEventListener('input', function() {
-                document.getElementById('preview-quantity').textContent = this.value || '-';
-            });
-            
-            // Size
-            ['size', 'size-unit'].forEach(id => {
-                document.getElementById(id).addEventListener('input', updateSizePreview);
-            });
-            
-            // Deadline
-            document.getElementById('deadline').addEventListener('change', function() {
-                if (this.value) {
-                    const date = new Date(this.value);
-                    document.getElementById('preview-deadline').textContent = 
-                        date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-                } else {
-                    document.getElementById('preview-deadline').textContent = '-';
-                }
-            });
-        }
-
-        // Update size preview
-        function updateSizePreview() {
-            const size = document.getElementById('size').value;
-            const unit = document.getElementById('size-unit').value;
-            
-            if (size) {
-                document.getElementById('preview-size').textContent = `${size} ${unit}`;
-            } else {
-                document.getElementById('preview-size').textContent = '-';
-            }
-        }
-
-        // Generate order code
-        function generateOrderCode() {
+            // Show success modal
+            showSuccessModal(trackingCode);
+        });
+        
+        // Generate tracking code
+        function generateTrackingCode() {
             const date = new Date();
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');
             const random = Math.random().toString(36).substring(2, 5).toUpperCase();
-            
             return `TR${year}${month}${day}${random}`;
         }
-
-        // Handle form submission
-        document.getElementById('create-order-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Generate order code
-            const orderCode = generateOrderCode();
-            
-            // Get product type (check if custom)
-            const productType = document.getElementById('product-type').value;
-            const finalProductType = productType === 'custom' ? 
-                document.getElementById('custom-product-type').value : productType;
-            
-            // Collect materials
+        
+        // Collect form data
+        function collectFormData() {
             const materials = [];
-            const materialRows = document.querySelectorAll('.material-row');
-            materialRows.forEach(row => {
-                const name = row.querySelector('input[name="material-name[]"]').value;
-                const quantity = row.querySelector('input[name="material-quantity[]"]').value;
-                const unit = row.querySelector('input[name="material-unit[]"]').value;
-                
-                if (name && quantity) {
-                    materials.push({ name, quantity, unit });
+            document.querySelectorAll('.material-row').forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs[0].value && inputs[1].value) {
+                    materials.push({
+                        name: inputs[0].value,
+                        quantity: inputs[1].value,
+                        unit: inputs[2].value
+                    });
                 }
             });
             
-            // Collect form data
-            const orderData = {
-                code: orderCode,
+            return {
                 customer: {
                     name: document.getElementById('customer-name').value,
                     company: document.getElementById('customer-company').value,
@@ -485,66 +637,105 @@
                     priority: document.getElementById('priority').value
                 },
                 product: {
-                    type: finalProductType,
+                    type: document.getElementById('product-type').value,
                     quantity: document.getElementById('quantity').value,
                     size: document.getElementById('size').value + ' ' + document.getElementById('size-unit').value,
                     material: document.getElementById('material').value,
                     description: document.getElementById('description').value
                 },
-                options: {
-                    designSource: document.getElementById('design-source').value,
-                    finishing: document.getElementById('finishing').value,
-                    specialInstructions: document.getElementById('special-instructions').value
-                },
-                rawMaterials: materials,
-                stages: {
-                    po: { completed: true, date: new Date().toLocaleDateString(), user: 'Admin' },
-                    layout: { completed: false },
-                    film: { completed: false },
-                    production: { completed: false },
-                    qc: { completed: false },
-                    shipping: { completed: false },
-                    payment: { completed: false }
-                },
-                createdBy: JSON.parse(localStorage.getItem('currentUser')).name,
-                createdAt: new Date().toISOString()
+                rawMaterials: materials
             };
+        }
+        
+        // Show success modal
+        function showSuccessModal(trackingCode) {
+            document.getElementById('tracking-number').textContent = trackingCode;
             
-            // Save to localStorage (in real app, this would be sent to backend)
-            localStorage.setItem(`order_${orderCode}`, JSON.stringify(orderData));
-            
-            // Save to order list
-            let orderList = JSON.parse(localStorage.getItem('orderList') || '[]');
-            orderList.push({
-                code: orderCode,
-                customer: orderData.customer.name,
-                date: orderData.order.orderDate,
-                status: 'New',
-                product: finalProductType
+            // Generate QR code
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = ''; // Clear previous QR code
+            qrCode = new QRCode(qrContainer, {
+                text: `${window.location.origin}/tracking.html?code=${trackingCode}`,
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
             });
-            localStorage.setItem('orderList', JSON.stringify(orderList));
             
-            // Show success message and redirect
-            alert(`Order created successfully!\nOrder Code: ${orderCode}\nProduct Type: ${finalProductType}\nMaterials: ${materials.length} items`);
-            window.location.href = `order-detail.html?code=${orderCode}`;
-        });
-
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('successModal'));
+            modal.show();
+        }
+        
+        // Print order
+        function printOrder() {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('successModal'));
+            modal.hide();
+            
+            setTimeout(() => {
+                window.print();
+            }, 300);
+        }
+        
+        // Save QR code
+        function saveQRCode() {
+            const canvas = document.querySelector('#qrcode canvas');
+            const link = document.createElement('a');
+            link.download = `QR_${currentOrderData.code}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        // Create another order
+        function createAnother() {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('successModal'));
+            modal.hide();
+            document.getElementById('create-order-form').reset();
+            
+            // Reset date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('order-date').value = today;
+        }
+        
         // Reset form
         function resetForm() {
             if (confirm('Are you sure you want to reset the form?')) {
                 document.getElementById('create-order-form').reset();
-                
-                // Reset preview
-                document.getElementById('preview-customer').textContent = '-';
-                document.getElementById('preview-po').textContent = '-';
-                document.getElementById('preview-product').textContent = '-';
-                document.getElementById('preview-quantity').textContent = '-';
-                document.getElementById('preview-size').textContent = '-';
-                document.getElementById('preview-deadline').textContent = '-';
-                
-                // Reset dates
-                document.getElementById('order-date').valueAsDate = new Date();
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('order-date').value = today;
             }
+        }
+        
+        // Add material row
+        function addMaterialRow() {
+            const container = document.getElementById('materials-container');
+            const newRow = document.createElement('div');
+            newRow.className = 'material-row';
+            newRow.innerHTML = `
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <input type="text" class="form-control" placeholder="Material name">
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <input type="number" class="form-control" placeholder="Quantity">
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <input type="text" class="form-control" placeholder="Unit">
+                    </div>
+                    <div class="col-md-2 mb-2">
+                        <button type="button" class="btn btn-danger btn-sm w-100" onclick="removeMaterialRow(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newRow);
+        }
+        
+        // Remove material row
+        function removeMaterialRow(button) {
+            button.closest('.material-row').remove();
         }
     </script>
 </body>
