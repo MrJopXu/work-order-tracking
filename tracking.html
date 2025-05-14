@@ -523,16 +523,29 @@
                 },
                 (decodedText, decodedResult) => {
                     console.log('QR Code detected:', decodedText);
-                    // Extract tracking code from URL
-                    const match = decodedText.match(/code=([A-Z0-9]+)/);
-                    if (match) {
-                        trackOrder(match[1]);
+                    // Extract tracking code from URL or direct code
+                    let trackingCode = null;
+                    
+                    // Check if it's a URL with code parameter
+                    const urlMatch = decodedText.match(/code=([A-Z0-9]+)/);
+                    if (urlMatch) {
+                        trackingCode = urlMatch[1];
+                    } 
+                    // Check if it's a direct tracking code
+                    else if (decodedText.match(/^TR[0-9]{8}[A-Z0-9]+$/)) {
+                        trackingCode = decodedText;
+                    }
+                    // Try if it's just a simple tracking code format
+                    else if (decodedText.match(/^TR[0-9]+[A-Z]$/)) {
+                        trackingCode = decodedText;
+                    }
+                    
+                    if (trackingCode) {
+                        trackOrder(trackingCode);
                         stopScanner();
                         switchTab('code');
-                    } else if (decodedText.match(/^TR[0-9]{8}[A-Z0-9]+$/)) {
-                        trackOrder(decodedText);
-                        stopScanner();
-                        switchTab('code');
+                    } else {
+                        console.log('Unrecognized QR code format:', decodedText);
                     }
                 },
                 (errorMessage) => {
@@ -562,15 +575,124 @@
         function trackOrder(code) {
             code = code.toUpperCase();
             
-            // Get order from localStorage
-            const orderData = localStorage.getItem(`order_${code}`);
+            // Sample data untuk demo
+            const sampleOrders = {
+                "TR20250511A": {
+                    code: "TR20250511A",
+                    customer: {
+                        name: "PT ABC Indonesia",
+                        company: "PT ABC Indonesia",
+                        email: "contact@abc.com",
+                        phone: "021-1234567"
+                    },
+                    order: {
+                        poNumber: "PO-ABC-2025-001",
+                        orderDate: "2025-05-11",
+                        deadline: "2025-05-20",
+                        priority: "normal"
+                    },
+                    product: {
+                        type: "Banner",
+                        quantity: "1",
+                        size: "3x4 meter",
+                        material: "Flexi",
+                        description: "Custom design banner untuk event"
+                    },
+                    stages: {
+                        po: { completed: true, date: "2025-05-11T09:00:00", user: "Admin Satu", notes: "PO received and confirmed" },
+                        layout: { completed: true, date: "2025-05-12T14:30:00", user: "Designer Kreatif", notes: "Design approved by customer" },
+                        film: { completed: true, date: "2025-05-13T10:00:00", user: "Designer Kreatif", notes: "Film ready for production" },
+                        production: { completed: false, inProgress: true, date: "2025-05-14T08:00:00", user: "Produksi Team", notes: "Production in progress - 60% completed" },
+                        qc: { completed: false },
+                        shipping: { completed: false },
+                        payment: { completed: false }
+                    },
+                    createdAt: "2025-05-11T09:00:00",
+                    createdBy: "Admin Satu"
+                },
+                "TR20250510B": {
+                    code: "TR20250510B",
+                    customer: {
+                        name: "CV XYZ Mandiri",
+                        company: "CV XYZ Mandiri",
+                        email: "info@xyz.com",
+                        phone: "021-7654321"
+                    },
+                    order: {
+                        poNumber: "PO-XYZ-2025-045",
+                        orderDate: "2025-05-10",
+                        deadline: "2025-05-25",
+                        priority: "urgent"
+                    },
+                    product: {
+                        type: "Sticker",
+                        quantity: "100",
+                        size: "10x10 cm",
+                        material: "Vinyl",
+                        description: "Sticker vinyl custom design"
+                    },
+                    stages: {
+                        po: { completed: true, date: "2025-05-10T11:00:00", user: "Admin Satu", notes: "Purchase order received" },
+                        layout: { completed: false, inProgress: true, date: "2025-05-11T09:00:00", user: "Designer Kreatif", notes: "Working on design layout" },
+                        film: { completed: false },
+                        production: { completed: false },
+                        qc: { completed: false },
+                        shipping: { completed: false },
+                        payment: { completed: false }
+                    },
+                    createdAt: "2025-05-10T11:00:00",
+                    createdBy: "Admin Satu"
+                },
+                "TR20250505C": {
+                    code: "TR20250505C",
+                    customer: {
+                        name: "Toko Jaya Abadi",
+                        company: "Toko Jaya Abadi",
+                        email: "tokojaya@gmail.com",
+                        phone: "021-5555555"
+                    },
+                    order: {
+                        poNumber: "PO-TJA-2025-012",
+                        orderDate: "2025-05-05",
+                        deadline: "2025-05-15",
+                        priority: "normal"
+                    },
+                    product: {
+                        type: "Poster",
+                        quantity: "50",
+                        size: "A3",
+                        material: "Art Paper Glossy",
+                        description: "Poster A3 untuk promosi produk"
+                    },
+                    stages: {
+                        po: { completed: true, date: "2025-05-05T10:00:00", user: "Admin Satu", notes: "Purchase order received" },
+                        layout: { completed: true, date: "2025-05-06T15:00:00", user: "Designer Kreatif", notes: "Design completed and approved" },
+                        film: { completed: true, date: "2025-05-07T09:00:00", user: "Designer Kreatif", notes: "Film printed successfully" },
+                        production: { completed: true, date: "2025-05-09T12:00:00", user: "Produksi Team", notes: "Production completed" },
+                        qc: { completed: true, date: "2025-05-10T14:00:00", user: "QC Team", notes: "All items passed quality control" },
+                        shipping: { completed: true, date: "2025-05-12T16:00:00", user: "Admin Satu", notes: "Shipped via JNE - Tracking: JNE123456789" },
+                        payment: { completed: true, date: "2025-05-15T11:00:00", user: "Finance Team", notes: "Payment received in full" }
+                    },
+                    createdAt: "2025-05-05T10:00:00",
+                    createdBy: "Admin Satu"
+                }
+            };
             
-            if (!orderData) {
+            // Try to get order from localStorage first
+            let order = null;
+            const storedData = localStorage.getItem(`order_${code}`);
+            
+            if (storedData) {
+                order = JSON.parse(storedData);
+            } else if (sampleOrders[code]) {
+                // Use sample data if not found in localStorage
+                order = sampleOrders[code];
+            }
+            
+            if (!order) {
                 alert('Order not found! Please check your tracking code.');
                 return;
             }
-            
-            const order = JSON.parse(orderData);
             
             // Save to recent codes
             if (!recentCodes.includes(code)) {
