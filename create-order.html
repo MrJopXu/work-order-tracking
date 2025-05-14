@@ -15,6 +15,10 @@
         <select class="form-select" id="sku-select" required></select>
       </div>
       <div class="mb-3">
+        <label class="form-label">Select SKU</label>
+        <select class="form-select" id="sku-select" required></select>
+      </div>
+      <div class="mb-3">
         <label class="form-label">Quantity</label>
         <input type="number" class="form-control" id="order-qty" required>
       </div>
@@ -62,5 +66,47 @@
       e.target.reset();
     }
   </script>
+
+<script>
+  let inventory = [];
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('inventory');
+    if (saved) {
+      inventory = JSON.parse(saved);
+      const select = document.getElementById('sku-select');
+      if (select) {
+        inventory.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item.sku;
+          option.textContent = `${item.name} - ${item.sku} (stock: ${item.quantity})`;
+          select.appendChild(option);
+        });
+      }
+    }
+  });
+
+  function updateStockAfterOrder(sku, qty) {
+    const index = inventory.findIndex(item => item.sku === sku);
+    if (index !== -1 && inventory[index].quantity >= qty) {
+      inventory[index].quantity -= qty;
+      localStorage.setItem('inventory', JSON.stringify(inventory));
+    } else {
+      alert("Stock not available or insufficient!");
+    }
+  }
+
+  // Patch form submission if available
+  document.addEventListener('submit', function(e) {
+    const form = e.target;
+    const skuEl = document.getElementById('sku-select');
+    const qtyEl = document.getElementById('quantity') || document.getElementById('order-qty');
+    if (skuEl && qtyEl) {
+      const qty = parseInt(qtyEl.value);
+      const sku = skuEl.value;
+      updateStockAfterOrder(sku, qty);
+    }
+  });
+</script>
 </body>
 </html>
