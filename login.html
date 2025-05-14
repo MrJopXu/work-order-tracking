@@ -29,5 +29,13 @@
   </div>
 
   <script src="user-DYNAMIC.js"></script>
+
+<script>
+  if (!localStorage.getItem('users')) {
+    localStorage.setItem('users', '[{"username": "manager1", "password": "pass123", "name": "Manager Utama", "role": "manager"}, {"username": "admin1", "password": "pass123", "name": "Admin Satu", "role": "admin"}, {"username": "designer1", "password": "pass123", "name": "Designer Kreatif", "role": "designer"}, {"username": "prod1", "password": "pass123", "name": "Produksi Team", "role": "production"}, {"username": "qc1", "password": "pass123", "name": "Quality Control", "role": "qc"}, {"username": "finance1", "password": "pass123", "name": "Finance Team", "role": "finance"}]');
+    console.log("Dummy users injected to localStorage!");
+  }
+</script>
+
 </body>
 </html>
