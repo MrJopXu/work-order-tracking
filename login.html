@@ -1,177 +1,180 @@
-// Fix Login dengan Credentials yang Benar dari GitHub
+// ULTIMATE LOGIN FIX - FORCE OVERRIDE
 
-// Credentials yang benar berdasarkan README
-const VALID_USERS = [
-  { username: 'manager1', password: 'pass123', role: 'manager', name: 'Manager User' },
-  { username: 'admin1', password: 'pass123', role: 'admin', name: 'Admin User' },
-  { username: 'designer1', password: 'pass123', role: 'designer', name: 'Designer User' },
-  { username: 'prod1', password: 'pass123', role: 'production', name: 'Production User' }
+// 1. Clear everything first
+localStorage.clear();
+sessionStorage.clear();
+console.log('Cleared all storage');
+
+// 2. Set correct users
+const users = [
+  { username: 'manager1', password: 'pass123', role: 'manager' },
+  { username: 'admin1', password: 'pass123', role: 'admin' },
+  { username: 'designer1', password: 'pass123', role: 'designer' },
+  { username: 'prod1', password: 'pass123', role: 'production' }
 ];
+localStorage.setItem('users', JSON.stringify(users));
 
-// 1. Initialize correct users in localStorage
-function initializeCorrectUsers() {
-  localStorage.setItem('users', JSON.stringify(VALID_USERS));
-  console.log('Initialized users with correct credentials');
+// 3. Override ALL form submissions
+document.addEventListener('submit', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  tryLogin();
+  return false;
+}, true);
+
+// 4. Override ALL button clicks
+document.addEventListener('click', function(e) {
+  if (e.target.tagName === 'BUTTON' || 
+      e.target.type === 'submit' ||
+      e.target.classList.contains('btn')) {
+    e.preventDefault();
+    e.stopPropagation();
+    tryLogin();
+    return false;
+  }
+}, true);
+
+// 5. Login function
+function tryLogin() {
+  // Find inputs dengan berbagai cara
+  let username = '';
+  let password = '';
+  
+  // Method 1
+  const userInput = document.querySelector('#username');
+  const passInput = document.querySelector('#password');
+  
+  if (userInput && passInput) {
+    username = userInput.value;
+    password = passInput.value;
+  } else {
+    // Method 2
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(input => {
+      if (input.type === 'text' || input.name === 'username') username = input.value;
+      if (input.type === 'password' || input.name === 'password') password = input.value;
+    });
+  }
+  
+  console.log('Login attempt:', username, password);
+  
+  // Check credentials
+  const validUser = users.find(u => u.username === username && u.password === password);
+  
+  if (validUser) {
+    console.log('Valid user found!');
+    
+    // Set session dengan berbagai cara
+    sessionStorage.setItem('isLoggedIn', 'true');
+    sessionStorage.setItem('loggedIn', 'true');
+    sessionStorage.setItem('authenticated', 'true');
+    
+    localStorage.setItem('currentUser', JSON.stringify(validUser));
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('user', JSON.stringify(validUser));
+    
+    alert('Login SUCCESS! Redirecting...');
+    
+    // Multiple redirect attempts
+    setTimeout(() => {
+      window.location.href = './dashboard.html';
+      window.location.replace('./dashboard.html');
+      window.location = 'dashboard.html';
+      window.open('./dashboard.html', '_self');
+    }, 100);
+  } else {
+    alert(`Wrong credentials!\n\nUse:\nUsername: admin1\nPassword: pass123`);
+  }
 }
 
-// 2. Fix login function
-function fixLogin() {
-  // Initialize users first
-  initializeCorrectUsers();
+// 6. Manual direct login
+window.forceLogin = function() {
+  console.log('Force login as admin...');
   
-  // Find form and attach handler
-  const forms = document.querySelectorAll('form');
-  const loginButtons = document.querySelectorAll('button[type="submit"], input[type="submit"], .btn-login');
-  
-  // Handler function
-  const handleLogin = function(e) {
-    e.preventDefault();
-    
-    // Get input values (try different selectors)
-    const usernameInput = document.querySelector('#username, input[name="username"], input[type="text"]');
-    const passwordInput = document.querySelector('#password, input[name="password"], input[type="password"]');
-    
-    if (!usernameInput || !passwordInput) {
-      console.error('Cannot find input fields');
-      return;
-    }
-    
-    const username = usernameInput.value;
-    const password = passwordInput.value;
-    
-    console.log('Attempting login with:', username);
-    
-    // Check credentials
-    const user = VALID_USERS.find(u => u.username === username && u.password === password);
-    
-    if (user) {
-      // Save session
-      sessionStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      
-      console.log('Login successful!');
-      alert('Login berhasil! Redirecting to dashboard...');
-      
-      // Redirect
-      setTimeout(() => {
-        window.location.href = './dashboard.html';
-      }, 500);
-    } else {
-      alert('Username atau password salah!\n\nGunakan salah satu:\n- manager1 / pass123\n- admin1 / pass123\n- designer1 / pass123\n- prod1 / pass123');
-    }
+  const adminUser = {
+    username: 'admin1',
+    password: 'pass123',
+    role: 'admin',
+    name: 'Admin'
   };
   
-  // Attach to all forms
-  forms.forEach(form => {
-    form.addEventListener('submit', handleLogin);
-  });
+  // Set everything
+  sessionStorage.setItem('isLoggedIn', 'true');
+  sessionStorage.setItem('loggedIn', 'true');
+  localStorage.setItem('currentUser', JSON.stringify(adminUser));
+  localStorage.setItem('isLoggedIn', 'true');
   
-  // Attach to all buttons
-  loginButtons.forEach(btn => {
-    btn.addEventListener('click', handleLogin);
-  });
+  // Force redirect
+  window.location.href = './dashboard.html';
+};
+
+// 7. Fill form automatically
+function autoFill() {
+  const userInput = document.querySelector('#username, input[type="text"], input[name="username"]');
+  const passInput = document.querySelector('#password, input[type="password"], input[name="password"]');
   
-  console.log('Login handlers attached');
+  if (userInput) userInput.value = 'admin1';
+  if (passInput) passInput.value = 'pass123';
+  
+  console.log('Form auto-filled with admin1/pass123');
 }
 
-// 3. Create visible hint box
-function showCredentialsHint() {
-  const hint = document.createElement('div');
-  hint.style.cssText = `
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    background: #007bff;
+// 8. Show big hint
+const bigHint = document.createElement('div');
+bigHint.style.cssText = `
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: red;
+  color: white;
+  padding: 30px;
+  font-size: 20px;
+  z-index: 99999;
+  border-radius: 10px;
+  text-align: center;
+`;
+bigHint.innerHTML = `
+  <h2>LOGIN CREDENTIALS</h2>
+  <p>Username: <strong>admin1</strong></p>
+  <p>Password: <strong>pass123</strong></p>
+  <button onclick="forceLogin()" style="
+    background: white;
+    color: red;
+    border: none;
+    padding: 10px 20px;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+  ">FORCE LOGIN AS ADMIN</button>
+  <br>
+  <button onclick="this.parentElement.remove()" style="
+    background: transparent;
     color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    z-index: 10000;
-    font-family: Arial, sans-serif;
-  `;
-  
-  hint.innerHTML = `
-    <h3 style="margin: 0 0 15px 0;">Login Credentials:</h3>
-    <table style="width: 100%; border-collapse: collapse;">
-      <tr>
-        <td style="padding: 5px;"><strong>Manager:</strong></td>
-        <td style="padding: 5px;">manager1 / pass123</td>
-      </tr>
-      <tr>
-        <td style="padding: 5px;"><strong>Admin:</strong></td>
-        <td style="padding: 5px;">admin1 / pass123</td>
-      </tr>
-      <tr>
-        <td style="padding: 5px;"><strong>Designer:</strong></td>
-        <td style="padding: 5px;">designer1 / pass123</td>
-      </tr>
-      <tr>
-        <td style="padding: 5px;"><strong>Production:</strong></td>
-        <td style="padding: 5px;">prod1 / pass123</td>
-      </tr>
-    </table>
-    <button onclick="this.parentElement.remove()" style="
-      margin-top: 15px;
-      padding: 8px 15px;
-      background: white;
-      color: #007bff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-    ">Close</button>
-  `;
-  
-  document.body.appendChild(hint);
-}
+    border: 2px solid white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+  ">Close</button>
+`;
+document.body.appendChild(bigHint);
 
-// 4. Quick login function for testing
-window.quickLogin = function(role = 'admin') {
-  const user = VALID_USERS.find(u => u.role === role);
-  if (user) {
-    sessionStorage.setItem('isLoggedIn', 'true');
-    localStorage.setItem('currentUser', JSON.stringify(user));
-    console.log(`Logged in as ${role}`);
-    window.location.href = './dashboard.html';
-  }
-};
-
-// 5. Debug function
-window.debugLogin = function() {
-  console.log('=== LOGIN DEBUG INFO ===');
-  console.log('Valid Users:', VALID_USERS);
-  console.log('Current Users in localStorage:', localStorage.getItem('users'));
-  console.log('Form elements:', document.querySelectorAll('form').length);
-  console.log('Username inputs:', document.querySelectorAll('#username, input[name="username"]').length);
-  console.log('Password inputs:', document.querySelectorAll('#password, input[name="password"]').length);
-  console.log('=======================');
-};
-
-// 6. Auto-fix everything
-window.autoFix = function() {
-  initializeCorrectUsers();
-  fixLogin();
-  showCredentialsHint();
-  console.log('Login system fixed! Use credentials shown in blue box.');
-};
-
-// Run auto-fix when script loads
-autoFix();
+// 9. Run everything
+autoFill();
 
 console.log(`
-========================================
-LOGIN FIX LOADED!
-========================================
-Credentials yang benar:
-- manager1 / pass123
-- admin1 / pass123
-- designer1 / pass123
-- prod1 / pass123
+====================================
+SUPER FIX LOADED!
+====================================
+1. Form sudah di-fill otomatis
+2. Klik FORCE LOGIN AS ADMIN di popup merah
+3. Atau isi manual: admin1 / pass123
 
 Commands:
-- autoFix() : Run fix lagi
-- quickLogin('admin') : Quick login as admin
-- quickLogin('manager') : Quick login as manager
-- debugLogin() : Show debug info
-========================================
+- forceLogin() : Bypass login
+- autoFill() : Fill form
+====================================
 `);
