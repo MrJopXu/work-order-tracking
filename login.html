@@ -1,87 +1,177 @@
-# Create revised login.html with auto-injected dummy user data
-revised_login_html = """
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - Work Order System</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
-</head>
-<body class="bg-light d-flex align-items-center justify-content-center vh-100">
-  <div class="card shadow p-4" style="min-width: 300px; max-width: 400px; width: 100%;">
-    <h4 class="text-center mb-4 text-primary">Login System</h4>
-    <form id="login-form">
-      <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <input type="text" id="username" class="form-control" required/>
-      </div>
-      <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <div class="input-group">
-          <input type="password" id="password" class="form-control" required/>
-          <button class="btn btn-outline-secondary" type="button" id="toggle-password">
-            <i class="fas fa-eye"></i>
-          </button>
-        </div>
-      </div>
-      <button type="submit" class="btn btn-primary w-100 mt-2">Login</button>
-    </form>
-  </div>
+// Fix Login dengan Credentials yang Benar dari GitHub
 
-  <script>
-    // Inject dummy users if not exists
-    if (!localStorage.getItem("users")) {
-      const dummyUsers = [
-        { username: "manager1", password: "pass123", name: "Manager Utama", role: "manager" },
-        { username: "admin1", password: "pass123", name: "Admin Satu", role: "admin" },
-        { username: "designer1", password: "pass123", name: "Desainer", role: "designer" },
-        { username: "prod1", password: "pass123", name: "Produksi", role: "production" }
-      ];
-      localStorage.setItem("users", JSON.stringify(dummyUsers));
+// Credentials yang benar berdasarkan README
+const VALID_USERS = [
+  { username: 'manager1', password: 'pass123', role: 'manager', name: 'Manager User' },
+  { username: 'admin1', password: 'pass123', role: 'admin', name: 'Admin User' },
+  { username: 'designer1', password: 'pass123', role: 'designer', name: 'Designer User' },
+  { username: 'prod1', password: 'pass123', role: 'production', name: 'Production User' }
+];
+
+// 1. Initialize correct users in localStorage
+function initializeCorrectUsers() {
+  localStorage.setItem('users', JSON.stringify(VALID_USERS));
+  console.log('Initialized users with correct credentials');
+}
+
+// 2. Fix login function
+function fixLogin() {
+  // Initialize users first
+  initializeCorrectUsers();
+  
+  // Find form and attach handler
+  const forms = document.querySelectorAll('form');
+  const loginButtons = document.querySelectorAll('button[type="submit"], input[type="submit"], .btn-login');
+  
+  // Handler function
+  const handleLogin = function(e) {
+    e.preventDefault();
+    
+    // Get input values (try different selectors)
+    const usernameInput = document.querySelector('#username, input[name="username"], input[type="text"]');
+    const passwordInput = document.querySelector('#password, input[name="password"], input[type="password"]');
+    
+    if (!usernameInput || !passwordInput) {
+      console.error('Cannot find input fields');
+      return;
     }
-
-    function checkLogin(username, password) {
-      const users = JSON.parse(localStorage.getItem("users") || "[]");
-      return users.find(u => u.username === username && u.password === password);
+    
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+    
+    console.log('Attempting login with:', username);
+    
+    // Check credentials
+    const user = VALID_USERS.find(u => u.username === username && u.password === password);
+    
+    if (user) {
+      // Save session
+      sessionStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      
+      console.log('Login successful!');
+      alert('Login berhasil! Redirecting to dashboard...');
+      
+      // Redirect
+      setTimeout(() => {
+        window.location.href = './dashboard.html';
+      }, 500);
+    } else {
+      alert('Username atau password salah!\n\nGunakan salah satu:\n- manager1 / pass123\n- admin1 / pass123\n- designer1 / pass123\n- prod1 / pass123');
     }
+  };
+  
+  // Attach to all forms
+  forms.forEach(form => {
+    form.addEventListener('submit', handleLogin);
+  });
+  
+  // Attach to all buttons
+  loginButtons.forEach(btn => {
+    btn.addEventListener('click', handleLogin);
+  });
+  
+  console.log('Login handlers attached');
+}
 
-    document.getElementById("toggle-password").addEventListener("click", function () {
-      const input = document.getElementById("password");
-      const icon = this.querySelector("i");
-      if (input.type === "password") {
-        input.type = "text";
-        icon.classList.remove("fa-eye");
-        icon.classList.add("fa-eye-slash");
-      } else {
-        input.type = "password";
-        icon.classList.remove("fa-eye-slash");
-        icon.classList.add("fa-eye");
-      }
-    });
+// 3. Create visible hint box
+function showCredentialsHint() {
+  const hint = document.createElement('div');
+  hint.style.cssText = `
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: #007bff;
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 10000;
+    font-family: Arial, sans-serif;
+  `;
+  
+  hint.innerHTML = `
+    <h3 style="margin: 0 0 15px 0;">Login Credentials:</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+      <tr>
+        <td style="padding: 5px;"><strong>Manager:</strong></td>
+        <td style="padding: 5px;">manager1 / pass123</td>
+      </tr>
+      <tr>
+        <td style="padding: 5px;"><strong>Admin:</strong></td>
+        <td style="padding: 5px;">admin1 / pass123</td>
+      </tr>
+      <tr>
+        <td style="padding: 5px;"><strong>Designer:</strong></td>
+        <td style="padding: 5px;">designer1 / pass123</td>
+      </tr>
+      <tr>
+        <td style="padding: 5px;"><strong>Production:</strong></td>
+        <td style="padding: 5px;">prod1 / pass123</td>
+      </tr>
+    </table>
+    <button onclick="this.parentElement.remove()" style="
+      margin-top: 15px;
+      padding: 8px 15px;
+      background: white;
+      color: #007bff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    ">Close</button>
+  `;
+  
+  document.body.appendChild(hint);
+}
 
-    document.getElementById("login-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const user = checkLogin(username, password);
+// 4. Quick login function for testing
+window.quickLogin = function(role = 'admin') {
+  const user = VALID_USERS.find(u => u.role === role);
+  if (user) {
+    sessionStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    console.log(`Logged in as ${role}`);
+    window.location.href = './dashboard.html';
+  }
+};
 
-      if (user) {
-        localStorage.setItem("currentUser", JSON.stringify(user));
-        alert("Login berhasil!");
-        window.location.href = "dashboard-simple.html";
-      } else {
-        alert("Username atau password salah!");
-      }
-    });
-  </script>
-</body>
-</html>
-"""
+// 5. Debug function
+window.debugLogin = function() {
+  console.log('=== LOGIN DEBUG INFO ===');
+  console.log('Valid Users:', VALID_USERS);
+  console.log('Current Users in localStorage:', localStorage.getItem('users'));
+  console.log('Form elements:', document.querySelectorAll('form').length);
+  console.log('Username inputs:', document.querySelectorAll('#username, input[name="username"]').length);
+  console.log('Password inputs:', document.querySelectorAll('#password, input[name="password"]').length);
+  console.log('=======================');
+};
 
-login_fixed_path = "/mnt/data/login-DUMMYREADY.html"
-with open(login_fixed_path, "w", encoding="utf-8") as f:
-    f.write(revised_login_html)
+// 6. Auto-fix everything
+window.autoFix = function() {
+  initializeCorrectUsers();
+  fixLogin();
+  showCredentialsHint();
+  console.log('Login system fixed! Use credentials shown in blue box.');
+};
 
-login_fixed_path
+// Run auto-fix when script loads
+autoFix();
+
+console.log(`
+========================================
+LOGIN FIX LOADED!
+========================================
+Credentials yang benar:
+- manager1 / pass123
+- admin1 / pass123
+- designer1 / pass123
+- prod1 / pass123
+
+Commands:
+- autoFix() : Run fix lagi
+- quickLogin('admin') : Quick login as admin
+- quickLogin('manager') : Quick login as manager
+- debugLogin() : Show debug info
+========================================
+`);
