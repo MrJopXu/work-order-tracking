@@ -3,925 +3,504 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Work Order System - Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Dashboard - Work Order System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #2563eb;
-            --secondary-color: #64748b;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --light-bg: #f8fafc;
-            --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
-            --hover-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --sidebar-bg: #2c3e50;
+            --sidebar-hover: #34495e;
+            --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--light-bg);
-            color: #1f2937;
-            font-size: 16px;
-            line-height: 1.5;
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
         }
-        
-        /* Mobile First Navbar */
+
+        /* Navbar Styles */
         .navbar {
-            background: white;
-            box-shadow: var(--card-shadow);
-            padding: 0;
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
         }
-        
-        .navbar-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
+
         .navbar-brand {
-            display: flex;
-            align-items: center;
             font-weight: 600;
-            color: var(--primary-color);
-            text-decoration: none;
-            font-size: 1.25rem;
+            font-size: 1.4rem;
         }
-        
-        .navbar-brand i {
-            margin-right: 0.5rem;
-        }
-        
-        .navbar-menu {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .user-info {
-            display: none;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--secondary-color);
-            font-size: 0.875rem;
-        }
-        
-        @media (min-width: 768px) {
-            .user-info {
-                display: flex;
-            }
-        }
-        
-        .mobile-menu-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--secondary-color);
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-        
-        @media (min-width: 768px) {
-            .mobile-menu-btn {
-                display: none;
-            }
-        }
-        
-        /* Sidebar for mobile */
+
+        /* Sidebar Styles */
         .sidebar {
-            position: fixed;
-            top: 0;
-            left: -100%;
-            width: 280px;
-            height: 100vh;
-            background: white;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-            transition: left 0.3s ease;
-            z-index: 1001;
-            overflow-y: auto;
+            background-color: var(--sidebar-bg);
+            min-height: calc(100vh - 72px);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
-        
-        .sidebar.active {
-            left: 0;
-        }
-        
+
         .sidebar-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        .sidebar-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--secondary-color);
-            cursor: pointer;
-        }
-        
+
         .sidebar-menu {
             padding: 1rem 0;
         }
-        
+
         .sidebar-item {
-            display: block;
-            padding: 1rem 1.5rem;
-            color: #374151;
+            margin: 0.2rem 0;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            color: #ecf0f1;
             text-decoration: none;
-            transition: all 0.2s;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
         }
-        
-        .sidebar-item:hover,
-        .sidebar-item.active {
-            background: var(--light-bg);
-            color: var(--primary-color);
-            border-left: 3px solid var(--primary-color);
+
+        .sidebar-link:hover {
+            background-color: var(--sidebar-hover);
+            color: white;
+            border-left-color: var(--primary-color);
         }
-        
-        .sidebar-item i {
+
+        .sidebar-link.active {
+            background-color: var(--sidebar-hover);
+            border-left-color: var(--primary-color);
+        }
+
+        .sidebar-icon {
             margin-right: 0.75rem;
             width: 20px;
             text-align: center;
         }
-        
-        /* Overlay for mobile menu */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            z-index: 1000;
-        }
-        
-        .overlay.active {
-            display: block;
-        }
-        
-        /* Main content */
+
+        /* Main Content */
         .main-content {
-            margin-top: 60px;
-            padding: 1rem;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
+            padding: 2rem;
         }
-        
-        @media (min-width: 768md) {
-            .main-content {
-                padding: 2rem;
-            }
+
+        /* Welcome Section */
+        .welcome-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
         }
-        
-        /* Cards */
-        .card {
-            background: white;
-            border: none;
-            border-radius: 0.75rem;
-            box-shadow: var(--card-shadow);
-            margin-bottom: 1.5rem;
-            transition: box-shadow 0.2s;
-        }
-        
-        .card:hover {
-            box-shadow: var(--hover-shadow);
-        }
-        
-        .card-header {
-            background: none;
-            border: none;
-            padding: 1.5rem;
+
+        .welcome-section h1 {
+            font-size: 2rem;
             font-weight: 600;
-            font-size: 1.125rem;
-            color: #111827;
+            margin-bottom: 0.5rem;
         }
-        
-        .card-body {
-            padding: 1.5rem;
+
+        .welcome-section p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin: 0;
         }
-        
-        /* Stats cards */
+
+        /* Stats Cards */
         .stats-grid {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
             margin-bottom: 2rem;
         }
-        
-        @media (min-width: 640px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        @media (min-width: 1024px) {
-            .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-        
+
         .stat-card {
             background: white;
-            border-radius: 0.75rem;
             padding: 1.5rem;
+            border-radius: 12px;
             box-shadow: var(--card-shadow);
-            border-left: 4px solid;
-            transition: transform 0.2s;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
-        
+
         .stat-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        
-        .stat-card.primary {
-            border-left-color: var(--primary-color);
+
+        .stat-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
         }
-        
-        .stat-card.success {
-            border-left-color: var(--success-color);
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 1.5rem;
         }
-        
-        .stat-card.warning {
-            border-left-color: var(--warning-color);
+
+        .stat-icon.primary {
+            background-color: rgba(102, 126, 234, 0.1);
+            color: var(--primary-color);
         }
-        
-        .stat-card.danger {
-            border-left-color: var(--danger-color);
+
+        .stat-icon.warning {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
         }
-        
+
+        .stat-icon.info {
+            background-color: rgba(23, 162, 184, 0.1);
+            color: #17a2b8;
+        }
+
+        .stat-icon.success {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
         .stat-value {
             font-size: 2rem;
             font-weight: 700;
-            margin: 0.5rem 0;
+            color: #2c3e50;
+            margin: 0;
         }
-        
+
         .stat-label {
-            color: var(--secondary-color);
-            font-size: 0.875rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin: 0;
         }
-        
-        /* Tables */
-        .table-responsive {
-            border-radius: 0.5rem;
-            overflow: hidden;
+
+        /* Content Cards */
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
-        
-        .table {
-            margin-bottom: 0;
+
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
         }
-        
-        .table th {
-            background: var(--light-bg);
+
+        .card-header h5 {
+            color: #2c3e50;
             font-weight: 600;
-            color: #374151;
-            border: none;
-            padding: 1rem;
-            font-size: 0.875rem;
-            text-transform: uppercase;
+            margin: 0;
         }
-        
+
+        /* Table Styles */
+        .table {
+            margin: 0;
+        }
+
+        .table th {
+            border-top: none;
+            color: #6c757d;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            padding: 1rem 1.5rem;
+        }
+
         .table td {
-            padding: 1rem;
-            border-color: #f3f4f6;
+            padding: 1rem 1.5rem;
             vertical-align: middle;
         }
-        
-        .table tbody tr:hover {
-            background: #f9fafb;
-        }
-        
-        /* Buttons */
-        .btn {
-            border: none;
-            border-radius: 0.5rem;
-            padding: 0.625rem 1.25rem;
-            font-weight: 500;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-        }
-        
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #1d4ed8;
-        }
-        
-        .btn-success {
-            background: var(--success-color);
-            color: white;
-        }
-        
-        .btn-info {
-            background: #0891b2;
-            color: white;
-        }
-        
-        .btn-warning {
-            background: var(--warning-color);
-            color: white;
-        }
-        
-        .btn-danger {
-            background: var(--danger-color);
-            color: white;
-        }
-        
-        .btn-secondary {
-            background: #e5e7eb;
-            color: #374151;
-        }
-        
-        .btn-secondary:hover {
-            background: #d1d5db;
-        }
-        
-        .btn-sm {
-            padding: 0.375rem 0.75rem;
-            font-size: 0.75rem;
-        }
-        
-        /* Status badges */
+
+        /* Badge Styles */
         .badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
+            padding: 0.5rem 1rem;
             font-weight: 500;
+            border-radius: 20px;
         }
-        
-        .badge-primary {
-            background: #dbeafe;
-            color: #1e40af;
+
+        /* Button Styles */
+        .btn {
+            border-radius: 8px;
+            padding: 0.5rem 1.2rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
-        
-        .badge-success {
-            background: #d1fae5;
-            color: #065f46;
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
         }
-        
-        .badge-warning {
-            background: #fef3c7;
-            color: #92400e;
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
         }
-        
-        .badge-danger {
-            background: #fee2e2;
-            color: #991b1b;
+
+        /* User Info */
+        .user-info {
+            display: flex;
+            align-items: center;
+            color: white;
         }
-        
-        /* Quick actions */
-        .quick-actions {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
         }
-        
-        @media (min-width: 640px) {
-            .quick-actions {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        .action-btn {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid #e5e7eb;
-            background: white;
-            border-radius: 0.75rem;
-            text-align: center;
-            transition: all 0.2s;
-            cursor: pointer;
-            text-decoration: none;
-            color: #374151;
-        }
-        
-        .action-btn:hover {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-            transform: translateY(-2px);
-        }
-        
-        .action-btn i {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-        
-        /* Responsive utilities */
-        @media (max-width: 640px) {
-            .hide-mobile {
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
                 display: none;
             }
             
-            .table {
-                font-size: 0.875rem;
+            .main-content {
+                padding: 1rem;
             }
             
-            .table th,
-            .table td {
-                padding: 0.75rem 0.5rem;
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
-        }
-        
-        /* Loading state */
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 200px;
-            color: var(--secondary-color);
-        }
-        
-        .spinner {
-            border: 3px solid #f3f4f6;
-            border-top: 3px solid var(--primary-color);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar">
-        <div class="navbar-container">
-            <a href="#" class="navbar-brand">
-                <i class="fas fa-clipboard-list"></i>
-                Work Order
+    <nav class="navbar navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-clipboard-list"></i> Work Order System
             </a>
-            
-            <div class="navbar-menu">
-                <div class="user-info">
-                    <i class="fas fa-user-circle"></i>
-                    <span id="user-name">User</span>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
                 </div>
-                <button class="btn btn-sm btn-secondary hide-mobile" onclick="logout()">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span class="hide-mobile">Logout</span>
-                </button>
-                <button class="mobile-menu-btn" onclick="toggleSidebar()">
-                    <i class="fas fa-bars"></i>
+                <span class="me-3" id="userDisplay">Welcome</span>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </div>
         </div>
     </nav>
-    
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <span class="h5 mb-0">Menu</span>
-            <button class="sidebar-close" onclick="toggleSidebar()">
-                <i class="fas fa-times"></i>
-            </button>
+
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h5 class="text-white mb-0">Navigation</h5>
+            </div>
+            <nav class="sidebar-menu">
+                <div class="sidebar-item">
+                    <a href="#" class="sidebar-link active">
+                        <i class="sidebar-icon fas fa-home"></i>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="sidebar-item">
+                    <a href="./tracking.html" class="sidebar-link">
+                        <i class="sidebar-icon fas fa-search"></i>
+                        Track Orders
+                    </a>
+                </div>
+                <div class="sidebar-item">
+                    <a href="#" class="sidebar-link" onclick="showOrders()">
+                        <i class="sidebar-icon fas fa-list"></i>
+                        All Orders
+                    </a>
+                </div>
+                <div class="sidebar-item">
+                    <a href="#" class="sidebar-link" onclick="showReports()">
+                        <i class="sidebar-icon fas fa-chart-bar"></i>
+                        Reports
+                    </a>
+                </div>
+                <div class="sidebar-item">
+                    <a href="#" class="sidebar-link" onclick="showSettings()">
+                        <i class="sidebar-icon fas fa-cog"></i>
+                        Settings
+                    </a>
+                </div>
+            </nav>
         </div>
-        <nav class="sidebar-menu" id="sidebar-menu">
-            <!-- Menu items will be loaded dynamically -->
-        </nav>
-        <div class="p-3 border-top">
-            <button class="btn btn-secondary w-100" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
+
+        <!-- Main Content -->
+        <div class="flex-fill">
+            <div class="main-content">
+                <!-- Welcome Section -->
+                <div class="welcome-section">
+                    <h1 id="welcomeTitle">Welcome to Work Order System</h1>
+                    <p id="roleDisplay">You are logged in as: </p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <h3 class="stat-value">25</h3>
+                                <p class="stat-label">Total Orders</p>
+                            </div>
+                            <div class="stat-icon primary">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <h3 class="stat-value">12</h3>
+                                <p class="stat-label">Pending</p>
+                            </div>
+                            <div class="stat-icon warning">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <h3 class="stat-value">8</h3>
+                                <p class="stat-label">In Progress</p>
+                            </div>
+                            <div class="stat-icon info">
+                                <i class="fas fa-spinner"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <h3 class="stat-value">5</h3>
+                                <p class="stat-label">Completed</p>
+                            </div>
+                            <div class="stat-icon success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Orders Table -->
+                <div class="content-card">
+                    <div class="card-header">
+                        <h5>Recent Orders</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>TR20250511A</strong></td>
+                                    <td>PT. ABC Company</td>
+                                    <td><span class="badge bg-warning">In Production</span></td>
+                                    <td>2025-05-11</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>TR20250510B</strong></td>
+                                    <td>CV. XYZ Corp</td>
+                                    <td><span class="badge bg-info">Layout</span></td>
+                                    <td>2025-05-10</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>TR20250505C</strong></td>
+                                    <td>PT. DEF Industries</td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                    <td>2025-05-05</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <!-- Overlay -->
-    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
-    
-    <!-- Main Content -->
-    <main class="main-content">
-        <div id="content-area">
-            <!-- Content will be loaded dynamically -->
-        </div>
-    </main>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        // Check authentication and load dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            checkAuth();
-            loadDashboard();
-        });
-        
-        // Check if user is logged in
+        // Check authentication
         function checkAuth() {
-            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-            if (!user.username) {
-                window.location.href = 'login.html';
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            const currentUser = localStorage.getItem('currentUser');
+            
+            if (!isLoggedIn || !currentUser) {
+                // Not logged in, redirect to login
+                window.location.href = './login.html';
                 return;
             }
-            document.getElementById('user-name').textContent = user.name || user.username;
-        }
-        
-        // Toggle sidebar
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
-        
-        // Load dashboard based on user role
-        function loadDashboard() {
-            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
-            const role = user.role || 'admin';
             
-            // Load menu items based on role
-            loadMenu(role);
-            
-            // Load dashboard content
-            const content = document.getElementById('content-area');
-            
-            if (role === 'manager') {
-                content.innerHTML = `
-                    <h2 class="mb-4">Manager Dashboard</h2>
-                    
-                    <!-- Stats -->
-                    <div class="stats-grid">
-                        <div class="stat-card primary">
-                            <div class="stat-label">Total Orders</div>
-                            <div class="stat-value">156</div>
-                            <small class="text-muted">All time</small>
-                        </div>
-                        <div class="stat-card success">
-                            <div class="stat-label">Completed</div>
-                            <div class="stat-value">89</div>
-                            <small class="text-muted">This month</small>
-                        </div>
-                        <div class="stat-card warning">
-                            <div class="stat-label">In Progress</div>
-                            <div class="stat-value">45</div>
-                            <small class="text-muted">Active now</small>
-                        </div>
-                        <div class="stat-card danger">
-                            <div class="stat-label">Low Stock Items</div>
-                            <div class="stat-value">5</div>
-                            <small class="text-muted">Need reorder</small>
-                        </div>
-                    </div>
-                    
-                    <!-- Recent Orders -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0">Recent Orders</h5>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Order Code</th>
-                                            <th>Customer</th>
-                                            <th>Status</th>
-                                            <th class="hide-mobile">Deadline</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><strong>TR20250514A</strong></td>
-                                            <td>PT ABC Indonesia</td>
-                                            <td><span class="badge badge-warning">Production</span></td>
-                                            <td class="hide-mobile">May 20, 2025</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-info">View</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>TR20250513B</strong></td>
-                                            <td>CV XYZ Mandiri</td>
-                                            <td><span class="badge badge-primary">Design</span></td>
-                                            <td class="hide-mobile">May 25, 2025</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-info">View</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>TR20250512C</strong></td>
-                                            <td>Toko Jaya</td>
-                                            <td><span class="badge badge-success">Completed</span></td>
-                                            <td class="hide-mobile">May 15, 2025</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-info">View</button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Quick Actions -->
-                    <div class="quick-actions">
-                        <a href="#" class="action-btn" onclick="showCreateOrder()">
-                            <i class="fas fa-plus-circle text-primary"></i>
-                            <h6>Create New Order</h6>
-                        </a>
-                        <a href="#" class="action-btn" onclick="showStockManagement()">
-                            <i class="fas fa-boxes text-info"></i>
-                            <h6>Stock Management</h6>
-                        </a>
-                        <a href="#" class="action-btn" onclick="showReports()">
-                            <i class="fas fa-chart-bar text-success"></i>
-                            <h6>View Reports</h6>
-                        </a>
-                        <a href="#" class="action-btn" onclick="showUsers()">
-                            <i class="fas fa-users text-warning"></i>
-                            <h6>Manage Users</h6>
-                        </a>
-                        <a href="#" class="action-btn" onclick="showAllOrders()">
-                            <i class="fas fa-list text-info"></i>
-                            <h6>All Orders</h6>
-                        </a>
-                    </div>
-                `;
-            } else if (role === 'admin') {
-                content.innerHTML = `
-                    <h2 class="mb-4">Admin Dashboard</h2>
-                    
-                    <!-- Stats -->
-                    <div class="stats-grid">
-                        <div class="stat-card primary">
-                            <div class="stat-label">New Orders</div>
-                            <div class="stat-value">12</div>
-                            <small class="text-muted">Today</small>
-                        </div>
-                        <div class="stat-card warning">
-                            <div class="stat-label">Pending Shipping</div>
-                            <div class="stat-value">8</div>
-                            <small class="text-muted">Ready to ship</small>
-                        </div>
-                    </div>
-                    
-                    <!-- Tasks -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0">Today's Tasks</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="task-item mb-3 p-3 border rounded">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">Process PO from PT ABC</h6>
-                                        <small class="text-muted">Customer: PT ABC Indonesia</small>
-                                    </div>
-                                    <button class="btn btn-sm btn-primary">Process</button>
-                                </div>
-                            </div>
-                            <div class="task-item mb-3 p-3 border rounded">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">Update Shipping TR20250508D</h6>
-                                        <small class="text-muted">Ready for delivery</small>
-                                    </div>
-                                    <button class="btn btn-sm btn-success">Update</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Quick Actions -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0">Quick Actions</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-primary" onclick="showCreateOrder()">
-                                    <i class="fas fa-plus me-2"></i>Create New Order
-                                </button>
-                                <button class="btn btn-info" onclick="showStockManagement()">
-                                    <i class="fas fa-boxes me-2"></i>Stock Management
-                                </button>
-                                <button class="btn btn-warning" onclick="showShipping()">
-                                    <i class="fas fa-truck me-2"></i>Update Shipping
-                                </button>
-                                <button class="btn btn-success" onclick="showCustomers()">
-                                    <i class="fas fa-users me-2"></i>Manage Customers
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else if (role === 'designer') {
-                content.innerHTML = `
-                    <h2 class="mb-4">Designer Dashboard</h2>
-                    
-                    <!-- Stats -->
-                    <div class="stats-grid">
-                        <div class="stat-card primary">
-                            <div class="stat-label">Layout Tasks</div>
-                            <div class="stat-value">4</div>
-                            <small class="text-muted">Pending</small>
-                        </div>
-                        <div class="stat-card warning">
-                            <div class="stat-label">Film Printing</div>
-                            <div class="stat-value">2</div>
-                            <small class="text-muted">Ready</small>
-                        </div>
-                    </div>
-                    
-                    <!-- Design Tasks -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0">Design Tasks</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="task-item mb-3 p-3 border rounded">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">Layout - TR20250510B</h6>
-                                        <small class="text-muted">Customer: CV XYZ Mandiri</small>
-                                        <div class="mt-1">
-                                            <span class="badge badge-warning">In Progress</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <button class="btn btn-sm btn-primary">Upload</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else if (role === 'production') {
-                content.innerHTML = `
-                    <h2 class="mb-4">Production Dashboard</h2>
-                    
-                    <!-- Stats -->
-                    <div class="stats-grid">
-                        <div class="stat-card primary">
-                            <div class="stat-label">In Production</div>
-                            <div class="stat-value">6</div>
-                            <small class="text-muted">Active</small>
-                        </div>
-                        <div class="stat-card success">
-                            <div class="stat-label">Completed Today</div>
-                            <div class="stat-value">4</div>
-                            <small class="text-muted">Finished</small>
-                        </div>
-                    </div>
-                    
-                    <!-- Production Queue -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0">Production Queue</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="task-item mb-3 p-3 border rounded">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">Banner - TR20250511A</h6>
-                                        <small class="text-muted">3x4m Custom Banner</small>
-                                        <div class="mt-2">
-                                            <div class="progress" style="height: 20px;">
-                                                <div class="progress-bar bg-warning" style="width: 60%">60%</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
+            // Display user info
+            const user = JSON.parse(currentUser);
+            document.getElementById('userDisplay').textContent = `${user.name || user.username}`;
+            document.getElementById('welcomeTitle').textContent = `Welcome, ${user.name || user.username}!`;
+            document.getElementById('roleDisplay').textContent = `You are logged in as: ${user.role.toUpperCase()}`;
         }
-        
-        // Load menu based on role
-        function loadMenu(role) {
-            const menu = document.getElementById('sidebar-menu');
-            
-            const menuItems = {
-                manager: [
-                    { icon: 'fa-tachometer-alt', text: 'Dashboard', action: 'loadDashboard()' },
-                    { icon: 'fa-plus', text: 'Create Order', action: 'showCreateOrder()' },
-                    { icon: 'fa-list', text: 'All Orders', action: 'showAllOrders()' },
-                    { icon: 'fa-boxes', text: 'Stock Management', action: 'showStockManagement()' },
-                    { icon: 'fa-chart-bar', text: 'Reports', action: 'showReports()' },
-                    { icon: 'fa-users', text: 'Users', action: 'showUsers()' },
-                    { icon: 'fa-cog', text: 'Settings', action: 'showSettings()' }
-                ],
-                admin: [
-                    { icon: 'fa-tachometer-alt', text: 'Dashboard', action: 'loadDashboard()' },
-                    { icon: 'fa-plus', text: 'New Order', action: 'showCreateOrder()' },
-                    { icon: 'fa-boxes', text: 'Stock Management', action: 'showStockManagement()' },
-                    { icon: 'fa-truck', text: 'Shipping', action: 'showShipping()' },
-                    { icon: 'fa-users', text: 'Customers', action: 'showCustomers()' }
-                ],
-                designer: [
-                    { icon: 'fa-tachometer-alt', text: 'Dashboard', action: 'loadDashboard()' },
-                    { icon: 'fa-palette', text: 'Layout Tasks', action: 'showLayoutTasks()' },
-                    { icon: 'fa-print', text: 'Film Tasks', action: 'showFilmTasks()' },
-                    { icon: 'fa-tasks', text: 'My Tasks', action: 'showMyTasks()' }
-                ],
-                production: [
-                    { icon: 'fa-tachometer-alt', text: 'Dashboard', action: 'loadDashboard()' },
-                    { icon: 'fa-industry', text: 'Production Queue', action: 'showProductionQueue()' },
-                    { icon: 'fa-tasks', text: 'My Tasks', action: 'showMyTasks()' }
-                ]
-            };
-            
-            const items = menuItems[role] || menuItems.admin;
-            
-            menu.innerHTML = items.map((item, index) => `
-                <button class="sidebar-item ${index === 0 ? 'active' : ''}" onclick="${item.action}">
-                    <i class="fas ${item.icon}"></i>
-                    ${item.text}
-                </button>
-            `).join('');
-        }
-        
-        // Show functions
-        function showCreateOrder() {
-            window.location.href = 'create-order.html';
-        }
-        
-        function showAllOrders() {
-            window.location.href = 'work-orders.html';
-        }
-        
-        function showStockManagement() {
-            const user = JSON.parse(localStorage.getItem('currentUser'));
-            if (['manager', 'admin'].includes(user.role)) {
-                window.location.href = 'stock-management.html';
-            } else {
-                alert('You do not have permission to access Stock Management.');
-            }
-        }
-        
-        function showReports() {
-            alert('Reports page - to be implemented');
-        }
-        
-        function showUsers() {
-            alert('Users management page - to be implemented');
-        }
-        
-        function showSettings() {
-            alert('Settings page - to be implemented');
-        }
-        
-        function showShipping() {
-            alert('Shipping page - to be implemented');
-        }
-        
-        function showCustomers() {
-            alert('Customers page - to be implemented');
-        }
-        
-        function showLayoutTasks() {
-            alert('Layout tasks page - to be implemented');
-        }
-        
-        function showFilmTasks() {
-            alert('Film tasks page - to be implemented');
-        }
-        
-        function showMyTasks() {
-            alert('My tasks page - to be implemented');
-        }
-        
-        function showProductionQueue() {
-            alert('Production queue page - to be implemented');
-        }
-        
+
+        // Logout function
         function logout() {
+            sessionStorage.removeItem('isLoggedIn');
             localStorage.removeItem('currentUser');
-            window.location.href = 'login.html';
+            window.location.href = './login.html';
         }
+
+        // Placeholder functions
+        function showOrders() {
+            alert('Orders page coming soon!');
+        }
+
+        function showReports() {
+            alert('Reports page coming soon!');
+        }
+
+        function showSettings() {
+            alert('Settings page coming soon!');
+        }
+
+        // Active menu item
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', function() {
+                document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Initialize
+        window.addEventListener('load', checkAuth);
     </script>
 </body>
 </html>
