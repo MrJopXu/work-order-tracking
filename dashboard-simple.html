@@ -92,6 +92,14 @@
             transform: translate(-50%, -50%);
             z-index: 9999;
         }
+
+        .user-role-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -102,8 +110,9 @@
                 <i class="fas fa-clipboard-list"></i> Work Order System
             </a>
             <div class="d-flex align-items-center">
-                <span class="text-white me-3" id="userDisplay">Welcome</span>
-                <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                <span class="text-white" id="userDisplay">Welcome</span>
+                <span class="user-role-badge text-white" id="roleDisplay">Role</span>
+                <button class="btn btn-outline-light btn-sm ms-3" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </div>
@@ -426,17 +435,25 @@
             }
             
             const user = JSON.parse(currentUser);
+            // Ensure role is lowercase for consistency
+            user.role = (user.role || 'staff').toLowerCase();
+            
+            // Update display
             document.getElementById('userDisplay').textContent = `${user.name || user.username}`;
+            document.getElementById('roleDisplay').textContent = user.role.toUpperCase();
             
             // Update menu based on role
             updateMenuByRole(user.role);
+            
             // Initialize data
             initializeData();
         }
 
-        // Update menu based on role
+        // Update menu based on role - FIXED VERSION
         function updateMenuByRole(role) {
-            const menuItems = {
+            console.log('Updating menu for role:', role);
+            
+            const menuConfig = {
                 admin: ['dashboard', 'create-order', 'all-orders', 'stock-management', 'users', 'settings', 'reports'],
                 manager: ['dashboard', 'create-order', 'all-orders', 'stock-management', 'reports'],
                 staff: ['dashboard', 'create-order', 'all-orders'],
@@ -444,13 +461,17 @@
                 designer: ['dashboard', 'create-order']
             };
             
-            const allowedItems = menuItems[role] || menuItems.staff;
+            // Get allowed items for the role (with fallback to staff)
+            const allowedItems = menuConfig[role] || menuConfig.staff;
+            console.log('Allowed items:', allowedItems);
             
-            // Hide menu items not allowed for this role
+            // Show/hide menu items based on role
             document.querySelectorAll('.sidebar-link').forEach(link => {
                 const menuType = link.getAttribute('data-menu');
-                if (!allowedItems.includes(menuType)) {
-                    link.style.display = 'none';
+                if (allowedItems.includes(menuType)) {
+                    link.style.display = 'flex'; // Show allowed items
+                } else {
+                    link.style.display = 'none'; // Hide not allowed items
                 }
             });
         }
@@ -489,12 +510,12 @@
         }
 
         function showSettings() {
-            // Check if settings.html exists
+            // Navigate to settings page or show alert
             window.location.href = './settings.html';
         }
 
         function showReports() {
-            // Check if reports.html exists
+            // Navigate to reports page or show alert
             window.location.href = './reports.html';
         }
 
@@ -647,7 +668,7 @@
                 <tr>
                     <td>${user.username}</td>
                     <td>${user.fullname || user.name || 'N/A'}</td>
-                    <td>${user.role}</td>
+                    <td><span class="badge bg-secondary">${user.role}</span></td>
                     <td><span class="badge bg-${user.status === 'active' ? 'success' : 'danger'}">${user.status || 'active'}</span></td>
                     <td>
                         <button class="btn btn-sm btn-info" onclick="editUser(${user.id})">Edit</button>
@@ -764,10 +785,32 @@
         // Initialize on load
         window.addEventListener('load', () => {
             checkAuth();
-            // Restore active menu
-            const activeMenu = sessionStorage.getItem('activeMenu') || 'Dashboard';
-            showDashboard(); // Show dashboard by default
+            // Show dashboard by default
+            showDashboard();
         });
+
+        // Debug helpers
+        function debugRole() {
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            console.log('Current user:', user);
+            console.log('Current role:', user.role);
+            
+            // Check visible menu items
+            console.log('Visible menu items:');
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                const menuType = link.getAttribute('data-menu');
+                const isVisible = link.style.display !== 'none';
+                console.log(`${menuType}: ${isVisible ? 'VISIBLE' : 'HIDDEN'}`);
+            });
+        }
+
+        // Manual role update (for testing)
+        function changeRole(newRole) {
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            user.role = newRole.toLowerCase();
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            location.reload();
+        }
     </script>
 </body>
 </html>
