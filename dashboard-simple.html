@@ -925,3 +925,48 @@
     </script>
 </body>
 </html>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const user = JSON.parse(localStorage.getItem("currentUser") || "null");
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    const greeting = document.getElementById("greeting");
+    const roleDisplay = document.getElementById("user-role");
+    if (greeting) greeting.textContent = user.role;
+    if (roleDisplay) roleDisplay.textContent = user.name;
+
+    // Sidebar toggle
+    document.getElementById("sidebarToggle").addEventListener("click", function () {
+      document.getElementById("sidebar").classList.toggle("d-none");
+    });
+
+    // Show/hide menu based on role
+    const role = user.role;
+    document.querySelectorAll(".sidebar-section").forEach((section) => section.classList.add("d-none"));
+    document.querySelectorAll(`.sidebar-section[data-role="${role}"]`).forEach((section) => section.classList.remove("d-none"));
+  });
+
+  function showCreateOrder() {
+    window.location.href = "create-order.html";
+  }
+
+  function showStockManagement() {
+    const user = JSON.parse(localStorage.getItem("currentUser") || "null");
+    if (user && (user.role === "admin" || user.role === "manager")) {
+      window.location.href = "stock-management.html";
+    } else {
+      alert("Kamu tidak punya akses ke Stock Management!");
+    }
+  }
+
+  function showUsers() {
+    window.location.href = "user-manage.html";
+  }
+
+  function showAllOrders() {
+    window.location.href = "work-orders.html";
+  }
+</script>
