@@ -77,20 +77,20 @@
             margin-bottom: 2rem;
         }
 
-        .stock-management-section {
-            display: none;
-        }
-
-        .users-section {
-            display: none;
-        }
-
-        .orders-section {
+        .stock-management-section, .users-section, .orders-section {
             display: none;
         }
 
         .modal-backdrop {
             background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        #loader {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
         }
     </style>
 </head>
@@ -114,25 +114,25 @@
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
             <nav class="py-3">
-                <a href="#" class="sidebar-link active" onclick="showDashboard()">
+                <a href="#" class="sidebar-link active" data-menu="dashboard" onclick="showDashboard()">
                     <i class="fas fa-home me-3"></i> Dashboard
                 </a>
-                <a href="#" class="sidebar-link" onclick="showCreateOrder()">
+                <a href="#" class="sidebar-link" data-menu="create-order" onclick="showCreateOrder()">
                     <i class="fas fa-plus me-3"></i> Create Order
                 </a>
-                <a href="#" class="sidebar-link" onclick="showAllOrders()">
+                <a href="#" class="sidebar-link" data-menu="all-orders" onclick="showAllOrders()">
                     <i class="fas fa-list me-3"></i> All Orders
                 </a>
-                <a href="#" class="sidebar-link" onclick="showStockManagement()">
+                <a href="#" class="sidebar-link" data-menu="stock-management" onclick="showStockManagement()">
                     <i class="fas fa-warehouse me-3"></i> Stock Management
                 </a>
-                <a href="#" class="sidebar-link" onclick="showUsers()">
+                <a href="#" class="sidebar-link" data-menu="users" onclick="showUsers()">
                     <i class="fas fa-users me-3"></i> Users
                 </a>
-                <a href="#" class="sidebar-link" onclick="showSettings()">
+                <a href="#" class="sidebar-link" data-menu="settings" onclick="showSettings()">
                     <i class="fas fa-cog me-3"></i> Settings
                 </a>
-                <a href="#" class="sidebar-link" onclick="showReports()">
+                <a href="#" class="sidebar-link" data-menu="reports" onclick="showReports()">
                     <i class="fas fa-chart-bar me-3"></i> Reports
                 </a>
             </nav>
@@ -149,28 +149,28 @@
                     <div class="col-md-3 mb-3">
                         <div class="stat-card text-center">
                             <i class="fas fa-clipboard-list text-primary mb-3" style="font-size: 2.5rem;"></i>
-                            <h3>25</h3>
+                            <h3 id="totalOrdersCount">25</h3>
                             <p class="text-muted">Total Orders</p>
                         </div>
                     </div>
                     <div class="col-md-3 mb-3">
                         <div class="stat-card text-center">
                             <i class="fas fa-hourglass-half text-warning mb-3" style="font-size: 2.5rem;"></i>
-                            <h3>12</h3>
+                            <h3 id="pendingOrdersCount">12</h3>
                             <p class="text-muted">Pending</p>
                         </div>
                     </div>
                     <div class="col-md-3 mb-3">
                         <div class="stat-card text-center">
                             <i class="fas fa-spinner text-info mb-3" style="font-size: 2.5rem;"></i>
-                            <h3>8</h3>
+                            <h3 id="inProgressCount">8</h3>
                             <p class="text-muted">In Progress</p>
                         </div>
                     </div>
                     <div class="col-md-3 mb-3">
                         <div class="stat-card text-center">
                             <i class="fas fa-check-circle text-success mb-3" style="font-size: 2.5rem;"></i>
-                            <h3>5</h3>
+                            <h3 id="completedCount">5</h3>
                             <p class="text-muted">Completed</p>
                         </div>
                     </div>
@@ -192,7 +192,7 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="recentOrdersTable">
                                 <tr>
                                     <td>TR20250511A</td>
                                     <td>PT. ABC Company</td>
@@ -244,16 +244,7 @@
                                 </tr>
                             </thead>
                             <tbody id="stockTable">
-                                <tr>
-                                    <td>SKU001</td>
-                                    <td>Widget A</td>
-                                    <td>Components</td>
-                                    <td>150</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info">Edit</button>
-                                        <button class="btn btn-sm btn-danger">Delete</button>
-                                    </td>
-                                </tr>
+                                <!-- Dynamic content -->
                             </tbody>
                         </table>
                     </div>
@@ -281,27 +272,8 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>admin1</td>
-                                    <td>Admin User</td>
-                                    <td>Admin</td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info">Edit</button>
-                                        <button class="btn btn-sm btn-danger">Delete</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>manager1</td>
-                                    <td>Manager User</td>
-                                    <td>Manager</td>
-                                    <td><span class="badge bg-success">Active</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info">Edit</button>
-                                        <button class="btn btn-sm btn-danger">Delete</button>
-                                    </td>
-                                </tr>
+                            <tbody id="usersTable">
+                                <!-- Dynamic content -->
                             </tbody>
                         </table>
                     </div>
@@ -321,14 +293,14 @@
                     <div class="card-body">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <input type="text" class="form-control" placeholder="Search orders...">
+                                <input type="text" class="form-control" placeholder="Search orders..." onkeyup="searchOrders(this.value)">
                             </div>
                             <div class="col-md-3">
-                                <select class="form-select">
-                                    <option>All Status</option>
-                                    <option>Pending</option>
-                                    <option>In Progress</option>
-                                    <option>Completed</option>
+                                <select class="form-select" onchange="filterOrdersByStatus(this.value)">
+                                    <option value="">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="in-progress">In Progress</option>
+                                    <option value="completed">Completed</option>
                                 </select>
                             </div>
                         </div>
@@ -343,19 +315,8 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>TR20250511A</td>
-                                    <td>PT. ABC Company</td>
-                                    <td>Custom Packaging</td>
-                                    <td><span class="badge bg-warning">In Production</span></td>
-                                    <td>2025-05-11</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-primary">View</button>
-                                        <button class="btn btn-sm btn-info">Edit</button>
-                                        <button class="btn btn-sm btn-danger">Cancel</button>
-                                    </td>
-                                </tr>
+                            <tbody id="allOrdersTable">
+                                <!-- Dynamic content -->
                             </tbody>
                         </table>
                     </div>
@@ -376,23 +337,24 @@
                     <form id="addItemForm">
                         <div class="mb-3">
                             <label class="form-label">SKU</label>
-                            <input type="text" class="form-control" required>
+                            <input type="text" class="form-control" name="sku" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Name</label>
-                            <input type="text" class="form-control" required>
+                            <input type="text" class="form-control" name="name" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Category</label>
-                            <select class="form-select">
-                                <option>Components</option>
-                                <option>Materials</option>
-                                <option>Finished Products</option>
+                            <select class="form-select" name="category" required>
+                                <option value="">Select Category</option>
+                                <option value="Components">Components</option>
+                                <option value="Materials">Materials</option>
+                                <option value="Finished Products">Finished Products</option>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Quantity</label>
-                            <input type="number" class="form-control" required>
+                            <input type="number" class="form-control" name="quantity" min="0" required>
                         </div>
                     </form>
                 </div>
@@ -416,28 +378,29 @@
                     <form id="addUserForm">
                         <div class="mb-3">
                             <label class="form-label">Username</label>
-                            <input type="text" class="form-control" required>
+                            <input type="text" class="form-control" name="username" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Full Name</label>
-                            <input type="text" class="form-control" required>
+                            <input type="text" class="form-control" name="fullname" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-control" required>
+                            <input type="email" class="form-control" name="email" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Password</label>
-                            <input type="password" class="form-control" required>
+                            <input type="password" class="form-control" name="password" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Role</label>
-                            <select class="form-select">
-                                <option>Admin</option>
-                                <option>Manager</option>
-                                <option>Staff</option>
-                                <option>Designer</option>
-                                <option>Production</option>
+                            <select class="form-select" name="role" required>
+                                <option value="">Select Role</option>
+                                <option value="admin">Admin</option>
+                                <option value="manager">Manager</option>
+                                <option value="staff">Staff</option>
+                                <option value="designer">Designer</option>
+                                <option value="production">Production</option>
                             </select>
                         </div>
                     </form>
@@ -465,14 +428,31 @@
             const user = JSON.parse(currentUser);
             document.getElementById('userDisplay').textContent = `${user.name || user.username}`;
             
-            // Show menu based on role
+            // Update menu based on role
             updateMenuByRole(user.role);
+            // Initialize data
+            initializeData();
         }
 
         // Update menu based on role
         function updateMenuByRole(role) {
-            // This would filter menu items based on role
-            // For now, showing all menu items
+            const menuItems = {
+                admin: ['dashboard', 'create-order', 'all-orders', 'stock-management', 'users', 'settings', 'reports'],
+                manager: ['dashboard', 'create-order', 'all-orders', 'stock-management', 'reports'],
+                staff: ['dashboard', 'create-order', 'all-orders'],
+                production: ['dashboard', 'all-orders', 'stock-management'],
+                designer: ['dashboard', 'create-order']
+            };
+            
+            const allowedItems = menuItems[role] || menuItems.staff;
+            
+            // Hide menu items not allowed for this role
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                const menuType = link.getAttribute('data-menu');
+                if (!allowedItems.includes(menuType)) {
+                    link.style.display = 'none';
+                }
+            });
         }
 
         // Navigation functions
@@ -480,24 +460,28 @@
             hideAllSections();
             document.getElementById('dashboardSection').style.display = 'block';
             setActiveMenu('Dashboard');
+            updateDashboardStats();
         }
 
         function showStockManagement() {
             hideAllSections();
             document.getElementById('stockManagementSection').style.display = 'block';
             setActiveMenu('Stock Management');
+            updateStockTable();
         }
 
         function showUsers() {
             hideAllSections();
             document.getElementById('usersSection').style.display = 'block';
             setActiveMenu('Users');
+            updateUsersTable();
         }
 
         function showAllOrders() {
             hideAllSections();
             document.getElementById('ordersSection').style.display = 'block';
             setActiveMenu('All Orders');
+            updateOrdersTable();
         }
 
         function showCreateOrder() {
@@ -505,12 +489,12 @@
         }
 
         function showSettings() {
-            // Check if settings page exists
+            // Check if settings.html exists
             window.location.href = './settings.html';
         }
 
         function showReports() {
-            // Check if reports page exists  
+            // Check if reports.html exists
             window.location.href = './reports.html';
         }
 
@@ -528,35 +512,223 @@
                 link.classList.remove('active');
                 if (link.textContent.includes(menuName)) {
                     link.classList.add('active');
+                    sessionStorage.setItem('activeMenu', menuName);
                 }
             });
         }
 
-        // Modal functions
+        // Stock Management Functions
         function showAddItemModal() {
+            document.getElementById('addItemForm').reset();
             const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
             modal.show();
         }
 
+        function saveItem() {
+            const form = document.getElementById('addItemForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const formData = new FormData(form);
+            const item = {
+                id: Date.now(),
+                sku: formData.get('sku'),
+                name: formData.get('name'),
+                category: formData.get('category'),
+                quantity: parseInt(formData.get('quantity'))
+            };
+            
+            let items = JSON.parse(localStorage.getItem('stockItems') || '[]');
+            items.push(item);
+            localStorage.setItem('stockItems', JSON.stringify(items));
+            
+            updateStockTable();
+            bootstrap.Modal.getInstance(document.getElementById('addItemModal')).hide();
+            form.reset();
+            alert('Item saved successfully!');
+        }
+
+        function updateStockTable(items = null) {
+            if (!items) {
+                items = JSON.parse(localStorage.getItem('stockItems') || '[]');
+            }
+            
+            const tbody = document.getElementById('stockTable');
+            tbody.innerHTML = items.map(item => `
+                <tr>
+                    <td>${item.sku}</td>
+                    <td>${item.name}</td>
+                    <td>${item.category}</td>
+                    <td>${item.quantity}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info" onclick="editItem(${item.id})">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteItem(${item.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function searchStock(query) {
+            const items = JSON.parse(localStorage.getItem('stockItems') || '[]');
+            const filtered = items.filter(item => 
+                item.name.toLowerCase().includes(query.toLowerCase()) ||
+                item.sku.toLowerCase().includes(query.toLowerCase()) ||
+                item.category.toLowerCase().includes(query.toLowerCase())
+            );
+            updateStockTable(filtered);
+        }
+
+        function deleteItem(id) {
+            if (!confirm('Are you sure you want to delete this item?')) {
+                return;
+            }
+            
+            let items = JSON.parse(localStorage.getItem('stockItems') || '[]');
+            items = items.filter(item => item.id !== id);
+            localStorage.setItem('stockItems', JSON.stringify(items));
+            updateStockTable();
+            alert('Item deleted successfully!');
+        }
+
+        function editItem(id) {
+            // TODO: Implement edit functionality
+            alert('Edit functionality coming soon!');
+        }
+
+        // User Management Functions
         function showAddUserModal() {
+            document.getElementById('addUserForm').reset();
             const modal = new bootstrap.Modal(document.getElementById('addUserModal'));
             modal.show();
         }
 
-        function saveItem() {
-            alert('Item saved successfully!');
-            bootstrap.Modal.getInstance(document.getElementById('addItemModal')).hide();
-        }
-
         function saveUser() {
-            alert('User saved successfully!');
+            const form = document.getElementById('addUserForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const formData = new FormData(form);
+            const user = {
+                id: Date.now(),
+                username: formData.get('username'),
+                fullname: formData.get('fullname'),
+                email: formData.get('email'),
+                password: formData.get('password'),
+                role: formData.get('role'),
+                status: 'active'
+            };
+            
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            
+            // Check if username already exists
+            if (users.some(u => u.username === user.username)) {
+                alert('Username already exists!');
+                return;
+            }
+            
+            users.push(user);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            updateUsersTable();
             bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+            form.reset();
+            alert('User saved successfully!');
         }
 
-        // Search functions
-        function searchStock(query) {
-            // Implement search functionality
-            console.log('Searching for:', query);
+        function updateUsersTable() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const tbody = document.getElementById('usersTable');
+            
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user.username}</td>
+                    <td>${user.fullname || user.name || 'N/A'}</td>
+                    <td>${user.role}</td>
+                    <td><span class="badge bg-${user.status === 'active' ? 'success' : 'danger'}">${user.status || 'active'}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-info" onclick="editUser(${user.id})">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteUser(id) {
+            if (!confirm('Are you sure you want to delete this user?')) {
+                return;
+            }
+            
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            users = users.filter(user => user.id !== id);
+            localStorage.setItem('users', JSON.stringify(users));
+            updateUsersTable();
+            alert('User deleted successfully!');
+        }
+
+        function editUser(id) {
+            // TODO: Implement edit functionality
+            alert('Edit functionality coming soon!');
+        }
+
+        // Order Management Functions
+        function updateOrdersTable() {
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const tbody = document.getElementById('allOrdersTable');
+            
+            tbody.innerHTML = orders.map(order => `
+                <tr>
+                    <td>${order.orderId}</td>
+                    <td>${order.customer}</td>
+                    <td>${order.product}</td>
+                    <td><span class="badge bg-${getStatusColor(order.status)}">${order.status}</span></td>
+                    <td>${order.date}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary">View</button>
+                        <button class="btn btn-sm btn-info">Edit</button>
+                        <button class="btn btn-sm btn-danger">Cancel</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function searchOrders(query) {
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const filtered = orders.filter(order => 
+                order.orderId.toLowerCase().includes(query.toLowerCase()) ||
+                order.customer.toLowerCase().includes(query.toLowerCase()) ||
+                order.product.toLowerCase().includes(query.toLowerCase())
+            );
+            updateOrdersTable(filtered);
+        }
+
+        function filterOrdersByStatus(status) {
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const filtered = status ? orders.filter(order => order.status === status) : orders;
+            updateOrdersTable(filtered);
+        }
+
+        function getStatusColor(status) {
+            const colors = {
+                'pending': 'warning',
+                'in-progress': 'info',
+                'completed': 'success',
+                'cancelled': 'danger'
+            };
+            return colors[status] || 'secondary';
+        }
+
+        // Dashboard Functions
+        function updateDashboardStats() {
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            
+            document.getElementById('totalOrdersCount').textContent = orders.length;
+            document.getElementById('pendingOrdersCount').textContent = orders.filter(o => o.status === 'pending').length;
+            document.getElementById('inProgressCount').textContent = orders.filter(o => o.status === 'in-progress').length;
+            document.getElementById('completedCount').textContent = orders.filter(o => o.status === 'completed').length;
         }
 
         // Logout
@@ -566,8 +738,36 @@
             window.location.href = './login.html';
         }
 
-        // Initialize
-        window.addEventListener('load', checkAuth);
+        // Initialize data
+        function initializeData() {
+            // Initialize stock items if not exists
+            if (!localStorage.getItem('stockItems')) {
+                const demoItems = [
+                    { id: 1, sku: 'SKU001', name: 'Widget A', category: 'Components', quantity: 150 },
+                    { id: 2, sku: 'SKU002', name: 'Widget B', category: 'Materials', quantity: 75 },
+                    { id: 3, sku: 'SKU003', name: 'Product C', category: 'Finished Products', quantity: 30 }
+                ];
+                localStorage.setItem('stockItems', JSON.stringify(demoItems));
+            }
+
+            // Initialize orders if not exists
+            if (!localStorage.getItem('orders')) {
+                const demoOrders = [
+                    { id: 1, orderId: 'TR20250511A', customer: 'PT. ABC Company', product: 'Custom Packaging', status: 'in-progress', date: '2025-05-11' },
+                    { id: 2, orderId: 'TR20250510B', customer: 'CV. XYZ Corp', product: 'Product Label', status: 'pending', date: '2025-05-10' },
+                    { id: 3, orderId: 'TR20250509C', customer: 'PT. DEF Industries', product: 'Marketing Material', status: 'completed', date: '2025-05-09' }
+                ];
+                localStorage.setItem('orders', JSON.stringify(demoOrders));
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            checkAuth();
+            // Restore active menu
+            const activeMenu = sessionStorage.getItem('activeMenu') || 'Dashboard';
+            showDashboard(); // Show dashboard by default
+        });
     </script>
 </body>
 </html>
